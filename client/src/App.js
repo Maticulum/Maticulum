@@ -1,11 +1,20 @@
 import React, { Component } from "react";
 import SimpleStorageContract from "./contracts/SimpleStorage.json";
 import getWeb3 from "./getWeb3";
+import config from './config';
+
+import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
+import { Button, Nav, Navbar } from 'react-bootstrap';
+
+import Home from './components/Home';
 
 import "./App.css";
 
+
 class App extends Component {
-  state = { storageValue: 0, web3: null, accounts: null, contract: null };
+
+  state = { storageValue: 0, web3: null, networkId: -1, accounts: null, contract: null };
+
 
   componentDidMount = async () => {
     try {
@@ -23,9 +32,21 @@ class App extends Component {
         deployedNetwork && deployedNetwork.address,
       );
 
+      window.ethereum.on('accountsChanged', accounts => {
+        console.log('Accounts changed ', accounts);
+        //window.location.reload();
+        this.setState({ accounts });
+      });
+
+      window.ethereum.on('networkChanged', networkId => {
+        console.log('Network changed ', networkId);
+        //window.location.reload();
+        this.setState({ networkId: parseInt(networkId) });
+      });
+
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
-      this.setState({ web3, accounts, contract: instance }, this.runExample);
+      this.setState({ web3, networkId, accounts, contract: instance }, this.init);
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -35,37 +56,81 @@ class App extends Component {
     }
   };
 
-  runExample = async () => {
-    const { accounts, contract } = this.state;
 
-    // Stores a given value, 5 by default.
-    await contract.methods.set(5).send({ from: accounts[0] });
+  init = async () => {
+    const { networkId, accounts, contract } = this.state;
 
-    // Get the value from the contract to prove it worked.
-    const response = await contract.methods.get().call();
+    if (networkId !== config.NETWORK_ID) {
+      return;
+    }
 
-    // Update state with the result.
-    this.setState({ storageValue: response });
+    // TODO Init ...
   };
 
-  render() {
+
+  ellipsis(s) {
+    return s.substring(0, 6) + '...' + s.substring(s.length - 4, s.length);
+  }
+
+
+  connectPolygon = async () => {
+    const { networkId, web3 } = this.state;
+
+    if (networkId !== config.NETWORK_ID) {
+      const data = [{
+        chainId: config.CHAIN_ID,
+        chainName: config.CHAIN_NAME,
+        nativeCurrency: {
+          name: config.CURRENCY_NAME,
+          symbol: config.CURRENCY_SYMBOL,
+          decimals: 18
+        },
+        rpcUrls: [ config.RPC_URL ],
+        blockExplorerUrls: [ config.EXPLORER_URL ]
+      }];
+  
+      await window.ethereum.request({ method: 'wallet_addEthereumChain', params: data });
+    }
+  }
+
+
+  connectUser = async () => {
+    await window.ethereum.enable();
+  }
+
+
+  render() {  
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
+
+    const { accounts, networkId } = this.state;
+    const polygon = networkId === config.NETWORK_ID;
+    const connected = accounts.length > 0;
+    console.log(accounts, connected);
+
     return (
-      <div className="App">
-        <h1>Good to Go!</h1>
-        <p>Your Truffle Box is installed and ready.</p>
-        <h2>Smart Contract Example</h2>
-        <p>
-          If your contracts compiled and migrated successfully, below will show
-          a stored value of 5 (by default).
-        </p>
-        <p>
-          Try changing the value stored on <strong>line 42</strong> of App.js.
-        </p>
-        <div>The stored value is: {this.state.storageValue}</div>
-      </div>
+      <Router>
+        <Navbar>
+          <Navbar.Brand href='/'>Maticulum</Navbar.Brand>
+          <Navbar.Collapse>
+            <Nav className='mr-auto'>
+              <Nav.Link href={'/'}>Accueil</Nav.Link>
+            </Nav>
+          </Navbar.Collapse>
+          <Navbar.Collapse className="justify-content-end">
+              <Button { ...polygon ? {} : {href: '#'}} variant="outline-info" onClick={this.connectPolygon} >
+                { polygon ? config.NETWORK_NAME : 'Réseau non supporté' }
+              </Button>
+              <Button { ...connected ? {} : {href: '#'}} className="next" variant="outline-primary" onClick={this.connectUser}>
+                { connected ? this.ellipsis(accounts[0]) : 'Connection' }
+              </Button>
+          </Navbar.Collapse>
+        </Navbar>
+        <Switch>
+          <Route exact path='/' component={Home} />
+        </Switch>
+      </Router>
     );
   }
 }
