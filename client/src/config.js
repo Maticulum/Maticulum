@@ -25,10 +25,10 @@ const dev = {
 
 const devRinkeby = {
     NETWORK_ID: 4,
-    NETWORK_NAME: 'Etherum Rinkeby',
+    NETWORK_NAME: 'Ethereum Rinkeby',
 
-    CHAIN_ID: '4',
-    CHAIN_NAME: 'Etherum Rinkeby Testnet',
+    CHAIN_ID: '0x4',
+    CHAIN_NAME: 'Ethereum Rinkeby Testnet',
     CURRENCY_NAME: 'Ether',
     CURRENCY_SYMBOL: 'ETH',
     RPC_URL: 'https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
