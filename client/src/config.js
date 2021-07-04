@@ -23,12 +23,12 @@ const dev = {
     EXPLORER_URL: 'https://matic.network'
 };
 
-const rinkeby = {
+const devRinkeby = {
     NETWORK_ID: 4,
-    NETWORK_NAME: 'Ethereum Rinkeby',
+    NETWORK_NAME: 'Etherum Rinkeby',
 
-    CHAIN_ID: '0x4',
-    CHAIN_NAME: 'Ethereum Rinkeby Testnet',
+    CHAIN_ID: '4',
+    CHAIN_NAME: 'Etherum Rinkeby Testnet',
     CURRENCY_NAME: 'Ether',
     CURRENCY_SYMBOL: 'ETH',
     RPC_URL: 'https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
@@ -53,7 +53,7 @@ const config = {
 
     ...(process.env.REACT_APP_STAGE === 'prod' ? prod :
         (process.env.REACT_APP_STAGE === 'dev' ? dev : 
-        (process.env.REACT_APP_STAGE === 'rinkeby' ? rinkeby : local))),
+		(process.env.REACT_APP_STAGE === 'devRinkeby' ? devRinkeby : local))),
 }
 
 export default config;

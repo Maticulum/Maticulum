@@ -2,12 +2,14 @@ import React, { Component } from "react";
 import SimpleStorageContract from "./contracts/SimpleStorage.json";
 import getWeb3 from "./getWeb3";
 import config from './config';
+import Maticulum from "./contracts/Maticulum.json";
 
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { Button, Nav, Navbar } from 'react-bootstrap';
 
 import Home from './components/Home';
 import Example from './components/Example';
+import Registration from './components/Registration';
 
 import "./App.css";
 
@@ -27,9 +29,9 @@ class App extends Component {
 
       // Get the contract instance.
       const networkId = await web3.eth.net.getId();
-      const deployedNetwork = SimpleStorageContract.networks[networkId];
+      const deployedNetwork = Maticulum.networks[networkId];
       const instance = new web3.eth.Contract(
-        SimpleStorageContract.abi,
+        Maticulum.abi,
         deployedNetwork && deployedNetwork.address,
       );
 
@@ -115,6 +117,7 @@ class App extends Component {
             <Nav className='mr-auto'>
               <Nav.Link href={'/'}>Accueil</Nav.Link>
               <Nav.Link href={'/sample'}>Exemple</Nav.Link>
+			  <Nav.Link href={'/Registration'}>Registration</Nav.Link>
             </Nav>
           </Navbar.Collapse>
           <Navbar.Collapse className="justify-content-end">
@@ -131,6 +134,9 @@ class App extends Component {
           <Route exact path='/sample'>
               <Example web3={this.state.web3} account={this.state.accounts[0]} />
           </Route>
+		  <Route exact path='/Registration' component={Registration}>	
+			<Registration contract={this.state.contract} account={this.state.accounts[0]} />
+		  </Route>
         </Switch>
       </Router>
     );

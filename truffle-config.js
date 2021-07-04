@@ -14,7 +14,7 @@ module.exports = {
       port: 7545,
       network_id: 5777
     },
-    mumbai: {
+     mumbai: {
       provider: () => new HDWalletProvider([ process.env.PRIVATE_KEY ], `https://polygon-mumbai.infura.io/v3/${process.env.INFURA_API_KEY}`),
       network_id: 80001,
       confirmations: 2,
@@ -28,6 +28,15 @@ module.exports = {
       timeoutBlocks: 200,
       skipDryRun: true
     },
+	rinkeby: { 
+      provider: () => new HDWalletProvider([ process.env.PRIVATE_KEY ],`https://rinkeby.infura.io/v3/{process.env.INFURA_API_KEY}`),
+      network_id:    4,       
+      gas:           6721975, 
+      gasPrice: 20000000000,	
+	  confirmations: 2,      
+      timeoutBlocks: 200,     
+      skipDryRun:    true     
+    }, 
   },
 
   compilers: {
