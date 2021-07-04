@@ -9,18 +9,8 @@ class Registration extends Component {
 
         this.contract = props.contract;
         this.account = props.account;
-  }
-	
-<<<<<<< Updated upstream
-  getUser = async() => {	  
-	  const user = await this.contract.methods.getUser().call({from: this.account});
-	  alert(user[0]);
   }	
 
-  registerUser = async() => {	  
-	  await this.contract.methods.register(this.nameUser.value,this.firstnameUser.value).send({from: this.account});
-	  
-=======
   GetUser = async() => {	  
 	  const user = await this.contract.methods.GetUser().call({from: this.account});
 	  this.nameUser.value = user[0];
@@ -28,8 +18,7 @@ class Registration extends Component {
   }	
 
   RegisterUser = async() => {	  
-	  await this.contract.methods.Register(this.nameUser.value,this.firstnameUser.value).send({from: this.account});	  
->>>>>>> Stashed changes
+	  await this.contract.methods.Register(this.nameUser.value,this.firstnameUser.value).send({from: this.account});
   }	
 
   modifyUser = async() => {	  
