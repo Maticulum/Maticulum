@@ -7,7 +7,7 @@ const local = {
     CHAIN_NAME: 'Ganache',
     CURRENCY_NAME: 'Ether',
     CURRENCY_SYMBOL: 'ETH',
-    RPC_URL: 'http://127.0.0.1:7545',
+    RPC_URL: 'http://localhost:7545',
     EXPLORER_URL: ''
 };
 

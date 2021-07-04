@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import SimpleStorageContract from "./contracts/SimpleStorage.json";
 import getWeb3 from "./getWeb3";
 import config from './config';
 import Maticulum from "./contracts/Maticulum.json";
@@ -117,7 +116,7 @@ class App extends Component {
             <Nav className='mr-auto'>
               <Nav.Link href={'/'}>Accueil</Nav.Link>
               <Nav.Link href={'/sample'}>Exemple</Nav.Link>
-			  <Nav.Link href={'/Registration'}>Registration</Nav.Link>
+			        <Nav.Link href={'/registration'}>Registration</Nav.Link>
             </Nav>
           </Navbar.Collapse>
           <Navbar.Collapse className="justify-content-end">
@@ -129,15 +128,17 @@ class App extends Component {
               </Button>
           </Navbar.Collapse>
         </Navbar>
-        <Switch>
-          <Route exact path='/' component={Home} />
-          <Route exact path='/sample'>
-              <Example web3={this.state.web3} account={this.state.accounts[0]} />
-          </Route>
-		  <Route exact path='/Registration' component={Registration}>	
-			<Registration contract={this.state.contract} account={this.state.accounts[0]} />
-		  </Route>
-        </Switch>
+        <div className="main">
+          <Switch>
+            <Route exact path='/' component={Home} />
+            <Route exact path='/sample'>
+                <Example web3={this.state.web3} account={this.state.accounts[0]} />
+            </Route>
+            <Route exact path='/registration'>	
+              <Registration contract={this.state.contract} account={this.state.accounts[0]} />
+            </Route>
+          </Switch>
+          </div>
       </Router>
     );
   }

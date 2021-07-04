@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import Card from 'react-bootstrap/Card';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
+import { Button, Form } from 'react-bootstrap';
+
 
 class Registration extends Component {
 	
@@ -12,41 +11,43 @@ class Registration extends Component {
         this.account = props.account;
   }
 	
-  GetUser = async() => {	  
-	  const user = await this.contract.methods.GetUser().call({from: this.account});
+  getUser = async() => {	  
+	  const user = await this.contract.methods.getUser().call({from: this.account});
 	  alert(user[0]);
   }	
 
-  RegisterUser = async() => {	  
-	  await this.contract.methods.Register(this.nameUser.value,this.firstnameUser.value).send({from: this.account});
+  registerUser = async() => {	  
+	  await this.contract.methods.register(this.nameUser.value,this.firstnameUser.value).send({from: this.account});
 	  
   }	
 
-  ModifyUser = async() => {	  
-	  await this.contract.methods.UpdateUser(this.nameUser.value,this.firstnameUser.value).send({from: this.account});
+  modifyUser = async() => {	  
+	  await this.contract.methods.updateUser(this.nameUser.value,this.firstnameUser.value).send({from: this.account});
 	  
   }	  
 	
   render() {
     return (
-        <div className="App">
-            <h1>Register you</h1>  
-			<Form.Control type="text" id="nameUser"
-				 ref={(input) => { this.nameUser = input }}
-				 />	
-			 <Form.Control type="text" id="firstnameUser"
-			 ref={(input) => { this.firstnameUser = input }}
-			 />	
-			<Card style={{ width: '50rem' }}>				
-				<Button onClick={this.RegisterUser}>Register</Button>
-			</Card>	
-			<Card style={{ width: '50rem' }}>				
-				<Button onClick={this.GetUser}>Get User</Button>
-			</Card>	
-			<Card style={{ width: '50rem' }}>				
-				<Button onClick={this.ModifyUser}>Update User</Button>
-			</Card>	
-        </div>
+      <Form>
+        <h1>Register you</h1>  
+        <Form.Group>
+          <Form.Label>Name</Form.Label>
+          <Form.Control type="text" id="nameUser"
+            ref={(input) => { this.nameUser = input }}
+          />
+        </Form.Group>
+
+        <Form.Group>
+          <Form.Label>First name</Form.Label>
+          <Form.Control type="text" id="firstnameUser"
+            ref={(input) => { this.firstnameUser = input }}
+          />	
+        </Form.Group>
+        
+        <Button onClick={this.registerUser}>Register</Button>
+        <Button className="next" onClick={this.getUser}>Get User</Button>
+        <Button className="next" onClick={this.modifyUser}>Update User</Button>
+      </Form>
     );
   }
 }
