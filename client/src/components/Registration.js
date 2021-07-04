@@ -12,10 +12,19 @@ class Registration extends Component {
         this.account = props.account;
   }
 	
-  RegisterUser = async() => {	  
+  GetUser = async() => {	  
 	  const user = await this.contract.methods.GetUser().call({from: this.account});
 	  alert(user[0]);
-	  alert(user[1]);
+  }	
+
+  RegisterUser = async() => {	  
+	  await this.contract.methods.Register(this.nameUser.value,this.firstnameUser.value).send({from: this.account});
+	  
+  }	
+
+  ModifyUser = async() => {	  
+	  await this.contract.methods.UpdateUser(this.nameUser.value,this.firstnameUser.value).send({from: this.account});
+	  
   }	  
 	
   render() {
@@ -30,6 +39,12 @@ class Registration extends Component {
 			 />	
 			<Card style={{ width: '50rem' }}>				
 				<Button onClick={this.RegisterUser}>Register</Button>
+			</Card>	
+			<Card style={{ width: '50rem' }}>				
+				<Button onClick={this.GetUser}>Get User</Button>
+			</Card>	
+			<Card style={{ width: '50rem' }}>				
+				<Button onClick={this.ModifyUser}>Update User</Button>
 			</Card>	
         </div>
     );
