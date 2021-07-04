@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { Button, Nav, Navbar } from 'react-bootstrap';
 
 import Home from './components/Home';
+import Example from './components/Example';
 
 import "./App.css";
 
@@ -34,13 +35,11 @@ class App extends Component {
 
       window.ethereum.on('accountsChanged', accounts => {
         console.log('Accounts changed ', accounts);
-        //window.location.reload();
         this.setState({ accounts });
       });
 
       window.ethereum.on('networkChanged', networkId => {
         console.log('Network changed ', networkId);
-        //window.location.reload();
         this.setState({ networkId: parseInt(networkId) });
       });
 
@@ -107,7 +106,6 @@ class App extends Component {
     const { accounts, networkId } = this.state;
     const polygon = networkId === config.NETWORK_ID;
     const connected = accounts.length > 0;
-    console.log(accounts, connected);
 
     return (
       <Router>
@@ -116,10 +114,11 @@ class App extends Component {
           <Navbar.Collapse>
             <Nav className='mr-auto'>
               <Nav.Link href={'/'}>Accueil</Nav.Link>
+              <Nav.Link href={'/sample'}>Exemple</Nav.Link>
             </Nav>
           </Navbar.Collapse>
           <Navbar.Collapse className="justify-content-end">
-              <Button { ...polygon ? {} : {href: '#'}} variant="outline-info" onClick={this.connectPolygon} >
+              <Button { ...polygon ? {} : {href: '#'}} variant={ polygon ? "outline-info" : "outline-danger" } onClick={this.connectPolygon} >
                 { polygon ? config.NETWORK_NAME : 'Réseau non supporté' }
               </Button>
               <Button { ...connected ? {} : {href: '#'}} className="next" variant="outline-primary" onClick={this.connectUser}>
@@ -129,6 +128,9 @@ class App extends Component {
         </Navbar>
         <Switch>
           <Route exact path='/' component={Home} />
+          <Route exact path='/sample'>
+              <Example web3={this.state.web3} account={this.state.accounts[0]} />
+          </Route>
         </Switch>
       </Router>
     );

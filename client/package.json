@@ -13,6 +13,7 @@
   },
   "scripts": {
     "start:local": "set \"REACT_APP_STAGE=local\" && react-scripts start",
+    "start:rinkeby": "set \"REACT_APP_STAGE=rinkeby\" && react-scripts start",
     "start": "set \"REACT_APP_STAGE=dev\" && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
