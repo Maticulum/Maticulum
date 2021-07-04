@@ -1,4 +1,4 @@
-const SimpleStorage = artifacts.require("./SimpleStorage.sol");
+const Maticulum = artifacts.require("./Maticulum.sol");
 
 contract("SimpleStorage", accounts => {
   it("...should store the value 89.", async () => {

@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import getWeb3 from "./getWeb3";
+import Web3Context from "./Web3Context";
 import config from './config';
 import Maticulum from "./contracts/Maticulum.json";
 
@@ -7,8 +8,8 @@ import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { Button, Nav, Navbar } from 'react-bootstrap';
 
 import Home from './components/Home';
-import Example from './components/Example';
 import Registration from './components/Registration';
+import School from './components/school/School';
 
 import "./App.css";
 
@@ -109,37 +110,44 @@ class App extends Component {
     const connected = accounts.length > 0;
 
     return (
-      <Router>
-        <Navbar>
-          <Navbar.Brand href='/'>Maticulum</Navbar.Brand>
-          <Navbar.Collapse>
-            <Nav className='mr-auto'>
-              <Nav.Link href={'/'}>Accueil</Nav.Link>
-              <Nav.Link href={'/sample'}>Exemple</Nav.Link>
-			        <Nav.Link href={'/registration'}>Registration</Nav.Link>
-            </Nav>
-          </Navbar.Collapse>
-          <Navbar.Collapse className="justify-content-end">
-              <Button { ...polygon ? {} : {href: '#'}} variant={ polygon ? "outline-info" : "outline-danger" } onClick={this.connectPolygon} >
-                { polygon ? config.NETWORK_NAME : 'Réseau non supporté' }
-              </Button>
-              <Button { ...connected ? {} : {href: '#'}} className="next" variant="outline-primary" onClick={this.connectUser}>
-                { connected ? this.ellipsis(accounts[0]) : 'Connection' }
-              </Button>
-          </Navbar.Collapse>
-        </Navbar>
-        <div className="main">
-          <Switch>
-            <Route exact path='/' component={Home} />
-            <Route exact path='/sample'>
-                <Example web3={this.state.web3} account={this.state.accounts[0]} />
-            </Route>
-            <Route exact path='/registration'>	
-              <Registration contract={this.state.contract} account={this.state.accounts[0]} />
-            </Route>
-          </Switch>
+      <Web3Context.Provider value={{
+        web3: this.state.web3,
+        contract: this.state.contract,
+        account: this.state.accounts[0]
+      }} >
+        <Router>
+          <Navbar>
+            <Navbar.Brand href='/'>Maticulum</Navbar.Brand>
+            <Navbar.Collapse>
+              <Nav className='mr-auto'>
+                <Nav.Link href={'/'}>Accueil</Nav.Link>              
+                <Nav.Link href={'/registration'}>Registration</Nav.Link>
+                <Nav.Link href={'/school'}>Écoles</Nav.Link>
+              </Nav>
+            </Navbar.Collapse>
+            <Navbar.Collapse className="justify-content-end">
+                <Button { ...polygon ? {} : {href: '#'}} variant={ polygon ? "outline-info" : "outline-danger" } onClick={this.connectPolygon} >
+                  { polygon ? config.NETWORK_NAME : 'Réseau non supporté' }
+                </Button>
+                <Button { ...connected ? {} : {href: '#'}} className="next" variant="outline-primary" onClick={this.connectUser}>
+                  { connected ? this.ellipsis(accounts[0]) : 'Connection' }
+                </Button>
+            </Navbar.Collapse>
+          </Navbar>
+
+          <div className="main">
+            <Switch>
+              <Route exact path='/' component={Home} />
+              <Route exact path='/registration'>	
+                <Registration />
+              </Route>
+              <Route path='/school'>
+                  <School />
+              </Route>
+            </Switch>
           </div>
-      </Router>
+        </Router>
+      </Web3Context.Provider>
     );
   }
 }
