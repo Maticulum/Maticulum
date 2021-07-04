@@ -53,10 +53,10 @@ const config = {
 
     ...(process.env.REACT_APP_STAGE === 'prod' ? prod :
         (process.env.REACT_APP_STAGE === 'dev' ? dev : 
-		(process.env.REACT_APP_STAGE === 'devRinkeby' ? devRinkeby : local))),
+		(process.env.REACT_APP_STAGE === 'local' ? local : devRinkeby))),
 }
 
 export default config;
 
-console.log(process.env.REACT_APP_STAGE);
-console.log(config);
+console.log('REACT_APP_STAGE = ', process.env.REACT_APP_STAGE);
+console.log('config = ', config);
