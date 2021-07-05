@@ -21,7 +21,8 @@ import i18n from "./i18n";
 
 class App extends Component {
 
-  state = { storageValue: 0, web3: null, networkId: -1, accounts: null, contract: null };
+  state = { storageValue: 0, web3: null, networkId: -1, accounts: null, contract: null,
+    isCreated:false, isAdmin : false };
 
   componentDidMount = async () => {
     try {
@@ -38,10 +39,19 @@ class App extends Component {
         Maticulum.abi,
         deployedNetwork && deployedNetwork.address,
       );
-
+	  
+      const isCreated = await instance.methods.isRegistered().call({from: accounts[0]});
+      let isAdmin = false;
+      
+      if(isCreated){
+        const user = await instance.methods.getUser().call({from: accounts[0]});
+        isAdmin = user[8];
+      }
+	  
       window.ethereum.on('accountsChanged', accounts => {
         console.log('Accounts changed ', accounts);
         this.setState({ accounts });
+		    this.registered(accounts);
       });
 
       window.ethereum.on('chainChanged', networkId => {
@@ -49,8 +59,10 @@ class App extends Component {
         this.setState({ networkId: parseInt(networkId) });
       });
 
-      // Set web3, accounts, and contract to the state
-      this.setState({ web3, networkId, accounts, contract: instance }, this.init);
+      // Set web3, accounts, and contract to the state, and then proceed with an
+      // example of interacting with the contract's methods.
+      this.setState({ web3, networkId, accounts, contract: instance,isCreated:isCreated}, this.init);
+	  
     } catch (error) {
       alert(`Failed to load web3, accounts, or contract. Check console for details.`,);
       console.error(error);
@@ -60,12 +72,10 @@ class App extends Component {
 
   init = async () => {
     const { networkId, accounts, contract } = this.state;
-
+		
     if (networkId !== config.NETWORK_ID) {
       return;
-    }
-
-    // TODO Init ...
+    }	
   };
 
 
@@ -98,6 +108,13 @@ class App extends Component {
   connectUser = async () => {
     await window.ethereum.enable();
   }
+  
+  registered = async (accounts) => {
+    const { isCreated } = this.state;
+    if(!isCreated) {
+      window.location.assign('/registration');
+    }	
+  }
 
 
   changeLanguage = (lng) => {
@@ -115,7 +132,7 @@ class App extends Component {
     const { accounts, networkId } = this.state;
     const polygon = networkId === config.NETWORK_ID;
     const connected = accounts.length > 0;
-
+	
     return (
       <Web3Context.Provider value={{
         web3: this.state.web3,
@@ -128,9 +145,9 @@ class App extends Component {
             <Navbar.Collapse>
               <Nav className='mr-auto'>
                 <NavLink className="nav-link" exact to={'/'}>{t('nav.home')}</NavLink>
-				        <NavLink className="nav-link" to={'/whitelisted'}>{t('nav.whitelisted')}</NavLink>				
+				        { this.state.isAdmin ? <NavLink className="nav-link" visibility="hidden" href={'/whitelisted'}>{t('nav.whitelisted')}</NavLink> : null}
                 <NavLink className="nav-link" to={'/registration'}>{t('nav.registration')}</NavLink>
-                <NavLink className="nav-link" to={'/schools'}>{t('nav.schools')}</NavLink>
+                { this.state.isAdmin ? <NavLink className="nav-link" to={'/schools/list'}>{t('nav.schools')}</NavLink> : null}
               </Nav>
             </Navbar.Collapse>
             <Navbar.Collapse className="justify-content-end">
@@ -150,13 +167,13 @@ class App extends Component {
           <div className="main">
             <Switch>
               <Route exact path='/' component={Home} />
-			  <Route exact path='/whitelisted'>	
-				<Whitelisted web3={this.state.web3} account={this.state.accounts[0]} />
-			 </Route>
+			        <Route exact path='/whitelisted'>	
+				        <Whitelisted web3={this.state.web3} account={this.state.accounts[0]} />
+			        </Route>
               <Route exact path='/registration'>	
                 <Registration />
               </Route>
-              <Route path='/schools'>
+              <Route path='/schools'> 
                   <School />
               </Route>
             </Switch>

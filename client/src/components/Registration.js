@@ -1,50 +1,54 @@
 import React, { Component } from 'react';
 import { Button, Form } from 'react-bootstrap';
+import Web3Context from "../Web3Context";
 
 
 class Registration extends Component {
-  state = { registeredButtonDisabled:''};	
- 
-  constructor(props) {
-        super(props);
-
-        this.contract = props.contract;
-        this.account = props.account;	
-		this.isRegistered = props.isRegistered;	
-
-		this.onChange = this.onChange.bind(this);		
-  }	
+state = {isRegistered : false} 
+  static contextType = Web3Context; 	
   
   componentDidMount = async () => {
-	if(this.isRegistered){
+	const isRegistered = await this.context.contract.methods.isRegistered().call({from: this.context.account});
+	if(isRegistered){
 	  this.GetThisUser();
-	  this.setState({registeredButtonDisabled : 'true'});
-	  alert(this.state.registeredButtonDisabled);
 	}
+	this.setState({ isRegistered: isRegistered});
   }
 
   GetThisUser = async() => {	  
-	const user = await this.contract.methods.getUser().call({from: this.account});
+	const user = await this.context.contract.methods.getUser().call({from: this.context.account});
+
 	this.nameUser.value = user[0];
 	this.firstnameUser.value = user[1];
-  }	
-  
-  RegisterThisUser = async() => {	
-    await this.contract.methods.Register(this.nameUser.value,this.firstnameUser.value).send({from: this.account}); 	  
+	this.birthCountry.value = user[2];
+	this.birthDate.value = user[3];	
+	this.mail.value = user[5];
+	this.mobile.value = user[6];
+	this.telfixe.value = user[7];
+		
   }	
 
-  modifyUser = async() => {	  
-	await this.contract.methods.UpdateUser(this.nameUser.value,this.firstnameUser.value).send({from: this.account});	  
+  CreateModifyUser = async() => {
+	const { isCreated } = this.state;
+	if(!isCreated){
+		await this.context.contract.methods.userRegister(
+		this.nameUser.value,this.firstnameUser.value,this.birthCountry.value,
+	this.birthDate.value,this.mail.value,this.mobile.value,this.telfixe.value)
+		.send({from: this.context.account});
+		this.state.isCreated = await this.context.contract.methods.isRegistered().call({from:this.context.account});
+	}		
+	else{
+		await this.context.contract.methods.userUpdate(
+		this.nameUser.value,this.firstnameUser.value,this.birthCountry.value,
+		this.birthDate.value,this.mail.value,this.mobile.value,this.telfixe.value)
+		.send({from: this.context.account});
+	}	  
   }	
-  
-  onChange(e) {
-	if(!this.isRegistered){
-		this.setState({ registeredButtonDisabled: e.target.value });	
-	}
-  }
 
-  TestRegistration = async() => {	  
-	alert(this.account);
+  TestRegistration = async() => {
+    const registered = await this.context.contract.methods.isRegistered().call(
+	{from:this.context.account});	  
+	alert(registered);
   }		
 	
   render() {	  
@@ -54,32 +58,54 @@ class Registration extends Component {
         <Form.Group>
           <Form.Label>Name</Form.Label>
           <Form.Control type="text" id="nameUser"
-            ref={(input) => { this.nameUser = input }} 
-			onChange={this.onChange}
+            ref={(input) => { this.nameUser = input }}
           />
         </Form.Group>
 
         <Form.Group>
           <Form.Label>First name</Form.Label>
-          <Form.Control type="text" id="firstnameUser" 
-		  
+          <Form.Control type="text" id="firstnameUser" 		  
             ref={(input) => { this.firstnameUser = input }}
           />	
         </Form.Group>
 		
 		<Form.Group>
-          <Form.Label>Role</Form.Label>
-          <Form.Control type="text" id="firstnameUser" 
-		  
-            ref={(input) => { this.firstnameUser = input }}
+          <Form.Label>Birth country</Form.Label>
+          <Form.Control type="text" id="birthCountry" 		  
+            ref={(input) => { this.birthCountry = input }}
           />	
         </Form.Group>
-        
-        <Button disabled={!this.state.registeredButtonDisabled} className="next" onClick={this.RegisterThisUser}>Register</Button>
-        <Button className="next" onClick={this.GetThisUser}>Get recorded User datas</Button>
-        <Button className="next" onClick={this.modifyUser}>Update User</Button>
 		
-		<Button className="next" onClick={this.TestRegistration}>Is Registered ?</Button>
+		<Form.Group>
+          <Form.Label>Birth date</Form.Label>
+          <Form.Control type="text" id="birthDate" 		  
+            ref={(input) => { this.birthDate = input }}
+          />	
+        </Form.Group>
+		
+		<Form.Group>
+          <Form.Label>Email</Form.Label>
+          <Form.Control type="text" id="mail" 		  
+            ref={(input) => { this.mail = input }}
+          />	
+        </Form.Group>
+		
+		<Form.Group>
+          <Form.Label>Mobile phone</Form.Label>
+          <Form.Control type="text" id="mobile" 		  
+            ref={(input) => { this.mobile = input }}
+          />	
+        </Form.Group>
+		
+		<Form.Group>
+          <Form.Label>Fixed phone name</Form.Label>
+          <Form.Control type="text" id="telfixe"
+            ref={(input) => { this.telfixe = input }}
+          />	
+        </Form.Group>
+                
+        <Button className="next" onClick={this.GetThisUser}>Get recorded User datas</Button>
+        <Button className="next" onClick={this.CreateModifyUser}>Create/Update User</Button>		
       </Form>
     );
   }
