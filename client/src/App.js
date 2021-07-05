@@ -10,6 +10,7 @@ import Maticulum from "./contracts/Maticulum.json";
 import Home from './components/Home';
 import Registration from './components/Registration';
 import School from './components/school/School';
+import Whitelisted from './components/Whitelisted';
 
 import "./App.css";
 
@@ -120,7 +121,8 @@ class App extends Component {
             <Navbar.Brand href='/'>Maticulum</Navbar.Brand>
             <Navbar.Collapse>
               <Nav className='mr-auto'>
-                <NavLink className="nav-link" exact to={'/'}>Accueil</NavLink>              
+                <NavLink className="nav-link" exact to={'/'}>Accueil</NavLink>
+				<Nav.Link href={'/whitelisted'}>Whitelisted</Nav.Link>				
                 <NavLink className="nav-link" to={'/registration'}>Registration</NavLink>
                 <NavLink className="nav-link" to={'/schools/list'}>Écoles</NavLink>
               </Nav>
@@ -138,6 +140,9 @@ class App extends Component {
           <div className="main">
             <Switch>
               <Route exact path='/' component={Home} />
+			  <Route exact path='/whitelisted'>	
+				<Whitelisted web3={this.state.web3} account={this.state.accounts[0]} />
+			 </Route>
               <Route exact path='/registration'>	
                 <Registration />
               </Route>

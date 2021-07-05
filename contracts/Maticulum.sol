@@ -1,54 +1,85 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.4;
 
+import "./Owner.sol";
 
-contract Maticulum {
+contract Maticulum is Owner {
     
-   struct User{
+   enum role{
+       adminUniversity,
+       jury,
+       student
+   } 
+   
+   struct user{
        string name;
        string firstname;
+       string matricule;
+       role userRole;
    }
-
-    struct School {
+   
+   struct School {
         string name;
         address[] validators;
     }
    
-   mapping(address => User) Users;
+   struct data{
+       string name;
+       string firstname;
+   }
+   
+   struct userData{
+       user userInfo;
+       address userAddress;
+   }
+   
+   mapping(address => user) Users;
    mapping(address => bool) UserRegistered;
-
-    School[] public schools;
-    uint256[] schoolsToValidate;
-
-
-    event SchoolAdded(uint256 id, string name);
-    event SchoolUpdated(uint256 id, string name);
-    event SchoolValidated(uint256 id, string name, address validator, uint256 count);
-
    
-   function Register(string memory name, string memory firstname) external{
-       require(!UserRegistered[msg.sender], "user already registered");
-       UserRegistered[msg.sender] = true;
-       Users[msg.sender] = User(name, firstname);
+   School[] public schools;
+   uint256[] schoolsToValidate;
+   
+   event SchoolAdded(uint256 id, string name);
+   event SchoolUpdated(uint256 id, string name);
+   event SchoolValidated(uint256 id, string name, address validator, uint256 count);
+   
+   function whitelist(address userAddress) external isOwner{
+       UserRegistered[userAddress] = true;
+       Users[userAddress] = user('','','', role.adminUniversity);
    }
    
-   function GetUser() external view returns( User memory){
+   function whitelistByAdmin(address userAddress, role userRole) external{
        require(UserRegistered[msg.sender], "user not registered");
-       return Users[msg.sender];
+       user memory u = Users[msg.sender];
+       require(u.userRole == role.adminUniversity, "user not registered");
+       UserRegistered[userAddress] = true;
+       Users[userAddress] = user('','','', userRole);
    }
    
-   function UpdateUser(string memory name, string memory firstname) external{
+   function whitelistByAdmin(userData[] memory userDatas) external{
+       for (uint i=0; i<userDatas.length; i++) {
+            userData memory u = userDatas[i];
+            Users[u.userAddress] = user('','',u.userInfo.matricule,u.userInfo.userRole);
+            UserRegistered[u.userAddress] = true;
+        }
+   }
+   
+   function userModifications(string memory name, string memory firstname) external{
        require(UserRegistered[msg.sender], "user not registered");
        Users[msg.sender].name = name;
        Users[msg.sender].firstname = firstname;
    }
    
-   function isRegistered() external view returns (bool){
+   function getUser() external view returns(user memory){
+       require(UserRegistered[msg.sender], "user not registered");
+       return Users[msg.sender];
+   }
+   
+   function isRegistered() external view returns(bool){
        return UserRegistered[msg.sender];
    }
-
-
-    function addSchool(string memory _name) external /* only(Admin) */ returns (uint256) {
+   
+   function addSchool(string memory _name) external /* only(Admin) */ returns (uint256) {
         address[] memory validators = new address[](1);
         validators[0] = msg.sender;
         schools.push(School(_name, validators));
@@ -114,5 +145,4 @@ contract Maticulum {
             needValidation[i] = schools[schoolsToValidate[i]];
         }
     }
-
 }
