@@ -17,7 +17,8 @@ import "./App.css";
 
 class App extends Component {
 
-  state = { storageValue: 0, web3: null, networkId: -1, accounts: null, contract: null };
+  state = { storageValue: 0, web3: null, networkId: -1, accounts: null, contract: null,
+  isRegistered:false, roleUser : null};
 
 
   componentDidMount = async () => {
@@ -35,10 +36,20 @@ class App extends Component {
         Maticulum.abi,
         deployedNetwork && deployedNetwork.address,
       );
+	  
+	  const isRegistered = await instance.methods.isRegistered().call({from: accounts[0]});
+	  
+	  let roleUser = -1;
+	  
+	  if(isRegistered){		  
+		const user = await instance.methods.getUser().call({from: accounts[0]});
+		roleUser = user[3];
+	  }
 
       window.ethereum.on('accountsChanged', accounts => {
         console.log('Accounts changed ', accounts);
         this.setState({ accounts });
+		this.registered(accounts);
       });
 
       window.ethereum.on('chainChanged', networkId => {
@@ -48,7 +59,8 @@ class App extends Component {
 
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
-      this.setState({ web3, networkId, accounts, contract: instance }, this.init);
+      this.setState({ web3, networkId, accounts, contract: instance, roleUser:roleUser,
+	  isRegistered:isRegistered}, this.init);
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -61,12 +73,10 @@ class App extends Component {
 
   init = async () => {
     const { networkId, accounts, contract } = this.state;
-
+		
     if (networkId !== config.NETWORK_ID) {
       return;
     }
-
-    // TODO Init ...
   };
 
 
@@ -99,6 +109,12 @@ class App extends Component {
   connectUser = async () => {
     await window.ethereum.enable();
   }
+  
+  registered = async (accounts) => {
+	const { contract } = this.state;
+	this.state.isRegistered = await contract.methods.isRegistered().call({from: accounts[0]});
+	window.location.assign('/');		
+  }
 
 
   render() {  
@@ -109,6 +125,10 @@ class App extends Component {
     const { accounts, networkId } = this.state;
     const polygon = networkId === config.NETWORK_ID;
     const connected = accounts.length > 0;
+	
+	if(!this.state.isRegistered){
+		return <div>Contact admin to be registered...</div>;
+	}
 
     return (
       <Web3Context.Provider value={{
@@ -122,7 +142,7 @@ class App extends Component {
             <Navbar.Collapse>
               <Nav className='mr-auto'>
                 <NavLink className="nav-link" exact to={'/'}>Accueil</NavLink>
-				<Nav.Link href={'/whitelisted'}>Whitelisted</Nav.Link>				
+				{ this.state.roleUser == 0 ? <Nav.Link visibility="hidden" href={'/whitelisted'}>Whitelisted</Nav.Link>	: null}			
                 <NavLink className="nav-link" to={'/registration'}>Registration</NavLink>
                 <NavLink className="nav-link" to={'/schools/list'}>Écoles</NavLink>
               </Nav>

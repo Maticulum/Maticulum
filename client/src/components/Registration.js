@@ -1,40 +1,41 @@
 import React, { Component } from 'react';
 import { Button, Form } from 'react-bootstrap';
+import Web3Context from "../Web3Context";
 
 
 class Registration extends Component {
-  state = { registeredButtonDisabled:''};	
- 
-  constructor(props) {
-        super(props);
-
-        this.contract = props.contract;
-        this.account = props.account;	
-		this.isRegistered = props.isRegistered;	
-
-		this.onChange = this.onChange.bind(this);		
-  }	
+  static contextType = Web3Context; 	
   
   componentDidMount = async () => {
-	if(this.isRegistered){
+	const isRegistered = await this.context.contract.methods.isRegistered().call({from: this.context.account});
+	if(isRegistered){
 	  this.GetThisUser();
-	  this.setState({registeredButtonDisabled : 'true'});
-	  alert(this.state.registeredButtonDisabled);
 	}
   }
 
   GetThisUser = async() => {	  
-	const user = await this.contract.methods.getUser().call({from: this.account});
+	const user = await this.context.contract.methods.getUser().call({from: this.context.account});
 	this.nameUser.value = user[0];
 	this.firstnameUser.value = user[1];
+	const idRole = user[3];
+	
+	this.getRole(idRole);	
   }	
   
-  RegisterThisUser = async() => {	
-    await this.contract.methods.Register(this.nameUser.value,this.firstnameUser.value).send({from: this.account}); 	  
-  }	
+  getRole(idRole) {	
+	 if(idRole == 0){
+	  this.roleUser.value = "Administrator";
+	}
+	else if(idRole == 1){
+	  this.roleUser.value = "Jury";
+	}
+	else if(idRole == 2){
+	  this.roleUser.value = "Student";
+	} 
+  }  
 
   modifyUser = async() => {	  
-	await this.contract.methods.UpdateUser(this.nameUser.value,this.firstnameUser.value).send({from: this.account});	  
+	await this.context.contract.methods.userModifications(this.nameUser.value,this.firstnameUser.value).send({from: this.context.account});	  
   }	
   
   onChange(e) {
@@ -43,8 +44,10 @@ class Registration extends Component {
 	}
   }
 
-  TestRegistration = async() => {	  
-	alert(this.account);
+  TestRegistration = async() => {
+    const registered = await this.context.contract.methods.isRegistered().call(
+	{from:this.context.account});	  
+	alert(registered);
   }		
 	
   render() {	  
@@ -54,8 +57,7 @@ class Registration extends Component {
         <Form.Group>
           <Form.Label>Name</Form.Label>
           <Form.Control type="text" id="nameUser"
-            ref={(input) => { this.nameUser = input }} 
-			onChange={this.onChange}
+            ref={(input) => { this.nameUser = input }}
           />
         </Form.Group>
 
@@ -69,17 +71,14 @@ class Registration extends Component {
 		
 		<Form.Group>
           <Form.Label>Role</Form.Label>
-          <Form.Control type="text" id="firstnameUser" 
-		  
-            ref={(input) => { this.firstnameUser = input }}
+          <Form.Control type="text" id="roleUser" 
+		    disabled="true"
+            ref={(input) => { this.roleUser = input }}
           />	
         </Form.Group>
-        
-        <Button disabled={!this.state.registeredButtonDisabled} className="next" onClick={this.RegisterThisUser}>Register</Button>
+                
         <Button className="next" onClick={this.GetThisUser}>Get recorded User datas</Button>
-        <Button className="next" onClick={this.modifyUser}>Update User</Button>
-		
-		<Button className="next" onClick={this.TestRegistration}>Is Registered ?</Button>
+        <Button className="next" onClick={this.modifyUser}>Update User</Button>		
       </Form>
     );
   }
