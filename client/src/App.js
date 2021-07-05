@@ -18,7 +18,7 @@ import "./App.css";
 class App extends Component {
 
   state = { storageValue: 0, web3: null, networkId: -1, accounts: null, contract: null,
-  isRegistered:false, roleUser : null};
+  isCreated:false, isAdmin : false };
 
 
   componentDidMount = async () => {
@@ -37,15 +37,14 @@ class App extends Component {
         deployedNetwork && deployedNetwork.address,
       );
 	  
-	  const isRegistered = await instance.methods.isRegistered().call({from: accounts[0]});
+	  const isCreated = await instance.methods.isRegistered().call({from: accounts[0]});
+	  let isAdmin = false;
 	  
-	  let roleUser = -1;
-	  
-	  if(isRegistered){		  
-		const user = await instance.methods.getUser().call({from: accounts[0]});
-		roleUser = user[3];
+	  if(isCreated){
+		  const user = await instance.methods.getUser().call({from: accounts[0]});
+		  isAdmin = user[8];
 	  }
-
+	  
       window.ethereum.on('accountsChanged', accounts => {
         console.log('Accounts changed ', accounts);
         this.setState({ accounts });
@@ -59,8 +58,8 @@ class App extends Component {
 
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
-      this.setState({ web3, networkId, accounts, contract: instance, roleUser:roleUser,
-	  isRegistered:isRegistered}, this.init);
+      this.setState({ web3, networkId, accounts, contract: instance,isCreated:isCreated}, this.init);
+	  
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -76,7 +75,7 @@ class App extends Component {
 		
     if (networkId !== config.NETWORK_ID) {
       return;
-    }
+    }	
   };
 
 
@@ -111,9 +110,10 @@ class App extends Component {
   }
   
   registered = async (accounts) => {
-	const { contract } = this.state;
-	this.state.isRegistered = await contract.methods.isRegistered().call({from: accounts[0]});
-	window.location.assign('/');		
+	const { isCreated } = this.state;
+	if(!isCreated) {
+		window.location.assign('/registration');
+	}	
   }
 
 
@@ -121,15 +121,11 @@ class App extends Component {
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
-
+	
     const { accounts, networkId } = this.state;
     const polygon = networkId === config.NETWORK_ID;
     const connected = accounts.length > 0;
 	
-	if(!this.state.isRegistered){
-		return <div>Contact admin to be registered...</div>;
-	}
-
     return (
       <Web3Context.Provider value={{
         web3: this.state.web3,
@@ -142,9 +138,9 @@ class App extends Component {
             <Navbar.Collapse>
               <Nav className='mr-auto'>
                 <NavLink className="nav-link" exact to={'/'}>Accueil</NavLink>
-				{ this.state.roleUser == 0 ? <Nav.Link visibility="hidden" href={'/whitelisted'}>Whitelisted</Nav.Link>	: null}			
+				{ this.state.isAdmin ? <Nav.Link visibility="hidden" href={'/whitelisted'}>Whitelisted</Nav.Link>	: null}			
                 <NavLink className="nav-link" to={'/registration'}>Registration</NavLink>
-                <NavLink className="nav-link" to={'/schools/list'}>Écoles</NavLink>
+                {this.state.isAdmin ? <NavLink className="nav-link" to={'/schools/list'}>Écoles</NavLink>: null}
               </Nav>
             </Navbar.Collapse>
             <Navbar.Collapse className="justify-content-end">
@@ -166,9 +162,9 @@ class App extends Component {
               <Route exact path='/registration'>	
                 <Registration />
               </Route>
-              <Route path='/schools'>
+              <Route path='/schools'> 
                   <School />
-              </Route>
+              </Route> : null};
             </Switch>
           </div>
         </Router>

@@ -4,6 +4,7 @@ import Web3Context from "../Web3Context";
 
 
 class Registration extends Component {
+state = {isRegistered : false} 
   static contextType = Web3Context; 	
   
   componentDidMount = async () => {
@@ -11,38 +12,38 @@ class Registration extends Component {
 	if(isRegistered){
 	  this.GetThisUser();
 	}
+	this.setState({ isRegistered: isRegistered});
   }
 
   GetThisUser = async() => {	  
 	const user = await this.context.contract.methods.getUser().call({from: this.context.account});
+
 	this.nameUser.value = user[0];
 	this.firstnameUser.value = user[1];
-	const idRole = user[3];
-	
-	this.getRole(idRole);	
+	this.birthCountry.value = user[2];
+	this.birthDate.value = user[3];	
+	this.mail.value = user[5];
+	this.mobile.value = user[6];
+	this.telfixe.value = user[7];
+		
   }	
-  
-  getRole(idRole) {	
-	 if(idRole == 0){
-	  this.roleUser.value = "Administrator";
-	}
-	else if(idRole == 1){
-	  this.roleUser.value = "Jury";
-	}
-	else if(idRole == 2){
-	  this.roleUser.value = "Student";
-	} 
-  }  
 
-  modifyUser = async() => {	  
-	await this.context.contract.methods.userModifications(this.nameUser.value,this.firstnameUser.value).send({from: this.context.account});	  
+  CreateModifyUser = async() => {
+	const { isCreated } = this.state;
+	if(!isCreated){
+		await this.context.contract.methods.userRegister(
+		this.nameUser.value,this.firstnameUser.value,this.birthCountry.value,
+	this.birthDate.value,this.mail.value,this.mobile.value,this.telfixe.value)
+		.send({from: this.context.account});
+		this.state.isCreated = await this.context.contract.methods.isRegistered().call({from:this.context.account});
+	}		
+	else{
+		await this.context.contract.methods.userUpdate(
+		this.nameUser.value,this.firstnameUser.value,this.birthCountry.value,
+		this.birthDate.value,this.mail.value,this.mobile.value,this.telfixe.value)
+		.send({from: this.context.account});
+	}	  
   }	
-  
-  onChange(e) {
-	if(!this.isRegistered){
-		this.setState({ registeredButtonDisabled: e.target.value });	
-	}
-  }
 
   TestRegistration = async() => {
     const registered = await this.context.contract.methods.isRegistered().call(
@@ -63,22 +64,48 @@ class Registration extends Component {
 
         <Form.Group>
           <Form.Label>First name</Form.Label>
-          <Form.Control type="text" id="firstnameUser" 
-		  
+          <Form.Control type="text" id="firstnameUser" 		  
             ref={(input) => { this.firstnameUser = input }}
           />	
         </Form.Group>
 		
 		<Form.Group>
-          <Form.Label>Role</Form.Label>
-          <Form.Control type="text" id="roleUser" 
-		    disabled="true"
-            ref={(input) => { this.roleUser = input }}
+          <Form.Label>Birth country</Form.Label>
+          <Form.Control type="text" id="birthCountry" 		  
+            ref={(input) => { this.birthCountry = input }}
+          />	
+        </Form.Group>
+		
+		<Form.Group>
+          <Form.Label>Birth date</Form.Label>
+          <Form.Control type="text" id="birthDate" 		  
+            ref={(input) => { this.birthDate = input }}
+          />	
+        </Form.Group>
+		
+		<Form.Group>
+          <Form.Label>Email</Form.Label>
+          <Form.Control type="text" id="mail" 		  
+            ref={(input) => { this.mail = input }}
+          />	
+        </Form.Group>
+		
+		<Form.Group>
+          <Form.Label>Mobile phone</Form.Label>
+          <Form.Control type="text" id="mobile" 		  
+            ref={(input) => { this.mobile = input }}
+          />	
+        </Form.Group>
+		
+		<Form.Group>
+          <Form.Label>Fixed phone name</Form.Label>
+          <Form.Control type="text" id="telfixe"
+            ref={(input) => { this.telfixe = input }}
           />	
         </Form.Group>
                 
         <Button className="next" onClick={this.GetThisUser}>Get recorded User datas</Button>
-        <Button className="next" onClick={this.modifyUser}>Update User</Button>		
+        <Button className="next" onClick={this.CreateModifyUser}>Create/Update User</Button>		
       </Form>
     );
   }

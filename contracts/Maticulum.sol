@@ -4,18 +4,17 @@ pragma solidity 0.8.4;
 import "./Owner.sol";
 
 contract Maticulum is Owner {
-    
-   enum role{
-       adminUniversity,
-       jury,
-       student
-   } 
-   
+  
    struct user{
        string name;
        string firstname;
+       string birthCountry;
+       string birthDate;
        string matricule;
-       role userRole;
+       string mail;
+       string mobile;
+       string telfixe;
+       bool isAdmin;
    }
    
    struct School {
@@ -23,60 +22,50 @@ contract Maticulum is Owner {
         address[] validators;
     }
    
-   struct data{
-       string name;
-       string firstname;
-   }
-   
-   struct userData{
-       user userInfo;
-       address userAddress;
-   }
-   
    mapping(address => user) Users;
-   mapping(address => bool) UserRegistered;
+   mapping(address => bool) UserIsCreated;
+   mapping(address => bool) UserIsRegistered;
+   address firstAdminUniveristy;
+   bool hasAdmin;
    
    School[] public schools;
    uint256[] schoolsToValidate;
+   
+   event UserCreated(address userAdress);
    
    event SchoolAdded(uint256 id, string name);
    event SchoolUpdated(uint256 id, string name);
    event SchoolValidated(uint256 id, string name, address validator, uint256 count);
    
-   function whitelist(address userAddress) external isOwner{
-       UserRegistered[userAddress] = true;
-       Users[userAddress] = user('','','', role.adminUniversity);
+   function setUserAdmin(address userAdress) external isOwner{
+       Users[userAdress].isAdmin = true;
    }
    
-   function whitelistByAdmin(address userAddress, role userRole) external{
-       require(UserRegistered[msg.sender], "user not registered");
-       user memory u = Users[msg.sender];
-       require(u.userRole == role.adminUniversity, "user not registered");
-       UserRegistered[userAddress] = true;
-       Users[userAddress] = user('','','', userRole);
+   function userRegister(string memory name, string memory firstname, string memory birthCountry, string memory birthDate,
+   string memory mail, string memory telfixe, string memory mobile) external {
+       UserIsCreated[msg.sender] = true;
+       userUpdate(name, firstname,mail, telfixe, mobile, birthCountry, birthDate);
    }
    
-   function whitelistByAdmin(userData[] memory userDatas) external{
-       for (uint i=0; i<userDatas.length; i++) {
-            userData memory u = userDatas[i];
-            Users[u.userAddress] = user('','',u.userInfo.matricule,u.userInfo.userRole);
-            UserRegistered[u.userAddress] = true;
-        }
-   }
-   
-   function userModifications(string memory name, string memory firstname) external{
-       require(UserRegistered[msg.sender], "user not registered");
+   function userUpdate(string memory name, string memory firstname, string memory birthCountry, string memory birthDate,
+   string memory mail, string memory telfixe, string memory mobile) public{
+       require(UserIsCreated[msg.sender], "user not created");
        Users[msg.sender].name = name;
        Users[msg.sender].firstname = firstname;
-   }
+       Users[msg.sender].birthCountry = birthCountry;
+       Users[msg.sender].birthDate = birthDate;
+       Users[msg.sender].mail = mail;
+       Users[msg.sender].telfixe = telfixe;
+       Users[msg.sender].mobile = mobile;
+    }
    
    function getUser() external view returns(user memory){
-       require(UserRegistered[msg.sender], "user not registered");
+       require(UserIsCreated[msg.sender], "user not created");
        return Users[msg.sender];
    }
    
    function isRegistered() external view returns(bool){
-       return UserRegistered[msg.sender];
+       return UserIsCreated[msg.sender];
    }
    
    function addSchool(string memory _name) external /* only(Admin) */ returns (uint256) {
