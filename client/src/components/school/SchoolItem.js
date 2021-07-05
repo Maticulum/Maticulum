@@ -23,8 +23,7 @@ class SchoolItem extends Component {
             console.log('School=', school);
             this.setState({ editedName: school.name, school: {
                 id: id,
-                name: school.name,
-                validators: school.validators
+                ...school
             } });
             console.log(this.state.school);
         }
@@ -45,7 +44,8 @@ class SchoolItem extends Component {
         }
         else {
             await this.context.contract.methods.updateSchool(this.state.school.id, this.state.editedName).send({ from: this.context.account });
-            window.location.reload();
+            this.props.history.push('/temp');
+            this.props.history.replace(`/schools/${this.state.school.id}`);
         }
     }
 

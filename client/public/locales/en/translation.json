@@ -1,0 +1,18 @@
+{
+    "nav": {
+        "home": "Home",
+        "whitelisted": "Whitelisted",
+        "registration": "Registration",
+        "schools": "Schools"
+    },
+    "button": {
+        "add": "Add new",
+        "edit": "Edit",
+        "validate": "Validate"
+    },
+    "table": {
+        "name": "Name",
+        "validated": "Validated",
+        "action": "Action"
+    }
+}

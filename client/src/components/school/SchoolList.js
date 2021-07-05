@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import { Button, Container, Row, Table } from 'react-bootstrap';
+import { withTranslation } from "react-i18next";
+
 
 import Web3Context from '../../Web3Context';
 
@@ -39,9 +41,11 @@ class SchoolList extends Component {
     this.props.history.push('/schools/new')
   }
 
+
   onValidate = async (id) => {
     await this.context.contract.methods.validateSchool(id).send({from: this.context.account});
-    window.location.reload();
+    this.props.history.push('/temp');
+    this.props.history.replace('/schools/list');
   }
 
 
@@ -50,10 +54,12 @@ class SchoolList extends Component {
       return <div>Loading...</div>;
     }    
 
+    const { t } = this.props;
+
     return (
       <Container>
         <Row className="main">
-          <Button onClick={ this.onNewSchool } >Ajouter</Button>
+          <Button onClick={ this.onNewSchool }>{t('button.add')}</Button>
         </Row>
 
         <Row>
@@ -61,9 +67,9 @@ class SchoolList extends Component {
             <thead>
               <tr>
                 <th>#</th>
-                <th>Nom</th>
-                <th>Validée</th>
-                <th>Action</th>
+                <th>{t('table.name')}</th>
+                <th>{t('table.validated')}</th>
+                <th>{t('table.action')}</th>
               </tr>
             </thead>
             <tbody>
@@ -73,14 +79,14 @@ class SchoolList extends Component {
                   <td>{ school.name }</td>
                   <td>
                     { school.validators.length >= 3 ?
-                     (<i class="bi bi-check2-all" style={{color:'green'}}></i>) :
+                     (<i className="bi bi-check2-all" style={{color:'green'}}></i>) :
                      (school.validators.length + ' / 3')
                     }
                   </td>
                   <td valign="top">
-                    <Link to={`/schools/${school.id}`}><i className="bi bi-pencil-square"></i>Editer</Link>
+                    <Link to={`/schools/${school.id}`}><i className="bi bi-pencil-square"></i>{t('button.edit')}</Link>
                     { !school.validators.includes(this.context.account) &&
-                      (<a href="#" onClick={() => this.onValidate(school.id)} className="next"><i className="bi bi-check-square"></i>Valider</a>)
+                      (<a href="" onClick={() => this.onValidate(school.id)} className="next"><i className="bi bi-check-square"></i>{t('button.edit')}</a>)
                     }
                   </td>
                 </tr>
@@ -93,4 +99,4 @@ class SchoolList extends Component {
   }
 }
 
-export default withRouter(SchoolList);
+export default withTranslation()(withRouter(SchoolList));

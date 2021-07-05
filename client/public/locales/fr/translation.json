@@ -1,0 +1,18 @@
+{
+    "nav": {
+        "home": "Accueil",
+        "whitelisted": "Liste blanche",
+        "registration": "Enregistrement",
+        "schools": "Écoles"
+    },
+    "button": {
+        "add": "Ajouter",
+        "edit": "Editer",
+        "validate": "Valider"
+    },
+    "table": {
+        "name": "Nom",
+        "validated": "Validée",
+        "action": "Action"
+    }
+}

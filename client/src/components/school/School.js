@@ -16,7 +16,7 @@ class School extends Component {
 
     return (
       <Switch>
-          <Route exact path={`${path}/list`}>
+          <Route exact path={`${path}`}>
             <SchoolList />
           </Route>
           <Route path={`${path}/:schoolId`}>

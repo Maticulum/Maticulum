@@ -1,11 +1,14 @@
 import React, { Component } from "react";
 import { BrowserRouter as Router, NavLink, Switch, Route } from 'react-router-dom';
-import { Button, Nav, Navbar } from 'react-bootstrap';
+import { Button, Nav, Navbar, NavDropdown } from 'react-bootstrap';
+import { withTranslation } from "react-i18next";
 
 import getWeb3 from "./getWeb3";
 import Web3Context from "./Web3Context";
 import config from './config';
 import Maticulum from "./contracts/Maticulum.json";
+
+import './i18n';
 
 import Home from './components/Home';
 import Registration from './components/Registration';
@@ -13,12 +16,12 @@ import School from './components/school/School';
 import Whitelisted from './components/Whitelisted';
 
 import "./App.css";
+import i18n from "./i18n";
 
 
 class App extends Component {
 
   state = { storageValue: 0, web3: null, networkId: -1, accounts: null, contract: null };
-
 
   componentDidMount = async () => {
     try {
@@ -46,14 +49,10 @@ class App extends Component {
         this.setState({ networkId: parseInt(networkId) });
       });
 
-      // Set web3, accounts, and contract to the state, and then proceed with an
-      // example of interacting with the contract's methods.
+      // Set web3, accounts, and contract to the state
       this.setState({ web3, networkId, accounts, contract: instance }, this.init);
     } catch (error) {
-      // Catch any errors for any of the above operations.
-      alert(
-        `Failed to load web3, accounts, or contract. Check console for details.`,
-      );
+      alert(`Failed to load web3, accounts, or contract. Check console for details.`,);
       console.error(error);
     }
   };
@@ -76,7 +75,7 @@ class App extends Component {
 
 
   connectPolygon = async () => {
-    const { networkId, web3 } = this.state;
+    const { networkId } = this.state;
 
     if (networkId !== config.NETWORK_ID) {
       const data = [{
@@ -101,10 +100,17 @@ class App extends Component {
   }
 
 
+  changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+  }
+
+
   render() {  
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
+
+    const { t } = this.props;
 
     const { accounts, networkId } = this.state;
     const polygon = networkId === config.NETWORK_ID;
@@ -121,10 +127,10 @@ class App extends Component {
             <Navbar.Brand href='/'>Maticulum</Navbar.Brand>
             <Navbar.Collapse>
               <Nav className='mr-auto'>
-                <NavLink className="nav-link" exact to={'/'}>Accueil</NavLink>
-				<Nav.Link href={'/whitelisted'}>Whitelisted</Nav.Link>				
-                <NavLink className="nav-link" to={'/registration'}>Registration</NavLink>
-                <NavLink className="nav-link" to={'/schools/list'}>Écoles</NavLink>
+                <NavLink className="nav-link" exact to={'/'}>{t('nav.home')}</NavLink>
+				        <NavLink className="nav-link" to={'/whitelisted'}>{t('nav.whitelisted')}</NavLink>				
+                <NavLink className="nav-link" to={'/registration'}>{t('nav.registration')}</NavLink>
+                <NavLink className="nav-link" to={'/schools'}>{t('nav.schools')}</NavLink>
               </Nav>
             </Navbar.Collapse>
             <Navbar.Collapse className="justify-content-end">
@@ -134,6 +140,10 @@ class App extends Component {
                 <Button { ...connected ? {} : {href: '#'}} className="next" variant="outline-primary" onClick={this.connectUser}>
                   { connected ? this.ellipsis(accounts[0]) : 'Connection' }
                 </Button>
+                <NavDropdown title={i18n.language.toUpperCase()} id="language">
+                  <NavDropdown.Item onClick={() => this.changeLanguage('en')}>EN</NavDropdown.Item>
+                  <NavDropdown.Item onClick={() => this.changeLanguage('fr')}>FR</NavDropdown.Item>
+                </NavDropdown>
             </Navbar.Collapse>
           </Navbar>
 
@@ -157,4 +167,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default withTranslation()(App);
