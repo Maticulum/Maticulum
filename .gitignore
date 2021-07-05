@@ -1,4 +1,4 @@
 node_modules
 .env
 *.log
-src/contracts/*.json
+client/src/contracts/*.json
