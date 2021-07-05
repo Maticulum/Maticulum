@@ -39,13 +39,9 @@ class SchoolList extends Component {
     this.props.history.push('/schools/new')
   }
 
-
-  getValidationStatus = (validators) => {
-    if (validators.length >= 3) {
-      return 'Oui';
-    }
-    
-    return `Non (${validators.length} / 3)`;
+  onValidate = async (id) => {
+    await this.context.contract.methods.validateSchool(id).send({from: this.context.account});
+    window.location.reload();
   }
 
 
@@ -75,10 +71,17 @@ class SchoolList extends Component {
                 <tr key={school.id}>
                   <td>{ school.id }</td>
                   <td>{ school.name }</td>
-                  <td>{this.getValidationStatus(school.validators)}</td>
+                  <td>
+                    { school.validators.length >= 3 ?
+                     (<i class="bi bi-check2-all" style={{color:'green'}}></i>) :
+                     (school.validators.length + ' / 3')
+                    }
+                  </td>
                   <td valign="top">
                     <Link to={`/schools/${school.id}`}><i className="bi bi-pencil-square"></i>Editer</Link>
-                    <Link to={'#'} className="next"><i className="bi bi-check-square"></i>Valider</Link>
+                    { !school.validators.includes(this.context.account) &&
+                      (<a href="#" onClick={() => this.onValidate(school.id)} className="next"><i className="bi bi-check-square"></i>Valider</a>)
+                    }
                   </td>
                 </tr>
               ))}

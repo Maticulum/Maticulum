@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { BrowserRouter as Router, NavLink, Switch, Route } from 'react-router-dom';
 import { Button, Nav, Navbar } from 'react-bootstrap';
 
 import getWeb3 from "./getWeb3";
@@ -40,8 +40,8 @@ class App extends Component {
         this.setState({ accounts });
       });
 
-      window.ethereum.on('networkChanged', networkId => {
-        console.log('Network changed ', networkId);
+      window.ethereum.on('chainChanged', networkId => {
+        console.log('Chain changed ', networkId);
         this.setState({ networkId: parseInt(networkId) });
       });
 
@@ -120,9 +120,9 @@ class App extends Component {
             <Navbar.Brand href='/'>Maticulum</Navbar.Brand>
             <Navbar.Collapse>
               <Nav className='mr-auto'>
-                <Nav.Link href={'/'}>Accueil</Nav.Link>              
-                <Nav.Link href={'/registration'}>Registration</Nav.Link>
-                <Nav.Link href={'/schools/list'}>Écoles</Nav.Link>
+                <NavLink className="nav-link" exact to={'/'}>Accueil</NavLink>              
+                <NavLink className="nav-link" to={'/registration'}>Registration</NavLink>
+                <NavLink className="nav-link" to={'/schools/list'}>Écoles</NavLink>
               </Nav>
             </Navbar.Collapse>
             <Navbar.Collapse className="justify-content-end">
