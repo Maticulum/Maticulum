@@ -12,23 +12,17 @@ class School extends Component {
   static contextType = Web3Context;
 
   render() {
-    console.log('ACCOUNT = ', this.context.account);
-    console.log(this.props.match);
     const path = this.props.match.path;
 
     return (
-      
-        <div>
-            SCHOOL
-          <Switch>
-              <Route exact path={path}>
-                <SchoolList />
-              </Route>
-              <Route path={`${path}/:schoolId`}>
-                <SchoolItem />
-              </Route>
-          </Switch>
-        </div>
+      <Switch>
+          <Route exact path={`${path}/list`}>
+            <SchoolList />
+          </Route>
+          <Route path={`${path}/:schoolId`}>
+            <SchoolItem />
+          </Route>
+      </Switch>
     );
   }
 }

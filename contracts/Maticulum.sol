@@ -17,7 +17,7 @@ contract Maticulum {
    mapping(address => User) Users;
    mapping(address => bool) UserRegistered;
 
-    School[] schools;
+    School[] public schools;
     uint256[] schoolsToValidate;
 
 
@@ -43,21 +43,21 @@ contract Maticulum {
        Users[msg.sender].firstname = firstname;
    }
    
-   function isRegistered() external view returns(bool){
+   function isRegistered() external view returns (bool){
        return UserRegistered[msg.sender];
    }
 
 
-    function addSchool(string memory _name) external /* only(Admin) */ {
-        School memory school;
-        school.name = _name;
-
-        schools.push(school);
+    function addSchool(string memory _name) external /* only(Admin) */ returns (uint256) {
+        address[] memory validators = new address[](1);
+        validators[0] = msg.sender;
+        schools.push(School(_name, validators));
 
         uint256 id = schools.length - 1;
         schoolsToValidate.push(id);
         
         emit SchoolAdded(id, _name);
+        return id;
     }
 
 
@@ -65,6 +65,7 @@ contract Maticulum {
         School storage school = schools[_id];
         school.name = _name;
         delete school.validators;
+        school.validators.push(msg.sender);
 
         schoolsToValidate.push(_id);
 
@@ -74,6 +75,12 @@ contract Maticulum {
 
     function validateSchool(uint256 _id) external /* only(Admin) */ {
         School storage school = schools[_id];
+
+        for (uint256 i = 0; i < school.validators.length; i++) {
+            if (school.validators[i] == msg.sender) {
+                revert("Already validated by this user.");
+            }
+        }
         
         school.validators.push(msg.sender);
         if (school.validators.length >= 3) {
@@ -87,6 +94,18 @@ contract Maticulum {
         }
         
         emit SchoolValidated(_id, school.name, msg.sender, school.validators.length);
+    }
+
+
+    function getNbSchools() external view returns (uint256 length) {
+        return schools.length;
+    }
+
+
+    function getSchool(uint256 _id) external view returns (string memory name, address[] memory validators) {
+        School storage school = schools[_id];
+
+        return (school.name, school.validators);
     }
 
 

@@ -1,11 +1,11 @@
 import React, { Component } from "react";
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { Button, Nav, Navbar } from 'react-bootstrap';
+
 import getWeb3 from "./getWeb3";
 import Web3Context from "./Web3Context";
 import config from './config';
 import Maticulum from "./contracts/Maticulum.json";
-
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
-import { Button, Nav, Navbar } from 'react-bootstrap';
 
 import Home from './components/Home';
 import Registration from './components/Registration';
@@ -122,7 +122,7 @@ class App extends Component {
               <Nav className='mr-auto'>
                 <Nav.Link href={'/'}>Accueil</Nav.Link>              
                 <Nav.Link href={'/registration'}>Registration</Nav.Link>
-                <Nav.Link href={'/school'}>Écoles</Nav.Link>
+                <Nav.Link href={'/schools/list'}>Écoles</Nav.Link>
               </Nav>
             </Navbar.Collapse>
             <Navbar.Collapse className="justify-content-end">
@@ -141,7 +141,7 @@ class App extends Component {
               <Route exact path='/registration'>	
                 <Registration />
               </Route>
-              <Route path='/school'>
+              <Route path='/schools'>
                   <School />
               </Route>
             </Switch>
