@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@react-pdf/renderer": "^2.0.16",
     "bootstrap": "^5.0.2",
     "i18next": "^20.3.2",
     "i18next-browser-languagedetector": "^6.1.2",

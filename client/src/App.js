@@ -14,6 +14,7 @@ import Home from './components/Home';
 import Registration from './components/Registration';
 import School from './components/school/School';
 import Whitelisted from './components/Whitelisted';
+import PdfTest from "./components/pdf/PdfTest";
 
 import "./App.css";
 import i18n from "./i18n";
@@ -148,6 +149,7 @@ class App extends Component {
 				        { this.state.isAdmin ? <NavLink className="nav-link" visibility="hidden" href={'/whitelisted'}>{t('nav.whitelisted')}</NavLink> : null}
                 <NavLink className="nav-link" to={'/registration'}>{t('nav.registration')}</NavLink>
                 { this.state.isAdmin ? <NavLink className="nav-link" to={'/schools/list'}>{t('nav.schools')}</NavLink> : null}
+                <NavLink className="nav-link" to={'/pdf-test'}>Test PDF</NavLink>
               </Nav>
             </Navbar.Collapse>
             <Navbar.Collapse className="justify-content-end">
@@ -173,9 +175,8 @@ class App extends Component {
               <Route exact path='/registration'>	
                 <Registration />
               </Route>
-              <Route path='/schools'> 
-                  <School />
-              </Route>
+              <Route path='/schools' component={School} /> 
+              <Route exact path='/pdf-test' component={PdfTest} /> 
             </Switch>
           </div>
         </Router>

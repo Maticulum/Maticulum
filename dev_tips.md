@@ -22,6 +22,12 @@ this.context
 ```
 
 
+# Génération de PDF
+
+https://react-pdf.org/
+
+
+
 # i18n
 
 Utilisation de https://react.i18next.com/
