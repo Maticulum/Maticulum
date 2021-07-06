@@ -14,5 +14,14 @@
         "name": "Name",
         "validated": "Validated",
         "action": "Action"
-    }
+    },
+	"formlabel":{
+		"birthDate": "Birth date",
+		"birthCountry":"Birth country",
+		"mail": "Email",
+		"name": "Name",
+		"firstname": "First name",
+		"mobilePhone":"Mobile phone number",
+		"fixedPhone":"Telephone number"
+	}
 }

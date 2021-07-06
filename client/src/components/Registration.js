@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import Web3Context from "../Web3Context";
-
+import { withTranslation } from "react-i18next";
 
 class Registration extends Component {
 state = {isRegistered : false} 
   static contextType = Web3Context; 	
-  
+ 
   componentDidMount = async () => {
 	const isRegistered = await this.context.contract.methods.isRegistered().call({from: this.context.account});
 	if(isRegistered){
@@ -51,19 +51,20 @@ state = {isRegistered : false}
 	alert(registered);
   }		
 	
-  render() {	  
+  render() {
+	 const { t } = this.props;  
     return (
       <Form>
         <h1>Register you</h1>  
         <Form.Group>
-          <Form.Label>Name</Form.Label>
+          <Form.Label>{t('formlabel.name')}</Form.Label>
           <Form.Control type="text" id="nameUser"
             ref={(input) => { this.nameUser = input }}
           />
         </Form.Group>
 
         <Form.Group>
-          <Form.Label>First name</Form.Label>
+          <Form.Label>{t('formlabel.firstname')}</Form.Label>
           <Form.Control type="text" id="firstnameUser" 		  
             ref={(input) => { this.firstnameUser = input }}
           />	
@@ -77,28 +78,28 @@ state = {isRegistered : false}
         </Form.Group>
 		
 		<Form.Group>
-          <Form.Label>Birth date</Form.Label>
+          <Form.Label> {t('formlabel.birthDate')}</Form.Label>
           <Form.Control type="text" id="birthDate" 		  
             ref={(input) => { this.birthDate = input }}
           />	
         </Form.Group>
 		
 		<Form.Group>
-          <Form.Label>Email</Form.Label>
+          <Form.Label>{t('formlabel.mail')}</Form.Label>
           <Form.Control type="text" id="mail" 		  
             ref={(input) => { this.mail = input }}
           />	
         </Form.Group>
 		
 		<Form.Group>
-          <Form.Label>Mobile phone</Form.Label>
+          <Form.Label>{t('formlabel.mobilePhone')}</Form.Label>
           <Form.Control type="text" id="mobile" 		  
             ref={(input) => { this.mobile = input }}
           />	
         </Form.Group>
 		
 		<Form.Group>
-          <Form.Label>Fixed phone name</Form.Label>
+          <Form.Label>{t('formlabel.fixedPhone')}</Form.Label>
           <Form.Control type="text" id="telfixe"
             ref={(input) => { this.telfixe = input }}
           />	
@@ -111,4 +112,4 @@ state = {isRegistered : false}
   }
 }
 
-export default Registration;
+export default withTranslation()(Registration);
