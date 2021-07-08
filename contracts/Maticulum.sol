@@ -2,9 +2,15 @@
 pragma solidity 0.8.4;
 
 import "./Owner.sol";
+import "./MaticulumNFT.sol";
 
 contract Maticulum is Owner {
   
+   constructor() {
+       nft = new MaticulumNFT();
+   }
+  
+   MaticulumNFT public nft;
    struct user{
        string name;
        string firstname;
@@ -133,5 +139,9 @@ contract Maticulum is Owner {
         for (uint256 i = 0; i < schoolsToValidate.length; i++) {
             needValidation[i] = schools[schoolsToValidate[i]];
         }
+    }
+    
+    function createDiplomeNFT(address ownerAddressNFT, string memory hash) external returns(uint256){
+        return nft.AddNFTToAdress(ownerAddressNFT, hash);
     }
 }

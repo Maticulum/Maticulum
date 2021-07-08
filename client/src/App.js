@@ -15,6 +15,7 @@ import Registration from './components/Registration';
 import School from './components/school/School';
 import Whitelisted from './components/Whitelisted';
 import PdfTest from "./components/pdf/PdfTest";
+import Diplome from './components/Diplome';
 
 import "./App.css";
 import i18n from "./i18n";
@@ -122,7 +123,7 @@ class App extends Component {
     i18n.changeLanguage(lng);
   }
 
-
+ 
   render() {  
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...</div>;
@@ -150,6 +151,7 @@ class App extends Component {
                 <NavLink className="nav-link" to={'/registration'}>{t('nav.registration')}</NavLink>
                 { this.state.isAdmin ? <NavLink className="nav-link" to={'/schools/list'}>{t('nav.schools')}</NavLink> : null}
                 <NavLink className="nav-link" to={'/pdf-test'}>Test PDF</NavLink>
+				<NavLink className="nav-link" to={'/Diplome'}>Diplome</NavLink>
               </Nav>
             </Navbar.Collapse>
             <Navbar.Collapse className="justify-content-end">
@@ -177,6 +179,7 @@ class App extends Component {
               </Route>
               <Route path='/schools' component={School} /> 
               <Route exact path='/pdf-test' component={PdfTest} /> 
+			  <Route exact path='/diplome' component={Diplome} /> 
             </Switch>
           </div>
         </Router>
