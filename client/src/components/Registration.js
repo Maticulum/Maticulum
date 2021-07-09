@@ -31,14 +31,14 @@ state = {isRegistered : false}
   CreateModifyUser = async() => {
 	const { isCreated } = this.state;
 	if(!isCreated){
-		await this.context.contract.methods.userRegister(
+		await this.context.contract.methods.registerUser(
 		this.nameUser.value,this.firstnameUser.value,this.birthCountry.value,
 	this.birthDate.value,this.mail.value,this.mobile.value,this.telfixe.value)
 		.send({from: this.context.account});
 		this.state.isCreated = await this.context.contract.methods.isRegistered().call({from:this.context.account});
 	}		
 	else{
-		await this.context.contract.methods.userUpdate(
+		await this.context.contract.methods.updateUser(
 		this.nameUser.value,this.firstnameUser.value,this.birthCountry.value,
 		this.birthDate.value,this.mail.value,this.mobile.value,this.telfixe.value)
 		.send({from: this.context.account});
