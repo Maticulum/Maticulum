@@ -10,7 +10,12 @@ class Diplome extends Component {
 	static contextType = Web3Context;
 	
 	state = { linkDiplome : 'Diplome', linkVisible:false,
-	hashImage:null,hashJson:null,fileToUpload:null, isButtonMetamaskVisible : false};	
+	hashImage:null,hashJson:null,fileToUpload:null, isButtonMetamaskVisible : false};
+	
+	handleFile = async(e) => {
+		let files = e.target.files[0];
+		this.setState({ fileToUpload : files, linkVisible:true });
+	}
 	
 	getJsonData = async () => {
 		const { linkDiplome, hashJson} = this.state; 				
@@ -46,7 +51,7 @@ class Diplome extends Component {
 	 
 	};
 	
-	// TODO gestion si annulation envoi diplôme
+	// gestion si annulation envoi diplôme
 	
 	createImagePinataAxios = async(e) => {		
 		const { fileToUpload, linkDiplome} = this.state; 
@@ -72,7 +77,7 @@ class Diplome extends Component {
 		  data: formData,
 		})
 		  .then(async (res) => { 
-			let ipfsHash = res.data.IpfsHash;
+			let ipfsHash = res.data.IpfsHash;			
 			let urlMetadata = "https://gateway.pinata.cloud/ipfs/" + ipfsHash;	 
 			this.setState({ linkDiplome : urlMetadata, linkVisible:true,
 			hashImage:ipfsHash});
