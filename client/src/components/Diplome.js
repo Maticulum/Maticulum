@@ -10,12 +10,7 @@ class Diplome extends Component {
 	static contextType = Web3Context;
 	
 	state = { linkDiplome : 'Diplome', linkVisible:false,
-	hashImage:null,hashJson:null};
-	handleFile(e) {
-		// Getting the files from the input
-		let files = e.target.files[0];
-		this.setState({ fileToUpload : files });
-	}
+	hashImage:null,hashJson:null,fileToUpload:null, isButtonMetamaskVisible : false};	
 	
 	getJsonData = async () => {
 		const { linkDiplome, hashJson} = this.state; 				
@@ -43,7 +38,7 @@ class Diplome extends Component {
 			let urlMetadata = "https://gateway.pinata.cloud/ipfs/" + ipfsHash;
 			await this.context.contract.methods.createDiplomeNFT(this.context.account,ipfsHash).send({from:this.context.account});
 			
-			this.setState({ hashJson : ipfsHash});
+			this.setState({ hashJson : ipfsHash, isButtonMetamaskVisible:true});
         })
         .catch(function (error) {
             //handle error here
@@ -51,10 +46,12 @@ class Diplome extends Component {
 	 
 	};
 	
+	// TODO gestion si annulation envoi diplôme
+	
 	createImagePinataAxios = async(e) => {		
+		const { fileToUpload, linkDiplome} = this.state; 
 		
-		const { linkDiplome} = this.state;  
-		let file = e.target.files[0];
+		let file = fileToUpload;
 
 		let pinata_api_key = 'aa60ffe97b2e16419dba';
 		let pinata_secret_api_key = 'a4be1a2a85d05d6e350a13b82049e49c1afe9bb317531963e231f0a03d2a7158';
@@ -84,6 +81,38 @@ class Diplome extends Component {
 		  .catch((err) => { alert(err); }); 
 	}
 		
+	AddInMetamask = async() => {
+	const { accounts, contractStaking, web3 } = this.state; 
+	const tokenAddress = await this.context.contract.methods.getNFTAddress().call({from: this.context.account});
+	const tokenSymbol = 'MTCF';
+	const tokenDecimals = 0;
+	const tokenImage = 'https://ipfs.io/ipfs/QmeYp7Et2owcGBinFiSsU2Tdjvpeq2BzaW1bEpzVyhE8WV?filename=hermes.png'; // get from IPFS
+
+	try {
+	  // wasAdded is a boolean. Like any RPC method, an error may be thrown.
+	  const wasAdded = await window.ethereum.request({
+		method: 'wallet_watchAsset',
+		params: {
+		  type: 'ERC20', // Initially only supports ERC20, but eventually more!
+		  options: {
+			address: tokenAddress, // The address that the token is at.
+			symbol: tokenSymbol, // A ticker symbol or shorthand, up to 5 chars.
+			decimals: tokenDecimals, // The number of decimals in the token
+			image: tokenImage, // A string url of the token logo
+		  },
+		},
+	  });
+
+	  if (wasAdded) {
+		console.log('Thanks for your interest!');
+	  } else {
+		console.log('Your loss!');
+	  }
+	} catch (error) {
+	  console.log(error);
+	}
+  }	
+		
 	render() {
 		const { t } = this.props; 
 		
@@ -92,20 +121,26 @@ class Diplome extends Component {
           <Card style={{ width: '50rem' }}>
             <Card.Header><strong>{t('diplome.sendNFT')}</strong></Card.Header>
             <Card.Body>			  
-			  <input type="file" class="filename" id="avatar"  accept="image/png, image/jpeg" 
-				onChange={this.createImagePinataAxios} />
-			  
-			  { 
+				<input type="file" id="avatar" accept="image/png, image/jpeg" 
+					onChange={this.handleFile} />
+				</Card.Body>
+			{ 
 				this.state.linkVisible ? 
-				<Link visibility="hidden" to={this.state.linkDiplome}>{this.state.linkDiplome}</Link> 
+				<Card.Body>
+					<Button onClick={this.createImagePinataAxios}>{t('diplome.createNFT')}</Button>
+				</Card.Body>
 				: null
-			  }
-			</Card.Body>
+			}
+			 
+			{ 
+				this.state.isButtonMetamaskVisible ? 
+				<Card.Body>
+					<Button onClick={this.AddInMetamask}>{t('diplome.addMetamask')}</Button>
+				</Card.Body>
+				: null
+			}
           </Card>
-		  
-		 
-        </div>
-		
+        </div>		
 		);
 	}
 }

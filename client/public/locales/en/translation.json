@@ -26,6 +26,7 @@
 	},
 	"diplome":{
 		"createNFT":"Create NFT",
-		"sendNFT" : "Sendind of diploma to Maticulum"
+		"sendNFT" : "Sendind of diploma to Maticulum",
+		"addMetamask":"Add to Metamask"
 	}
 }

@@ -12,4 +12,8 @@ contract("SimpleStorage", accounts => {
 
     assert.equal(storedData, 89, "The value 89 was not stored.");
   });
+
+  // createDiplomeNFT
+  // tester si le hash est déjà présent dans le smart contract
+  // lève une erreur
 });

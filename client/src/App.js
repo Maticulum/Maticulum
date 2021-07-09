@@ -53,7 +53,7 @@ class App extends Component {
       window.ethereum.on('accountsChanged', accounts => {
         console.log('Accounts changed ', accounts);
         this.setState({ accounts });
-		    this.registered(accounts);
+		    //this.registered(accounts);
       });
 
       window.ethereum.on('chainChanged', networkId => {

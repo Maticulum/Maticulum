@@ -9,7 +9,7 @@ contract MaticulumNFT is ERC721URIStorage{
     Counters.Counter private _tokenIds;
     mapping(string => uint8) hashes;
     
-    constructor() ERC721("DiplomeNFT", "MTCN") {}
+    constructor() ERC721("DiplomeNFT", "MTCF") {}
   
     function AddNFTToAdress(address recipient, string memory hash) public returns (uint256){
         require(hashes[hash] != 1);

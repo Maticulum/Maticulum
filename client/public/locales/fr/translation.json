@@ -26,6 +26,7 @@
 	},
 	"diplome":{
 		"createNFT":"Créer NFT",
-		"sendNFT" : "Envoi du diplôme sur Maticulum"
+		"sendNFT" : "Envoi du diplôme sur Maticulum",
+		"addMetamask":"Ajouter à Metamask"
 	}
 }

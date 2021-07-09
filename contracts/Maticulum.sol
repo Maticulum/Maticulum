@@ -10,7 +10,7 @@ contract Maticulum is Owner {
        nft = new MaticulumNFT();
    }
   
-   MaticulumNFT public nft;
+   MaticulumNFT nft;
    struct user{
        string name;
        string firstname;
@@ -143,5 +143,9 @@ contract Maticulum is Owner {
     
     function createDiplomeNFT(address ownerAddressNFT, string memory hash) external returns(uint256){
         return nft.AddNFTToAdress(ownerAddressNFT, hash);
+    }
+    
+    function getNFTAddress() public view returns(address){
+        return address(nft);
     }
 }
