@@ -5,7 +5,6 @@ import Web3Context from "../Web3Context";
 import { withTranslation } from "react-i18next";
 
 import axios from "axios";
-require('dotenv').config();
 
 class Diplome extends Component {
 	static contextType = Web3Context;
@@ -25,15 +24,14 @@ class Diplome extends Component {
 			"image": [this.state.linkDiplome],
 			"description": "Diplome NFT hébergé par le smart contract MaticulumNFT"
 		};
-				
+		
 	  	let pinataApiKey = 'aa60ffe97b2e16419dba';
 		let pinataSecretApiKey = 'a4be1a2a85d05d6e350a13b82049e49c1afe9bb317531963e231f0a03d2a7158';
-		
-				
+						
 		const JSONBody = JSON.parse(JSON.stringify(data));
+			
 		
-		
-		const url = `https://api.pinata.cloud/pinning/pinJSONToIPFS`;
+		const url = `https://api.pinata.cloud/pinning/pinJSONToIPFS/`;
 		return axios.post(url, JSONBody, {
             headers: {
                 pinata_api_key: pinataApiKey,
@@ -41,8 +39,7 @@ class Diplome extends Component {
             }
         })
         .then(async (response) => {
-            let ipfsHash = response.data.IpfsHash;
-			alert(ipfsHash);
+            let ipfsHash = response.data.IpfsHash;	
 			let urlMetadata = "https://gateway.pinata.cloud/ipfs/" + ipfsHash;
 			await this.context.contract.methods.createDiplomeNFT(this.context.account,ipfsHash).send({from:this.context.account});
 			
@@ -52,9 +49,9 @@ class Diplome extends Component {
             //handle error here
         }); 
 	 
-  };
+	};
 	
-	createImagePinataAxios = async(e) => {
+	createImagePinataAxios = async(e) => {		
 		
 		const { linkDiplome} = this.state;  
 		let file = e.target.files[0];
@@ -62,7 +59,7 @@ class Diplome extends Component {
 		let pinata_api_key = 'aa60ffe97b2e16419dba';
 		let pinata_secret_api_key = 'a4be1a2a85d05d6e350a13b82049e49c1afe9bb317531963e231f0a03d2a7158';
 		  
-		const recipeUrl = 'https://api.pinata.cloud/pinning/pinFileToIPFS';
+		const recipeUrl = 'https://api.pinata.cloud/pinning/pinFileToIPFS/';
 	    const postHeader = {
 			pinata_api_key: pinata_api_key,
 			pinata_secret_api_key: pinata_secret_api_key
@@ -85,24 +82,19 @@ class Diplome extends Component {
 			await this.getJsonData();
 		  }) 
 		  .catch((err) => { alert(err); }); 
-	}		
-  
-	uploadedImage(e) {
-		alert('test');
-		let reader = new FileReader();
-		let file = e.target.files[0];
 	}
 		
 	render() {
+		const { t } = this.props; 
+		
 		return(
 		<div style={{display: 'flex', justifyContent: 'center'}}>
           <Card style={{ width: '50rem' }}>
-            <Card.Header><strong>Récupérer URI</strong></Card.Header>
-            <Card.Body>
-			  <img src="ipfs://bafybeihtohn6bfewapyvb3cb5og43h7zd64qrgup4hycsbrro5pdv5tizq" />
-			  <input type="file" id="avatar"  accept="image/png, image/jpeg" 
+            <Card.Header><strong>{t('diplome.sendNFT')}</strong></Card.Header>
+            <Card.Body>			  
+			  <input type="file" class="filename" id="avatar"  accept="image/png, image/jpeg" 
 				onChange={this.createImagePinataAxios} />
-			  <Button onClick={ this.getUri } variant="dark" >Créer NFT</Button> 
+			  
 			  { 
 				this.state.linkVisible ? 
 				<Link visibility="hidden" to={this.state.linkDiplome}>{this.state.linkDiplome}</Link> 

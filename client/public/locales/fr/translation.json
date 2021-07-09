@@ -23,5 +23,9 @@
 		"firstname": "Prénom",
 		"mobilePhone":"Numéro de téléphone mobile",
 		"fixedPhone":"Numéro de téléphone fixe"
+	},
+	"diplome":{
+		"createNFT":"Créer NFT",
+		"sendNFT" : "Envoi du diplôme sur Maticulum"
 	}
 }

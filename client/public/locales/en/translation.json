@@ -23,5 +23,9 @@
 		"firstname": "First name",
 		"mobilePhone":"Mobile phone number",
 		"fixedPhone":"Telephone number"
+	},
+	"diplome":{
+		"createNFT":"Create NFT",
+		"sendNFT" : "Sendind of diploma to Maticulum"
 	}
 }
