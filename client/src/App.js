@@ -14,7 +14,7 @@ import Home from './components/Home';
 import Registration from './components/Registration';
 import School from './components/school/School';
 import Whitelisted from './components/Whitelisted';
-import PdfTest from "./components/pdf/PdfTest";
+import ImgTest from "./components/pdf/ImgTest";
 import Diplome from './components/Diplome';
 
 import "./App.css";
@@ -150,7 +150,7 @@ class App extends Component {
 				        { this.state.isAdmin ? <NavLink className="nav-link" visibility="hidden" href={'/whitelisted'}>{t('nav.whitelisted')}</NavLink> : null}
                 <NavLink className="nav-link" to={'/registration'}>{t('nav.registration')}</NavLink>
                 { this.state.isAdmin ? <NavLink className="nav-link" to={'/schools/list'}>{t('nav.schools')}</NavLink> : null}
-                <NavLink className="nav-link" to={'/pdf-test'}>Test PDF</NavLink>
+                <NavLink className="nav-link" to={'/img-test'}>Test IMG</NavLink>
 				<NavLink className="nav-link" to={'/Diplome'}>Diplome</NavLink>
               </Nav>
             </Navbar.Collapse>
@@ -178,8 +178,8 @@ class App extends Component {
                 <Registration />
               </Route>
               <Route path='/schools' component={School} /> 
-              <Route exact path='/pdf-test' component={PdfTest} /> 
-			  <Route exact path='/diplome' component={Diplome} /> 
+              <Route exact path='/img-test' component={ImgTest} /> 
+			        <Route exact path='/diplome' component={Diplome} /> 
             </Switch>
           </div>
         </Router>
