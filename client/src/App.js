@@ -167,7 +167,7 @@ class App extends Component {
                      <NavLink className="nav-link" to={'/registration'}>{t('nav.registration')}</NavLink>
                      { this.state.isAdmin ? <NavLink className="nav-link" to={'/schools'}>{t('nav.schools')}</NavLink> : null}
                      <NavLink className="nav-link" to={'/diplome'}>{t('diplome.diploma')}</NavLink>
-					 <NavLink className="nav-link" to={'/diplomeMulti'}>{t('diplome.diploma')Multi}</NavLink>
+					 <NavLink className="nav-link" to={'/diplomeMulti'}>{t('diplome.diploma')}</NavLink>
                   </Nav>
                </Navbar.Collapse>
                <Navbar.Collapse className="justify-content-end">

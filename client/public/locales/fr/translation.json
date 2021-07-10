@@ -29,6 +29,7 @@
 		"sendNFT" : "Envoi du diplôme sur Maticulum",
 		"addMetamask":"Ajouter à Metamask",
 		"diploma":"Diplôme",
+		"diplomas":"Diplômes",
 		"generateImage":"Générer",
 		"diplomaBuid":"Génération du diplôme"
 	},
