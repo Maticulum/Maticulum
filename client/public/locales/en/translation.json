@@ -31,5 +31,13 @@
 		"diploma":"Diploma",
 		"generateImage":"Build",
 		"diplomaBuid":"Build diploma"
-	}
+	},
+   "school": {
+      "name": "Name",
+      "town": "Town",
+      "country": "Country",
+      "administrators": "Administrators",
+      "validators": "Validators",
+      "save": "Save"
+   }
 }

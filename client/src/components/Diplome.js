@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import { Button, Nav, Navbar, NavDropdown, Card, Form, Container, Row, Col } from 'react-bootstrap';
-import { Link  } from 'react-router-dom';
+import { Button, Card, Form, Container, Row, Col } from 'react-bootstrap';
 import Web3Context from "../Web3Context";
 import { withTranslation } from "react-i18next";
 import background from './pdf/assets/background.jpg';

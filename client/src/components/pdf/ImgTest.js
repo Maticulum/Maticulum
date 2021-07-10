@@ -1,4 +1,3 @@
-import { createTextNode } from 'min-document';
 import React, { Component } from 'react';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 
