@@ -319,10 +319,11 @@ contract Maticulum is Ownable {
    }
 
 
-   function createDiplomeNFT(address ownerAddressNFT, string memory hash) external returns(uint256){
+   function createDiplomeNFT(address ownerAddressNFT, string memory hash) public returns(uint256){
       return nft.AddNFTToAdress(ownerAddressNFT, hash);
    }
    
+
    function getNFTAddress() public view returns(address){
       return address(nft);
    }
@@ -330,7 +331,7 @@ contract Maticulum is Ownable {
    function getlastUriId() public view returns(uint256){
         return nft.getlastUriId();
    }
-   
+    
    function createDiplomeNFTs(address ownerAddressNFT, string[] memory hashes) external returns(uint256){
         uint256 last;
         for(uint i =0;i < hashes.length;i++){
@@ -339,8 +340,7 @@ contract Maticulum is Ownable {
         
         return last;
     }
-
-
+	
    // TODO For testing purposes, should be removed
    function forceRole(uint8 role) external onlyOwner {
       users[msg.sender].role = role;

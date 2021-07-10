@@ -78,6 +78,9 @@ class Diplome extends Component {
 		const canvas = document.createElement('canvas');
 		console.log(canvas.toDataURL('image/png'));
 		const context = canvas.getContext('2d');
+		
+		const data = new TextEncoder().encode("texte à hacher")
+		const buffer = await window.crypto.subtle.digest('SHA-256', data);
 
 		const img = new Image();
 		img.onload = () => {
@@ -89,11 +92,14 @@ class Diplome extends Component {
 
 		  context.fillText(this.state.title, 350, 120);
 		  context.fillText(this.state.firstname, 125, 175);
-		  context.fillText(this.state.lastname, 125, 215);
-		  	
+		  context.fillText(this.state.lastname, 125, 215);		  
+		  
+		  const hashString = Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');	
+	
+			
           let formData = new FormData();			
 		  canvas.toBlob((blob) => {
-			formData.append("file", new File([blob], 'diplome2.png'));
+			formData.append("file", new File([blob], hashString + '.png'));
 		  });
 		  this.setState({ linkVisible:true, formData:formData });	  		  
 		};

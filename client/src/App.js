@@ -16,6 +16,7 @@ import School from './components/school/School';
 import Whitelisted from './components/Whitelisted';
 import ImgTest from "./components/pdf/ImgTest";
 import Diplome from './components/Diplome';
+import DiplomeMulti from './components/DiplomeMulti';
 
 import "./App.css";
 import i18n from "./i18n";
@@ -166,6 +167,7 @@ class App extends Component {
                      <NavLink className="nav-link" to={'/registration'}>{t('nav.registration')}</NavLink>
                      { this.state.isAdmin ? <NavLink className="nav-link" to={'/schools'}>{t('nav.schools')}</NavLink> : null}
                      <NavLink className="nav-link" to={'/diplome'}>{t('diplome.diploma')}</NavLink>
+					 <NavLink className="nav-link" to={'/diplomeMulti'}>{t('diplome.diploma')Multi}</NavLink>
                   </Nav>
                </Navbar.Collapse>
                <Navbar.Collapse className="justify-content-end">
@@ -190,6 +192,7 @@ class App extends Component {
                   <Route path='/schools' component={School} /> 
                   <Route exact path='/img-test' component={ImgTest} /> 
                   <Route exact path='/diplome' component={Diplome} /> 
+				  <Route exact path='/diplomeMulti' component={DiplomeMulti} /> 
                </Switch>
             </div>
          </Router>
