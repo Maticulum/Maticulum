@@ -134,7 +134,7 @@ class Diplome extends Component {
 		
 	AddInMetamask = async() => {
 	const { accounts, contractStaking, web3 } = this.state; 
-	const tokenAddress = await this.context.contract.methods.getNFTAddress().call({from: this.context.account});
+	const tokenAddress = await this.context.contract.methods.nft().call();
 	const tokenSymbol = 'MTCF';
 	const tokenDecimals = 0;
 	const tokenImage = 'https://ipfs.io/ipfs/QmeYp7Et2owcGBinFiSsU2Tdjvpeq2BzaW1bEpzVyhE8WV?filename=hermes.png'; // get from IPFS

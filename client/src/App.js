@@ -54,7 +54,8 @@ class App extends Component {
             console.log('Accounts changed ', accounts);
             this.setState({ accounts });
             
-            if (!this.state.isCreated) {
+            this.init();
+            if (!this.state.isRegistered) {
                window.location.assign('/registration');
             }
          });
@@ -62,6 +63,7 @@ class App extends Component {
          window.ethereum.on('chainChanged', networkId => {
             console.log('Chain changed ', networkId);
             this.setState({ networkId: parseInt(networkId) });
+            this.init();
          });
 
          // Set web3, accounts, and contract to the state, and then proceed with an
