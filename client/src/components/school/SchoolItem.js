@@ -1,80 +1,101 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Button, Container, Form, ListGroup } from 'react-bootstrap';
+import { Button, Col,Container, Form, ListGroup, Row } from 'react-bootstrap';
+import { withTranslation } from "react-i18next";
 
 import Web3Context from '../../Web3Context';
 
 
 class SchoolItem extends Component {
   
-    static contextType = Web3Context;
+   static contextType = Web3Context;
 
-    state = { school: null, editedName: '' };
-    
+   state = { school: null, editedName: '', editedTown: '', editedCountry: '' };
+   
 
-    async componentDidMount() {
-        const id = this.props.match.params.schoolId;
-        this.create = id === 'new';
-        if (this.create) {
-            this.setState({ school: { id: id, name: '', validators: [] }});
-        }
-        else {
-            const school = await this.getSchool(id);
-            console.log('School=', school);
-            this.setState({ editedName: school.name, school: {
-                id: id,
-                ...school
-            } });
-            console.log(this.state.school);
-        }
-    }
-
-
-    getSchool = async (id) => {
-        return await this.context.contract.methods.getSchool(id).call();
-    }
+   async componentDidMount() {
+      const id = this.props.match.params.schoolId;
+      this.create = id === 'new';
+      if (this.create) {
+         this.setState({ school: { id: id, name: '', administrators: ['', ''], validators: [] }});
+      }
+      else {
+         const school = await this.context.contract.methods.schools(id).call();
+         this.setState({ editedName: school.name, editedTown: school.town, editedCountry: school.country,
+            school: {
+               id: id,
+               ...school
+         } });
+      }
+   }
 
 
-    onSave = async () => {
-        console.log("create", this.create);
-        if (this.create) {
-            const tx = await this.context.contract.methods.addSchool(this.state.editedName).send({ from: this.context.account });
-            const id = tx.events.SchoolAdded.returnValues.id;
-            this.props.history.push(`/schools/${id}`);
-        }
-        else {
-            await this.context.contract.methods.updateSchool(this.state.school.id, this.state.editedName).send({ from: this.context.account });
-            this.props.history.push('/temp');
-            this.props.history.replace(`/schools/${this.state.school.id}`);
-        }
-    }
+   onSave = async () => {
+      // TODO check at least 2 admins
+      if (this.create) {
+         await this.context.contract.methods.addSchool(this.state.editedName, this.state.editedTown, this.state.editedCountry)
+            .send({ from: this.context.account });
+         this.props.history.push(`/schools`);
+      }
+      else {
+         await this.context.contract.methods.updateSchool(this.state.school.id, this.state.editedName, this.state.editedTown, this.state.editedCountry)
+            .send({ from: this.context.account });
+         this.props.history.push(`/schools`);
+      }
+   }
 
 
-    render() {
-        if (this.state.school === null) {
-            return <div>Loading...</div>;
-        }
+   render() {
+      if (this.state.school === null) {
+         return <div>Loading...</div>;
+      }
 
-        return (
-            <Container>
-                <Form>
-                    <Form.Group >
-                        <Form.Label>Nom</Form.Label>
+      const { t } = this.props;
+
+      return (
+         <Container>
+               <Form>
+                  <Form.Group as={Row} >
+                     <Form.Label column sm="2">{t('school.name')}</Form.Label>
+                     <Col sm="10">
                         <Form.Control type="text" value={this.state.editedName} onChange={(e) => this.setState({editedName: e.target.value})} />
-                    </Form.Group>
-                    <Form.Group>
-                        <Form.Label>Validateurs</Form.Label>
+                     </Col>
+                  </Form.Group>
+                  <Form.Group as={Row} >
+                     <Form.Label column sm="2">{t('school.town')}</Form.Label>
+                     <Col sm="10">
+                        <Form.Control type="text" value={this.state.editedTown} onChange={(e) => this.setState({editedTown: e.target.value})} />
+                     </Col>
+                  </Form.Group>
+                  <Form.Group as={Row} >
+                     <Form.Label column sm="2">{t('school.country')}</Form.Label>
+                     <Col sm="10">
+                        <Form.Control type="text" value={this.state.editedCountry} onChange={(e) => this.setState({editedCountry: e.target.value})} />
+                     </Col>
+                  </Form.Group>
+                  <Form.Group>
+                     <Form.Label>{t('school.administrators')}</Form.Label>
+                     <ListGroup>
+                        { this.state.school.administrators.map((administrator, index) => (
+                           <ListGroup.Item key={index}>{administrator}</ListGroup.Item>
+                        ))}
+                     </ListGroup>
+                  </Form.Group>
+                  <Form.Group>
+                     <Form.Label>{t('school.validators')}</Form.Label>
+                     { this.state.school.validators &&
                         <ListGroup>
-                            { this.state.school.validators.map((validator, index) => (
-                                <ListGroup.Item key={index}>{validator}</ListGroup.Item>
-                            ))}
+                              { this.state.school.validators.map((validator, index) => (
+                                 <ListGroup.Item key={index}>{validator}</ListGroup.Item>
+                              ))}
                         </ListGroup>
-                    </Form.Group>
-                    <Button onClick={ this.onSave }>Enregistrer</Button>
-                </Form>
-            </Container>
-        );
-    }
+                     }
+                  </Form.Group>
+                  <Button onClick={ this.onSave }>{t('school.save')}</Button>
+               </Form>
+         </Container>
+      );
+   }
 }
 
-export default withRouter(SchoolItem);
+export default withTranslation()(withRouter(SchoolItem));

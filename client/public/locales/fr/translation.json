@@ -31,5 +31,13 @@
 		"diploma":"Diplôme",
 		"generateImage":"Générer",
 		"diplomaBuid":"Génération du diplôme"
-	}
+	},
+   "school": {
+      "name": "Nom",
+      "town": "Ville",
+      "country": "Pays",
+      "administrators": "Administrateurs",
+      "validators": "Validateurs",
+      "save": "Enregistrer"
+   }
 }

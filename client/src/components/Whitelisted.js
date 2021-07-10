@@ -6,12 +6,7 @@ import Web3Context from "../Web3Context";
 class Whitelisted extends Component {	
    static contextType = Web3Context;
    state = { role: -1 }
-   constructor(props) {
-        super(props);
-
-        this.web3 = props.web3;
-        this.account = props.account;
-    }
+   
 	
 	Registration = async() => {
 		if(this.state.role != -1){

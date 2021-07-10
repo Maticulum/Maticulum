@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import { Button, Nav, Navbar, NavDropdown, Card, Form, Container, Row, Col } from 'react-bootstrap';
-import { Link  } from 'react-router-dom';
+import { Button, Card, Form, Container, Row, Col } from 'react-bootstrap';
 import Web3Context from "../Web3Context";
 import { withTranslation } from "react-i18next";
 import background from './pdf/assets/background.jpg';
@@ -135,7 +134,7 @@ class Diplome extends Component {
 		
 	AddInMetamask = async() => {
 	const { accounts, contractStaking, web3 } = this.state; 
-	const tokenAddress = await this.context.contract.methods.getNFTAddress().call({from: this.context.account});
+	const tokenAddress = await this.context.contract.methods.nft().call();
 	const tokenSymbol = 'MTCF';
 	const tokenDecimals = 0;
 	const tokenImage = 'https://ipfs.io/ipfs/QmeYp7Et2owcGBinFiSsU2Tdjvpeq2BzaW1bEpzVyhE8WV?filename=hermes.png'; // get from IPFS

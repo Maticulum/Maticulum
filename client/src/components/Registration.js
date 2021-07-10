@@ -4,11 +4,11 @@ import Web3Context from "../Web3Context";
 import { withTranslation } from "react-i18next";
 
 class Registration extends Component {
-state = {isRegistered : false} 
+state = {isRegistered : false, isCreated: false} 
   static contextType = Web3Context; 	
  
   componentDidMount = async () => {
-	const isRegistered = await this.context.contract.methods.isRegistered().call({from: this.context.account});
+	const isRegistered = await this.context.contract.methods.isRegistered().call();
 	if(isRegistered){
 	  this.GetThisUser();
 	}
@@ -16,16 +16,15 @@ state = {isRegistered : false}
   }
 
   GetThisUser = async() => {	  
-	const user = await this.context.contract.methods.getUser().call({from: this.context.account});
+	const user = await this.context.contract.methods.getUser().call();
 
-	this.nameUser.value = user[0];
-	this.firstnameUser.value = user[1];
-	this.birthCountry.value = user[2];
-	this.birthDate.value = user[3];	
-	this.mail.value = user[5];
-	this.mobile.value = user[6];
-	this.telfixe.value = user[7];
-		
+	this.nameUser.value = user.name;
+	this.firstnameUser.value = user.firstname;
+	this.birthCountry.value = user.birthCountry;
+	this.birthDate.value = user.birthDate;
+	this.mail.value = user.mail;
+	this.mobile.value = user.mobile;
+	this.telfixe.value = user.telfixe;
   }	
 
   CreateModifyUser = async() => {
@@ -35,7 +34,7 @@ state = {isRegistered : false}
 		this.nameUser.value,this.firstnameUser.value,this.birthCountry.value,
 	this.birthDate.value,this.mail.value,this.mobile.value,this.telfixe.value)
 		.send({from: this.context.account});
-		this.state.isCreated = await this.context.contract.methods.isRegistered().call({from:this.context.account});
+		this.state.isCreated = await this.context.contract.methods.isRegistered().call();
 	}		
 	else{
 		await this.context.contract.methods.updateUser(
@@ -46,8 +45,7 @@ state = {isRegistered : false}
   }	
 
   TestRegistration = async() => {
-    const registered = await this.context.contract.methods.isRegistered().call(
-	{from:this.context.account});	  
+    const registered = await this.context.contract.methods.isRegistered().call();	  
 	alert(registered);
   }		
 	
