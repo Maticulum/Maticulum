@@ -153,5 +153,9 @@ contract Maticulum is Ownable {
    function getNFTAddress() public view returns(address){
       return address(nft);
    }
+   
+   function getlastUriId() public view returns(uint256){
+        return nft.getlastUriId();
+    }
 
 }
