@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Button, Col,Container, Form, ListGroup, Row } from 'react-bootstrap';
+import { Button, Col, Container, Form, ListGroup, Row } from 'react-bootstrap';
 import { withTranslation } from "react-i18next";
 
 import Web3Context from '../../Web3Context';
@@ -10,35 +10,51 @@ class SchoolItem extends Component {
   
    static contextType = Web3Context;
 
-   state = { school: null, editedName: '', editedTown: '', editedCountry: '' };
+   state = { id: null, name: '', town: '', country: '', administrators: ['', ''], validators: [], trainings: [] };
    
 
    async componentDidMount() {
       const id = this.props.match.params.schoolId;
       this.create = id === 'new';
-      if (this.create) {
-         this.setState({ school: { id: id, name: '', administrators: ['', ''], validators: [] }});
+      if (!this.create) {
+         const school = await this.context.contract.methods.getSchool(id).call();
+         console.log(school);
+         this.setState({ id, ...school, trainings: [] });
+         this.loadTrainings(school.trainings);
       }
       else {
-         const school = await this.context.contract.methods.schools(id).call();
-         this.setState({ editedName: school.name, editedTown: school.town, editedCountry: school.country,
-            school: {
-               id: id,
-               ...school
-         } });
+         this.setState({ school: { name: ''}, administrators: [ this.context.account, '']});
       }
    }
 
 
+   async loadTrainings(trainings) {
+      if (trainings) {
+         for (let i = 0; i < trainings.length; i++) {
+            const id = trainings[i];
+            const training = await this.context.contract.methods.getTraining(id).call();
+            const list = [...this.state.trainings];
+            list.push({ id: id, name: training.name });
+            this.setState({ trainings: list });
+         }
+      }
+   }
+
+
+   onAddTraining = async () => {
+      this.props.history.push(`/schools/${this.state.id}/trainings/new`);
+   }
+
+
    onSave = async () => {
-      // TODO check at least 2 admins
       if (this.create) {
-         await this.context.contract.methods.addSchool(this.state.editedName, this.state.editedTown, this.state.editedCountry)
+         await this.context.contract.methods.addSchool(this.state.name, this.state.town, this.state.country, 
+            this.state.administrators[0], this.state.administrators[1])
             .send({ from: this.context.account });
          this.props.history.push(`/schools`);
       }
       else {
-         await this.context.contract.methods.updateSchool(this.state.school.id, this.state.editedName, this.state.editedTown, this.state.editedCountry)
+         await this.context.contract.methods.updateSchool(this.state.id, this.state.name, this.state.town, this.state.country)
             .send({ from: this.context.account });
          this.props.history.push(`/schools`);
       }
@@ -46,53 +62,86 @@ class SchoolItem extends Component {
 
 
    render() {
-      if (this.state.school === null) {
+      if (this.state.id === null) {
          return <div>Loading...</div>;
       }
 
       const { t } = this.props;
 
       return (
-         <Container>
-               <Form>
-                  <Form.Group as={Row} >
-                     <Form.Label column sm="2">{t('school.name')}</Form.Label>
-                     <Col sm="10">
-                        <Form.Control type="text" value={this.state.editedName} onChange={(e) => this.setState({editedName: e.target.value})} />
+         <Container fluid>
+            <Row>
+               <Col>
+                  <Form>
+                     <h3>Details</h3>
+                     <Form.Group as={Row} >
+                        <Form.Label column sm="2">{t('school.name')}</Form.Label>
+                        <Col sm="10">
+                           <Form.Control type="text" value={this.state.name} onChange={(e) => this.setState({name: e.target.value})} />
+                        </Col>
+                     </Form.Group>
+                     <Form.Group as={Row} >
+                        <Form.Label column sm="2">{t('school.town')}</Form.Label>
+                        <Col sm="10">
+                           <Form.Control type="text" value={this.state.town} onChange={(e) => this.setState({town: e.target.value})} />
+                        </Col>
+                     </Form.Group>
+                     <Form.Group as={Row} >
+                        <Form.Label column sm="2">{t('school.country')}</Form.Label>
+                        <Col sm="10">
+                           <Form.Control type="text" value={this.state.country} onChange={(e) => this.setState({country: e.target.value})} />
+                        </Col>
+                     </Form.Group>
+                     <Form.Group>
+                        <Form.Label>{t('school.administrators')}</Form.Label>
+                     </Form.Group>
+                     { this.state.administrators.map((administrator, index) => (
+                        <Form.Group as={Row} key={index}>
+                           <Form.Label column sm="2">{t('school.administrator')} {index + 1}</Form.Label>
+                           <Col sm="10">
+                              <Form.Control type="text" value={this.state.administrators[index]} onChange={(e) => {
+                                    const admins = [...this.state.administrators];
+                                    admins[index] = e.target.value;
+                                    this.setState({ administrators: admins });
+                                 }} />
+                           </Col>
+                        </Form.Group>
+                     ))}
+                     <Form.Group>
+                        <Form.Label>{t('school.validators')}</Form.Label>
+                        { this.state.validators &&
+                           <ListGroup>
+                                 { this.state.validators.map((validator, index) => (
+                                    <ListGroup.Item key={index}>{validator}</ListGroup.Item>
+                                 ))}
+                           </ListGroup>
+                        }
+                     </Form.Group>
+                     <Button onClick={ this.onSave }>{t('button.save')}</Button>
+                  </Form>
+               </Col>
+
+               <Col>
+                  <Row>
+                     <Col>
+                        <h3>Trainings</h3>
                      </Col>
-                  </Form.Group>
-                  <Form.Group as={Row} >
-                     <Form.Label column sm="2">{t('school.town')}</Form.Label>
-                     <Col sm="10">
-                        <Form.Control type="text" value={this.state.editedTown} onChange={(e) => this.setState({editedTown: e.target.value})} />
+                     <Col style={{ textAlign: 'right' }}>
+                        <Button onClick={ this.onAddTraining } >Add training</Button>
                      </Col>
-                  </Form.Group>
-                  <Form.Group as={Row} >
-                     <Form.Label column sm="2">{t('school.country')}</Form.Label>
-                     <Col sm="10">
-                        <Form.Control type="text" value={this.state.editedCountry} onChange={(e) => this.setState({editedCountry: e.target.value})} />
-                     </Col>
-                  </Form.Group>
-                  <Form.Group>
-                     <Form.Label>{t('school.administrators')}</Form.Label>
-                     <ListGroup>
-                        { this.state.school.administrators.map((administrator, index) => (
-                           <ListGroup.Item key={index}>{administrator}</ListGroup.Item>
+                  </Row>
+                  <Row>
+                  { this.state.trainings &&
+                     <ul>
+                        { this.state.trainings.map((training, index) => (
+                           <li key={index}><a href={ `/schools/${this.state.id}/trainings/${training.id}` }>{training.name}</a></li>
                         ))}
-                     </ListGroup>
-                  </Form.Group>
-                  <Form.Group>
-                     <Form.Label>{t('school.validators')}</Form.Label>
-                     { this.state.school.validators &&
-                        <ListGroup>
-                              { this.state.school.validators.map((validator, index) => (
-                                 <ListGroup.Item key={index}>{validator}</ListGroup.Item>
-                              ))}
-                        </ListGroup>
-                     }
-                  </Form.Group>
-                  <Button onClick={ this.onSave }>{t('school.save')}</Button>
-               </Form>
+                     </ul>
+                  }
+                  </Row>
+               </Col>
+            </Row>
+               
          </Container>
       );
    }

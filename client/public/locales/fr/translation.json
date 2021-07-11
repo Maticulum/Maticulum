@@ -38,7 +38,14 @@
       "town": "Ville",
       "country": "Pays",
       "administrators": "Administrateurs",
-      "validators": "Validateurs",
-      "save": "Enregistrer"
+      "administrator": "Administrateur",
+      "validators": "Validateurs"
+   },
+   "training": {
+      "name": "Nom",
+      "level": "Niveau",
+      "duration": "Durée",
+      "hours": "heures",
+      "validationThreshold": "Nombre de validations"
    }
 }

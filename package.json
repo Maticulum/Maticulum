@@ -1,0 +1,16 @@
+{
+   "name": "Maticulum",
+   "version": "0.0.1",
+   "description": "",
+   "main": "truffle-config.js",
+   "directories": {
+      "test": "test"
+   },
+   "dependencies": {
+      "@openzeppelin/contracts": "^4.2.0",
+      "@openzeppelin/test-helpers": "^0.5.12",
+      "@truffle/hdwallet-provider": "^1.4.1",
+      "dotenv": "^10.0.0",
+      "webpack": "4.41.0"
+   }
+}
