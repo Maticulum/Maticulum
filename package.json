@@ -11,6 +11,10 @@
       "@openzeppelin/test-helpers": "^0.5.12",
       "@truffle/hdwallet-provider": "^1.4.1",
       "dotenv": "^10.0.0",
+      "solidity-docgen": "^0.5.13",
       "webpack": "4.41.0"
+   },
+   "devDependencies": {
+      "solc-0.8": "npm:solc@^0.8.4"
    }
 }
