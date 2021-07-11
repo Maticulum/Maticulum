@@ -41,7 +41,10 @@
 		"clearDiplomas":"Clear diplomas",
 		"school":"School",
 		"attribution":"Published the ",
-		"awaitedFormat":"Awaited .csv format file"
+		"awaitedFormat":"Awaited .csv format file",
+		"description":"This item was securely produced through MaticulumNFT smart contract. The private key of authorized administrators was required for the production and integration on the blockchain.",
+		"jsonName":"Maticulum Certified Item"
+		
 	},
    "school": {
       "name": "Name",

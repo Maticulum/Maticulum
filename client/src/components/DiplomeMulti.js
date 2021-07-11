@@ -20,12 +20,14 @@ class DiplomeMulti extends Component {
 		this.setState({ files : filesImages, linkVisible:true });
 	}
 	
-	getJsonData = async (urlImage) => {
-		const { hashes, file, sendNFTVisibility, sizeFile} = this.state; 				
+	getJsonData = async (linkDiplome) => {
+		const { hashes, file, sendNFTVisibility, sizeFile} = this.state; 	
+		const { t } = this.props; 
+		
 		const data ={ 
-			"name": "DiplomeMaticulum",
-			"image": urlImage,
-			"description": "Diplome NFT hébergé par le smart contract MaticulumNFT"
+			"name": t('diplome.jsonName'),
+			"image": linkDiplome,
+			"description": t('diplome.description')
 		};
 						
 		const JSONBody = JSON.parse(JSON.stringify(data));

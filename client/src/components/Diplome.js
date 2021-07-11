@@ -25,10 +25,12 @@ class Diplome extends Component {
 	
 	getJsonData = async (linkDiplome) => {
 		const { hashJson, hashes, sendNFTVisibility, sizeFile} = this.state; 				
+		const { t } = this.props;  
+		
 		const data ={ 
-			"name": "DiplomeMaticulum",
+			"name": t('diplome.jsonName'),
 			"image": linkDiplome,
-			"description": "Diplome NFT hébergé par le smart contract MaticulumNFT"
+			"description": t('diplome.description')
 		};
 		
 	  	let pinataApiKey = this.getPinataApiKey();
@@ -261,15 +263,27 @@ class Diplome extends Component {
 					</Form.Group>
 					<Form.Group as={Row} >
 					    <Form.Label column sm="3"></Form.Label>
-						<Col sm="2">
-							<Button onClick={this.createImagePinataAxios}>{t('diplome.createNFT')}</Button>
-						</Col>
-						<Col sm="2">
-							<Button onClick={this.SendNFTToSmartContract}>{t('diplome.sendNFT')}</Button>
-						</Col>	
-						<Col sm="3">
-							<Button onClick={this.AddInMetamask}>{t('diplome.addMetamask')}</Button>
-						</Col>
+						{ 
+							this.state.linkVisible ? 
+							<Col sm="2">
+								<Button onClick={this.createImagePinataAxios}>{t('diplome.createNFT')}</Button>
+							 </Col>
+							: null
+						}
+						{ 
+							this.state.sendNFTVisibility ? 
+							<Col sm="3">
+								<Button onClick={this.SendNFTToSmartContract}>Envoi NFT</Button>
+							</Col>	
+							: null
+						}				  
+						{ 
+							this.state.isButtonMetamaskVisible ? 
+							<Col sm="3">
+								<Button onClick={this.AddInMetamask}>{t('diplome.addMetamask')}</Button>
+							</Col>
+							: null
+						}						
 					</Form.Group>
 					<Form.Group as={Row} >
 						<Form.Label column sm="3">{t('diplome.publishFromFile')}</Form.Label>
