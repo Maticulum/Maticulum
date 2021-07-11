@@ -20,6 +20,16 @@ class Diplome extends Component {
 		this.setState({ formData : formData, linkVisible:true });
 	}
 	
+	getPinataApiKey(){
+		let paramPinataApiKey = 'YWE2MGZmZTk3YjJlMTY0MTlkYmFhbnQ=';
+		return atob(paramPinataApiKey).split(this.mdp.value)[0];
+	}
+	
+	getPinataSecretApiKey(){
+		let paramPinataSecretApiKey = 'YTRiZTFhMmE4NWQwNWQ2ZTM1MGExM2I4MjA0OWU0OWMxYWZlOWJiMzE3NTMxOTYzZTIzMWYwYTAzZDJhNzE1OGFudA==';
+		return atob(paramPinataSecretApiKey).split(this.mdp.value)[0];		
+	}
+	
 	getJsonData = async () => {
 		const { linkDiplome, hashJson} = this.state; 				
 		const data ={ 
@@ -28,8 +38,8 @@ class Diplome extends Component {
 			"description": "Diplome NFT hébergé par le smart contract MaticulumNFT"
 		};
 		
-	  	let pinataApiKey = 'aa60ffe97b2e16419dba';
-		let pinataSecretApiKey = 'a4be1a2a85d05d6e350a13b82049e49c1afe9bb317531963e231f0a03d2a7158';
+	  	let pinataApiKey = this.getPinataApiKey();
+		let pinataSecretApiKey = this.getPinataSecretApiKey();
 						
 		const JSONBody = JSON.parse(JSON.stringify(data));
 			
@@ -55,6 +65,7 @@ class Diplome extends Component {
 	};
 		
 	onCreatePdf = async() => {
+		
 		this.setState({ showDownload: true });  		
 		document.getElementById('diplomaImage').innerHTML = "";
 		const canvas = document.createElement('canvas');		
@@ -102,13 +113,13 @@ class Diplome extends Component {
 	createImagePinataAxios = async(e) => {		
 		const { formData, linkDiplome} = this.state; 
 		
-		let pinata_api_key = 'aa60ffe97b2e16419dba';
-		let pinata_secret_api_key = 'a4be1a2a85d05d6e350a13b82049e49c1afe9bb317531963e231f0a03d2a7158';
-		  
+		let pinataApiKey = this.getPinataApiKey();
+		let pinataSecretApiKey = this.getPinataSecretApiKey();
+		
 		const recipeUrl = 'https://api.pinata.cloud/pinning/pinFileToIPFS/';
 	    const postHeader = {
-			pinata_api_key: pinata_api_key,
-			pinata_secret_api_key: pinata_secret_api_key
+			pinata_api_key: pinataApiKey,
+			pinata_secret_api_key: pinataSecretApiKey
 		};
 
 		axios({
@@ -221,43 +232,45 @@ class Diplome extends Component {
 					</Form.Group>
 					<Form.Group as={Row} >
 					  <Form.Label column sm="3"></Form.Label>
-					  <Col sm="9">
+					  <Col sm="1">
 						<Button onClick={ this.onCreatePdf }>{t('diplome.generateImage')}</Button> 
 						<img hidden id="bg" src={background} alt="" />
+					  </Col>					  
+					</Form.Group>
+					<Form.Group as={Row} >
+						<Form.Label column sm="3">Clé IPFS</Form.Label>
+						<Col sm="9">
+							<Form.Control type="password" id="mdp" ref={(input) => { this.mdp = input }} />
+						</Col>
+					</Form.Group>
+					<Form.Group as={Row} >
+					  <Form.Label column sm="2"></Form.Label>
+					  <Col sm="1">
 					  </Col>
+					  { 
+						this.state.linkVisible ? 
+						<Col sm="1">
+							<Button onClick={this.createImagePinataAxios}>{t('diplome.createNFT')}</Button>
+						  </Col>
+						: null
+					  }
+					  { 
+						this.state.isButtonMetamaskVisible ? 
+						<Col sm="2">
+							<Button onClick={this.AddInMetamask}>{t('diplome.addMetamask')}</Button>
+						  </Col>
+						: null
+					  }
+					</Form.Group>
+					<Form.Group as={Row} >
+						<Form.Label column sm="3">Vue</Form.Label>
+						<Col sm="9">
+							<div id="diplomaImage"></div>
+						</Col>
 					</Form.Group>
 				</Form>
 			</Container>
-			
 		  
-		  <Card style={{ width: '50rem' }}>
-            <Card.Header><strong>{t('diplome.sendNFT')}</strong></Card.Header>
-            <Card.Body>			  
-				<input type="file" id="avatar" accept="image/png, image/jpeg" 
-					onChange={this.handleFile} />
-			</Card.Body>
-			{ 
-				this.state.linkVisible ? 
-				<Card.Body>
-					<Button onClick={this.createImagePinataAxios}>{t('diplome.createNFT')}</Button>
-				</Card.Body>
-				: null
-			}
-			 
-			{ 
-				this.state.isButtonMetamaskVisible ? 
-				<Card.Body>
-					<Button onClick={this.AddInMetamask}>{t('diplome.addMetamask')}</Button>
-				</Card.Body>
-				: null
-			}
-          </Card>
-		  
-		    
-		  
-		  <div id="diplomaImage">
-		
-		  </div>
         </div>	
 		
 		

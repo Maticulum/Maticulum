@@ -46,13 +46,45 @@ class DiplomeMulti extends Component {
 			let urlMetadata = "https://gateway.pinata.cloud/ipfs/" + ipfsHash;			
 			hashes.push(ipfsHash);
 			alert(urlMetadata);
-			this.setState({ hashJson : ipfsHash, isButtonMetamaskVisible:true,sendNFTVisibility : true});
+			this.setState({ hashJson : ipfsHash, sendNFTVisibility : true});
         })
         .catch(function (error) {
             //handle error here
         }); 
 	 
 	};
+	
+	AddInMetamask = async() => {
+		const { accounts, contractStaking, web3 } = this.state; 
+		const tokenAddress = await this.context.contract.methods.nft().call();
+		const tokenSymbol = 'MTCF';
+		const tokenDecimals = 0;
+		const tokenImage = 'https://gateway.pinata.cloud/ipfs/QmYFRV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC'; // get from IPFS
+
+		try {
+		  // wasAdded is a boolean. Like any RPC method, an error may be thrown.
+		  const wasAdded = await window.ethereum.request({
+			method: 'wallet_watchAsset',
+			params: {
+			  type: 'ERC20', // Initially only supports ERC20, but eventually more!
+			  options: {
+				address: tokenAddress, // The address that the token is at.
+				symbol: tokenSymbol, // A ticker symbol or shorthand, up to 5 chars.
+				decimals: tokenDecimals, // The number of decimals in the token
+				image: tokenImage, // A string url of the token logo
+			  },
+			},
+		  });
+
+		  if (wasAdded) {
+			console.log('Thanks for your interest!');
+		  } else {
+			console.log('Your loss!');
+		  }
+		} catch (error) {
+		  console.log(error);
+		}
+    }	
 	
 	// gestion si annulation envoi diplôme
 	onSendOneImage = async(formData, recipeUrl, postHeader) =>{	
@@ -94,8 +126,9 @@ class DiplomeMulti extends Component {
 	}
 	
 	SendNFT = async() => { 
-		const { hashes} = this.state;
+		const { hashes, isButtonMetamaskVisible} = this.state;
 		await this.context.contract.methods.createDiplomeNFTs(this.context.account,hashes).send({from:this.context.account});			
+		this.setState({ isButtonMetamaskVisible : true});
 	}
 	
 	getPinataApiKey(){
@@ -107,20 +140,6 @@ class DiplomeMulti extends Component {
 		let paramPinataSecretApiKey = 'YTRiZTFhMmE4NWQwNWQ2ZTM1MGExM2I4MjA0OWU0OWMxYWZlOWJiMzE3NTMxOTYzZTIzMWYwYTAzZDJhNzE1OGFudA==';
 		return atob(paramPinataSecretApiKey).split(this.mdp.value)[0];		
 	}
-	
-	decryptKey = async() =>{
-		const { files, pinataSecretApiKey, pinataApiKey} = this.state;		
-		
-		let paramPinataApiKey = 'YWE2MGZmZTk3YjJlMTY0MTlkYmFhbnQ=';
-		var decodedPinataApiKey = atob(paramPinataApiKey).split(this.mdp.value)[0];
-		
-		let paramPinataSecretApiKey = 'YTRiZTFhMmE4NWQwNWQ2ZTM1MGExM2I4MjA0OWU0OWMxYWZlOWJiMzE3NTMxOTYzZTIzMWYwYTAzZDJhNzE1OGFudA==';
-		var decodedPinataSecretApiKey = atob(paramPinataSecretApiKey).split(this.mdp.value)[0];		
-		
-		this.setState({ pinataSecretApiKey : decodedPinataSecretApiKey, pinataApiKey: decodedPinataApiKey});
-	}
-		
-	
 		
 	render() {
 		const { t } = this.props; 
@@ -128,8 +147,6 @@ class DiplomeMulti extends Component {
 		return(
 		<div style={{display: 'flex', justifyContent: 'center'}}>
 		  <Card style={{ width: '50rem' }}>
-			
-			
             <Card.Header><strong>{t('diplome.sendNFT')}</strong></Card.Header>
             <Card.Body>			  
 				<input type="file" id="avatar" accept="image/png, image/jpeg" 
@@ -150,6 +167,14 @@ class DiplomeMulti extends Component {
 				this.state.sendNFTVisibility ? 
 				<Card.Body>
 					<Button onClick={this.SendNFT}>Envoi NFT</Button>
+				</Card.Body>
+				: null
+			}
+			
+			{ 
+				this.state.isButtonMetamaskVisible ? 
+				<Card.Body>
+					<Button onClick={this.AddInMetamask}>{t('diplome.addMetamask')}</Button>
 				</Card.Body>
 				: null
 			}
