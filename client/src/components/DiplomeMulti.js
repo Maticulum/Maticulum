@@ -12,7 +12,7 @@ class DiplomeMulti extends Component {
 	hashImage:null,hashJson:null,fileToUpload:null, isButtonMetamaskVisible : false,
 	showDownload: false, firstname: '', lastname: '', title: '',formData:null,
 	files:null, hashes:[], pinataApiKey: '',
-	pinataSecretApiKey:'',sendNFTVisibility:false  };
+	pinataSecretApiKey:'',sendNFTVisibility:false, sizeFile:0  };
 	
 	handleFile = async(e) => {
 		const { files, pinataSecretApiKey, pinataApiKey, file} = this.state; 	
@@ -21,7 +21,7 @@ class DiplomeMulti extends Component {
 	}
 	
 	getJsonData = async (urlImage) => {
-		const { hashes, file, sendNFTVisibility} = this.state; 				
+		const { hashes, file, sendNFTVisibility, sizeFile} = this.state; 				
 		const data ={ 
 			"name": "DiplomeMaticulum",
 			"image": urlImage,
@@ -45,8 +45,8 @@ class DiplomeMulti extends Component {
             let ipfsHash = response.data.IpfsHash;	
 			let urlMetadata = "https://gateway.pinata.cloud/ipfs/" + ipfsHash;			
 			hashes.push(ipfsHash);
-			alert(urlMetadata);
-			this.setState({ hashJson : ipfsHash, sendNFTVisibility : true});
+			let finished = hashes.length == sizeFile;
+			this.setState({ hashJson : ipfsHash, sendNFTVisibility : finished});
         })
         .catch(function (error) {
             //handle error here
@@ -117,6 +117,9 @@ class DiplomeMulti extends Component {
 			pinata_secret_api_key: pinataSecretApiKey
 		};
 
+
+		const { sizeFile} = this.state;
+		this.setState({ sizeFile : files.length})
 		for(let i =0;i<files.length;i++){
 			let formData = new FormData();
 			formData.append("file", files[i]);
@@ -164,17 +167,9 @@ class DiplomeMulti extends Component {
 			}
 			
 			{ 
-				this.state.linkVisible ? 
-				<Card.Body>
-					Loading...
-				</Card.Body>
-				: null
-			}
-			
-			{ 
 				this.state.sendNFTVisibility ? 
 				<Card.Body>
-					<Button onClick={this.SendNFT}>Envoi NFT</Button>
+					<Button onClick={this.SendNFT}>{t('diplome.sendNFT')}</Button>
 				</Card.Body>
 				: null
 			}
@@ -186,9 +181,6 @@ class DiplomeMulti extends Component {
 				</Card.Body>
 				: null
 			}
-			
-			
-			 
 			
           </Card>
         </div>	

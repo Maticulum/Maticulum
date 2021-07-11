@@ -11,7 +11,7 @@ class Diplome extends Component {
 	state = { linkDiplome : 'Diplome', linkVisible:false,
 	hashImage:null,hashJson:null,fileToUpload:null, isButtonMetamaskVisible : false,
 	showDownload: false, firstname: '', lastname: '', school : '', formData:null,
-	grade:'',diplomaName:'',files:[], sendNFT:false, hashes:[] };
+	grade:'',diplomaName:'',files:[], sendNFT:false, hashes:[], sizeFile:0 };
 		
 	getPinataApiKey(){
 		let paramPinataApiKey = 'YWE2MGZmZTk3YjJlMTY0MTlkYmFhbnQ=';
@@ -23,11 +23,11 @@ class Diplome extends Component {
 		return atob(paramPinataSecretApiKey).split(this.mdp.value)[0];		
 	}
 	
-	getJsonData = async () => {
-		const { linkDiplome, hashJson, hashes} = this.state; 				
+	getJsonData = async (linkDiplome) => {
+		const { hashJson, hashes, sendNFTVisibility, sizeFile} = this.state; 				
 		const data ={ 
 			"name": "DiplomeMaticulum",
-			"image": this.state.linkDiplome,
+			"image": linkDiplome,
 			"description": "Diplome NFT hébergé par le smart contract MaticulumNFT"
 		};
 		
@@ -47,20 +47,15 @@ class Diplome extends Component {
         .then(async (response) => {
             let ipfsHash = response.data.IpfsHash;	
 			let urlMetadata = "https://gateway.pinata.cloud/ipfs/" + ipfsHash;
-			hashes.push(ipfsHash);
-			
-			this.setState({ hashJson : ipfsHash});
+			hashes.push(ipfsHash);	
+			let finished = hashes.length == sizeFile;	
+			this.setState({ hashJson : ipfsHash, sendNFTVisibility: finished});
         })
         .catch(function (error) {
             //handle error here
         }); 
 	 
 	};
-	
-	publiPostage = async() => {
-		await this.createImageDiplome("Albert","Ména","Université de Tours","","Licence","Mathématiques");
-		await this.createImageDiplome("Léa","François","Université d'Angers","","Master","Cybernétique");		
-	}
 	
 	createImageDiplome = async(firstname, lastname,school, grade, diplomaName) => {
 		const { files } = this.state; 
@@ -142,13 +137,13 @@ class Diplome extends Component {
 			pinata_secret_api_key: pinataSecretApiKey
 		};
 		
-		for(let i =0;i<files.length;i++){
+		const { sizeFile} = this.state;
+		this.setState({ sizeFile : files.length})
+		for(let i = 0;i<files.length;i++){
 			let formData = new FormData();
-			formData.append("file", files[i]);
+			formData.append("file", files[i]);			
 			await this.onSendOneImage(formData, recipeUrl, postHeader);
 		}
-		
-		this.setState({ sendNFTVisibility : true});
 	}
 	
 	SendNFTToSmartContract = async() => {
@@ -250,13 +245,13 @@ class Diplome extends Component {
 					</Form.Group>
 					<Form.Group as={Row} >
 					  <Form.Label column sm="3"></Form.Label>
-					  <Col sm="1">
-						<Button onClick={ this.onCreateDiplome }>{t('diplome.generateImage')}</Button> 
-						<img hidden id="bg" src={background} alt="" />
-					  </Col>	
-					  <Col sm="1">
-						<Button onClick={ this.clearDiplomas }>{t('diplome.clearDiplomas')}</Button> 
-					  </Col>					  
+						  <Col sm="2">
+							<Button onClick={ this.onCreateDiplome }>{t('diplome.generateImage')}</Button> 
+							<img hidden id="bg" src={background} alt="" />
+						  </Col>	
+						  <Col sm="2">
+							<Button onClick={ this.clearDiplomas }>{t('diplome.clearDiplomas')}</Button> 
+						  </Col>					  
 					</Form.Group>
 					<Form.Group as={Row} >
 						<Form.Label column sm="3">{t('diplome.IPFSkey')}</Form.Label>
@@ -265,30 +260,16 @@ class Diplome extends Component {
 						</Col>
 					</Form.Group>
 					<Form.Group as={Row} >
-					  <Form.Label column sm="2"></Form.Label>
-					  <Col sm="1">
-					  </Col>
-					  { 
-						this.state.linkVisible ? 
-						<Col sm="1">
+					    <Form.Label column sm="3"></Form.Label>
+						<Col sm="2">
 							<Button onClick={this.createImagePinataAxios}>{t('diplome.createNFT')}</Button>
-						  </Col>
-						: null
-					  }
-					  { 
-						this.state.sendNFTVisibility ? 
-						<Card.Body>
-							<Button onClick={this.SendNFTToSmartContract}>Envoi NFT</Button>
-						</Card.Body>
-						: null
-					  }				  
-					  { 
-						this.state.isButtonMetamaskVisible ? 
+						</Col>
+						<Col sm="2">
+							<Button onClick={this.SendNFTToSmartContract}>{t('diplome.sendNFT')}</Button>
+						</Col>	
 						<Col sm="3">
 							<Button onClick={this.AddInMetamask}>{t('diplome.addMetamask')}</Button>
 						</Col>
-						: null
-					  }
 					</Form.Group>
 					<Form.Group as={Row} >
 						<Form.Label column sm="3">{t('diplome.publishFromFile')}</Form.Label>
