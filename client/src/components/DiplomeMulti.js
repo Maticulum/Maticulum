@@ -152,7 +152,7 @@ class DiplomeMulti extends Component {
 				<input type="file" id="avatar" accept="image/png, image/jpeg" 
 				 multiple="multiple"	onChange={this.handleFile} />
 			</Card.Body>
-			Clé pour envoyer le NFT sur IPFS :
+			{t('diplome.IPFSkey')}
 			<Form.Control type="password" id="mdp" ref={(input) => { this.mdp = input }} />
 			
 			{ 

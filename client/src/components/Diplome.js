@@ -10,7 +10,7 @@ class Diplome extends Component {
 	
 	state = { linkDiplome : 'Diplome', linkVisible:false,
 	hashImage:null,hashJson:null,fileToUpload:null, isButtonMetamaskVisible : false,
-	showDownload: false, firstname: '', lastname: '', title: '',school : '', typeDiploma:'',formData:null,
+	showDownload: false, firstname: '', lastname: '', school : '', formData:null,
 	grade:'',diplomaName:'',files:[], sendNFT:false, hashes:[] };
 		
 	getPinataApiKey(){
@@ -62,7 +62,7 @@ class Diplome extends Component {
 		await this.createImageDiplome("Léa","François","Université d'Angers","","Master","Cybernétique");		
 	}
 	
-	createImageDiplome = async(firstname, lastname,school,typeDiploma, grade, diplomaName) => {
+	createImageDiplome = async(firstname, lastname,school, grade, diplomaName) => {
 		const { files } = this.state; 
 		
 		let userDatas = firstname + lastname + school;
@@ -79,14 +79,12 @@ class Diplome extends Component {
 		  
 		  context.drawImage(img, 0, 0);
 		  context.font = '20pt Verdana';
-
-		  //context.fillText(this.state.title, 350, 120);
+          const { t } = this.props; 
 		  context.fillText(firstname, 125, 175);
 		  context.fillText(lastname, 125, 215);	
-		  context.fillText(school, 10, 35);	
-		  context.fillText(typeDiploma, 400, 215);	
+		  context.fillText(school, 10, 35);		
 		  context.fillText(grade + " " + diplomaName, 175, 120);
-		  context.fillText("attribué à partir du 12/08/2021" , 200, 300);
+		  context.fillText(t('diplome.attribution') + "12/08/2021" , 200, 300);
 		  
 		  const hashString = Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');	
 							
@@ -105,46 +103,13 @@ class Diplome extends Component {
 		
 	onCreateDiplome = async() => {
 		const { files } = this.state; 	
-		this.setState({ showDownload: true });  		
-		//document.getElementById('diplomaImage').innerHTML = "";
-		const canvas = document.createElement('canvas');		
-		console.log(canvas.toDataURL('image/png'));
-		const context = canvas.getContext('2d');
-		
-		let userDatas = this.state.firstname + this.state.lastname + this.state.school;
-		
-		const data = new TextEncoder().encode(userDatas);
-		const buffer = await window.crypto.subtle.digest('SHA-256', data);
-
-		const img = new Image();
-		img.onload = () => {
-		  canvas.width = img.width;
-		  canvas.height = img.height;
-		  
-		  context.drawImage(img, 0, 0);
-		  context.font = '20pt Verdana';
-
-		  //context.fillText(this.state.title, 350, 120);
-		  context.fillText(this.state.firstname, 125, 175);
-		  context.fillText(this.state.lastname, 125, 215);	
-		  context.fillText(this.state.school, 10, 35);	
-		  context.fillText(this.state.typeDiploma, 400, 215);	
-		  context.fillText(this.state.grade + " " + this.state.diplomaName, 175, 120);
-		  context.fillText("attribué à partir du 30/06/2017" , 200, 300);
-		  
-		  const hashString = Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');	
-							
-		  canvas.toBlob((blob) => {
-			const file=  new File([blob], hashString + '.png');
-			files.push(file);
-		  });
-		  this.setState({ linkVisible:true});	  		  
-		};
-		
-		img.src = document.getElementById('bg').src;
-		
-		document.body.appendChild(canvas); 
-		document.getElementById('diplomaImage').appendChild(canvas);
+		this.setState({ showDownload: true });  				
+		await this.createImageDiplome(this.state.firstname, this.state.lastname,this.state.school,
+		"", this.state.grade, this.state.diplomaName);
+	}
+	
+	clearDiplomas() {
+		document.getElementById('diplomaImage').innerHTML = "";	
 	}
 	
 	onSendOneImage = async(formData, recipeUrl, postHeader) => {	
@@ -232,7 +197,7 @@ class Diplome extends Component {
 		  
 		  for(let i =0;i<lines.length;i++){
 			alert(lines[i]);
-			const line = lines[i].split(',');
+			const line = lines[i].split(',');	
 			await this.createImageDiplome(line[0],line[1],line[2],"",line[3],line[4]);	
 		  }
 		};
@@ -264,38 +229,21 @@ class Diplome extends Component {
 						<Col sm="9">
 						  <Form.Control type="text" value={this.state.firstname} onChange={(e) => this.setState({firstname: e.target.value})} />
 						</Col>
-					</Form.Group>
+					</Form.Group>					
 					<Form.Group as={Row} >
-						<Form.Label column sm="3">{t('diplome.diploma')}</Form.Label>
-						<Col sm="9">
-							<Form.Control type="text" value={this.state.title} onChange={(e) => this.setState({title: e.target.value})} />
-						</Col>
-					</Form.Group>
-					<Form.Group as={Row} >
-						<Form.Label column sm="3">Type</Form.Label>
-						<Col sm="9">
-							<label> 
-								<select id="lang">
-								  <option value="Certificate" onChange={(e) => this.setState({title: e.target.value})}>Certificat</option>
-								  <option value="diploma" onChange={(e) => this.setState({title: e.target.value})}>Diplôme</option>
-							   </select>
-							</label>
-						</Col>
-					</Form.Group>
-					<Form.Group as={Row} >
-						<Form.Label column sm="3">Ecole</Form.Label>
+						<Form.Label column sm="3">{t('diplome.school')}</Form.Label>
 						<Col sm="9">
 							<Form.Control type="text" value={this.state.school} onChange={(e) => this.setState({school: e.target.value})} />
 						</Col>
 					</Form.Group>
 					<Form.Group as={Row} >
-						<Form.Label column sm="3">Niveau</Form.Label>
+						<Form.Label column sm="3">{t('diplome.grade')}</Form.Label>
 						<Col sm="9">
 							<Form.Control type="text" value={this.state.grade} onChange={(e) => this.setState({grade: e.target.value})} />
 						</Col>
 					</Form.Group>
 					<Form.Group as={Row} >
-						<Form.Label column sm="3">Intitulé</Form.Label>
+						<Form.Label column sm="3">{t('diplome.diplomaName')}</Form.Label>
 						<Col sm="9">
 							<Form.Control type="text" value={this.state.diplomaName} onChange={(e) => this.setState({diplomaName: e.target.value})} />
 						</Col>
@@ -305,10 +253,13 @@ class Diplome extends Component {
 					  <Col sm="1">
 						<Button onClick={ this.onCreateDiplome }>{t('diplome.generateImage')}</Button> 
 						<img hidden id="bg" src={background} alt="" />
+					  </Col>	
+					  <Col sm="1">
+						<Button onClick={ this.clearDiplomas }>{t('diplome.clearDiplomas')}</Button> 
 					  </Col>					  
 					</Form.Group>
 					<Form.Group as={Row} >
-						<Form.Label column sm="3">Clé IPFS</Form.Label>
+						<Form.Label column sm="3">{t('diplome.IPFSkey')}</Form.Label>
 						<Col sm="9">
 							<Form.Control type="password" id="mdp" ref={(input) => { this.mdp = input }} />
 						</Col>
@@ -340,21 +291,24 @@ class Diplome extends Component {
 					  }
 					</Form.Group>
 					<Form.Group as={Row} >
-						<Form.Label column sm="3">Création en masse</Form.Label>
+						<Form.Label column sm="3">{t('diplome.publishFromFile')}</Form.Label>
 						<Col sm="9">
-							<Button onClick={this.publiPostage}>Créer diplômes</Button>
+							<input type="file" onChange={(e) => this.showFile(e)} />
 						</Col>
 					</Form.Group>
 					<Form.Group as={Row} >
-						<Form.Label column sm="3">Vue</Form.Label>
+						<Form.Label column sm="3">{t('diplome.awaitedFormat')}</Form.Label>
 						<Col sm="9">
-							<div>
-							  <input type="file" onChange={(e) => this.showFile(e)} />
-							</div>
+							<Form.Control disabled type="text" 
+							value={t('formlabel.firstname') + "," + 
+								  t('formlabel.name') + "," + 
+								  t('diplome.school') + "," + 
+								  t('diplome.grade') + "," + 
+								  t('diplome.diplomaName')} />
 						</Col>
 					</Form.Group>
 					<Form.Group as={Row} >
-						<Form.Label column sm="3">Vue</Form.Label>
+						<Form.Label column sm="3"></Form.Label>
 						<Col sm="9">
 							<div id="diplomaImage"></div>
 						</Col>

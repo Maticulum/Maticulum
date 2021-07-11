@@ -28,10 +28,18 @@
 		"createNFT":"Créer NFT",
 		"sendNFT" : "Envoi du diplôme sur Maticulum",
 		"addMetamask":"Ajouter à Metamask",
-		"diploma":"Diplôme",
-		"diplomas":"Diplômes",
+		"diploma":"Créer diplôme",
+		"diplomas":"Anciens diplômes",
 		"generateImage":"Générer",
-		"diplomaBuid":"Génération du diplôme"
+		"diplomaBuid":"Génération du diplôme",
+		"grade":"Niveau",
+		"diplomaName":"Intitulé",
+		"IPFSkey":"Clé IPFS",
+		"publishFromFile":"Publipostage",
+		"clearDiplomas":"Réinitialiser les diplômes",
+		"school":"Ecole",
+		"attribution":"Attribué le ",
+		"awaitedFormat":"Format attendu pour le fichier .csv"
 	},
    "school": {
       "name": "Nom",

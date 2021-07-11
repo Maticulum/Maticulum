@@ -29,10 +29,18 @@
 		"createNFT":"Create NFT",
 		"sendNFT" : "Sendind of diploma to Maticulum",
 		"addMetamask":"Add to Metamask",
-		"diploma":"Diploma",
-		"diplomas":"Diplomas",
+		"diploma":"Create diploma",
+		"diplomas":"Old diplomas",
 		"generateImage":"Build",
-		"diplomaBuid":"Build diploma"
+		"diplomaBuid":"Build diploma",
+		"grade":"Grade",
+		"diplomaName":"Diploma name",
+		"IPFSkey":"IPFS Key",
+		"publishFromFile":"Publish list",
+		"clearDiplomas":"Clear diplomas",
+		"school":"School",
+		"attribution":"Published the ",
+		"awaitedFormat":"Awaited .csv format file"
 	},
    "school": {
       "name": "Name",
