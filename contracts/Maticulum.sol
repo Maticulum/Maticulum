@@ -103,19 +103,6 @@ contract Maticulum is Ownable {
       _;
    }
 
-   modifier juryForTraining(address jury, uint256 id) {
-      Training memory training = trainings[id];
-      bool found = false;
-      for (uint256 i = 0; i < training.juries.length; i++) {
-         if (training.juries[i] == jury) {
-            found = true;
-            break;
-         }
-      }
-      require(found, "!juryForTraining");
-
-      _;
-   }
 
    modifier onlyStudent() {
       require((users[msg.sender].role & STUDENT_MASK) == STUDENT_MASK, "!Student");
@@ -194,6 +181,9 @@ contract Maticulum is Ownable {
       school.administrators = administrators;
       schools.push(school);
 
+      users[_admin1].role |= ADMIN_MASK;
+      users[_admin2].role |= ADMIN_MASK;
+
       uint256 id = schools.length - 1;
       emit SchoolAdded(id, _name, _town, _country, msg.sender);
       emit SchoolAdminAdded(id, _admin1, msg.sender);
@@ -205,6 +195,7 @@ contract Maticulum is Ownable {
 
    function addSchoolAdministrator(uint256 _id, address _administrator) external onlyAdmin {
       schools[_id].administrators.push(_administrator);
+      users[_administrator].role |= ADMIN_MASK;
 
       emit SchoolAdminAdded(_id, _administrator, msg.sender);
    }
@@ -256,10 +247,10 @@ contract Maticulum is Ownable {
 
 
    function getSchool(uint256 _id) external view onlyRegistered 
-         returns(string memory name, string memory town, string memory country, address[] memory administrators, address[] memory validators) {
+         returns(string memory name, string memory town, string memory country, address[] memory administrators, address[] memory validators, uint256[] memory _trainings) {
       School storage school = schools[_id];
 
-      return (school.name, school.town, school.country, school.administrators, school.validators);
+      return (school.name, school.town, school.country, school.administrators, school.validators, school.trainings);
    }
 
 
@@ -285,37 +276,21 @@ contract Maticulum is Ownable {
    }
 
 
+   function getTraining(uint256 _id) external view
+         returns (string memory name, string memory level, uint16 duration, uint16 validationThreshold, address[] memory juries) {
+      Training memory training = trainings[_id];
+
+      return (training.name, training.level, training.duration, training.validationThreshold, training.juries);
+   }
+
+
    function addJury(uint256 _schoolId, uint256 _trainingId, address _jury) external onlySchoolAdmin(_schoolId) schoolValidated(_schoolId) {
       require(isRegistered(_jury), "Jury !registered");
 
       trainings[_trainingId].juries.push(_jury);
+      users[_jury].role |= JURY_MASK;
 
       emit JuryAdded(_schoolId, _trainingId, _jury, msg.sender);
-   }
-
-
-   function validateJury(uint256 _schoolId, uint256 _trainingId, address _jury) 
-         external onlySchoolAdmin(_schoolId) schoolValidated(_schoolId) juryForTraining(_jury, _trainingId) {
-      
-      for (uint16 i = 0; i < juryValidators[_trainingId][_jury].length; i++) {
-         if (juryValidators[_trainingId][_jury][i] == msg.sender) {
-               revert("Already validated by this user.");
-         }
-      }
-
-      juryValidators[_trainingId][_jury].push(msg.sender);
-
-      if (isJuryValidated(_trainingId, _jury)) {
-         users[_jury].role |= JURY_MASK;
-      }
-
-      uint256 length = juryValidators[_trainingId][_jury].length;
-      emit JuryValidated(_schoolId, _trainingId, _jury, msg.sender, uint16(length));
-   }
-
-
-   function isJuryValidated(uint256 _trainingId, address _jury) public view returns (bool) {
-      return juryValidators[_trainingId][_jury].length >= trainings[_trainingId].validationThreshold;
    }
 
 
@@ -341,8 +316,4 @@ contract Maticulum is Ownable {
         return last;
     }
 	
-   // TODO For testing purposes, should be removed
-   function forceRole(uint8 role) external onlyOwner {
-      users[msg.sender].role = role;
-   }
 }

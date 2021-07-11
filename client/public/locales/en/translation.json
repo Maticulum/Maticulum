@@ -8,7 +8,8 @@
     "button": {
         "add": "Add new",
         "edit": "Edit",
-        "validate": "Validate"
+        "validate": "Validate",
+        "save": "Save"
     },
     "table": {
         "name": "Name",
@@ -38,7 +39,14 @@
       "town": "Town",
       "country": "Country",
       "administrators": "Administrators",
-      "validators": "Validators",
-      "save": "Save"
+      "administrator": "Administrator",
+      "validators": "Validators"
+   },
+   "training": {
+      "name": "Name",
+      "level": "Level",
+      "duration": "Duration",
+      "hours": "hours",
+      "validationThreshold": "Number of validations"
    }
 }
