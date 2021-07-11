@@ -11,8 +11,8 @@ class DiplomeMulti extends Component {
 	state = { linkDiplome : 'Diplome', linkVisible:false,
 	hashImage:null,hashJson:null,fileToUpload:null, isButtonMetamaskVisible : false,
 	showDownload: false, firstname: '', lastname: '', title: '',formData:null,
-	files:null, hashes:[], pinataApiKey: 'aa60ffe97b2e16419dba',
-	pinataSecretApiKey:'a4be1a2a85d05d6e350a13b82049e49c1afe9bb317531963e231f0a03d2a7158'  };
+	files:null, hashes:[], pinataApiKey: '',
+	pinataSecretApiKey:'',sendNFTVisibility:false  };
 	
 	handleFile = async(e) => {
 		const { files, pinataSecretApiKey, pinataApiKey, file} = this.state; 	
@@ -21,7 +21,7 @@ class DiplomeMulti extends Component {
 	}
 	
 	getJsonData = async (urlImage) => {
-		const { hashes, pinataSecretApiKey, pinataApiKey, file} = this.state; 				
+		const { hashes, file, sendNFTVisibility} = this.state; 				
 		const data ={ 
 			"name": "DiplomeMaticulum",
 			"image": urlImage,
@@ -29,6 +29,9 @@ class DiplomeMulti extends Component {
 		};
 						
 		const JSONBody = JSON.parse(JSON.stringify(data));
+		
+		const pinataApiKey = this.getPinataApiKey();
+		const pinataSecretApiKey = this.getPinataSecretApiKey();
 			
 		
 		const url = `https://api.pinata.cloud/pinning/pinJSONToIPFS/`;
@@ -42,16 +45,14 @@ class DiplomeMulti extends Component {
             let ipfsHash = response.data.IpfsHash;	
 			let urlMetadata = "https://gateway.pinata.cloud/ipfs/" + ipfsHash;			
 			hashes.push(ipfsHash);
-			//
-			this.setState({ hashJson : ipfsHash, isButtonMetamaskVisible:true});
+			alert(urlMetadata);
+			this.setState({ hashJson : ipfsHash, isButtonMetamaskVisible:true,sendNFTVisibility : true});
         })
         .catch(function (error) {
             //handle error here
         }); 
 	 
 	};
-	
-	
 	
 	// gestion si annulation envoi diplôme
 	onSendOneImage = async(formData, recipeUrl, postHeader) =>{	
@@ -64,7 +65,7 @@ class DiplomeMulti extends Component {
 		  .then(async (res) => { 
 			let ipfsHash = res.data.IpfsHash;
 			let urlMetadata = "https://gateway.pinata.cloud/ipfs/" + ipfsHash;	
-			alert(urlMetadata);			
+						
 			this.setState({ linkDiplome : urlMetadata, linkVisible:true,
 			hashImage:ipfsHash});
 			await this.getJsonData(urlMetadata);
@@ -73,9 +74,12 @@ class DiplomeMulti extends Component {
 	}
 	
 	createImagePinataAxios = async(e) => {		
-		const { pinataSecretApiKey, pinataApiKey, files} = this.state; 		 
-		alert(files[1]); 
-		const recipeUrl = 'https://api.pinata.cloud/pinning/pinFileToIPFS/';
+		const { files} = this.state; 
+		const recipeUrl = 'https://api.pinata.cloud/pinning/pinFileToIPFS/';		
+		
+		const pinataApiKey = this.getPinataApiKey();
+		const pinataSecretApiKey = this.getPinataSecretApiKey();
+		
 	    const postHeader = {
 			pinata_api_key: pinataApiKey,
 			pinata_secret_api_key: pinataSecretApiKey
@@ -91,9 +95,29 @@ class DiplomeMulti extends Component {
 	
 	SendNFT = async() => { 
 		const { hashes} = this.state;
-		alert(hashes[0]);
-		alert(hashes[1]);
 		await this.context.contract.methods.createDiplomeNFTs(this.context.account,hashes).send({from:this.context.account});			
+	}
+	
+	getPinataApiKey(){
+		let paramPinataApiKey = 'YWE2MGZmZTk3YjJlMTY0MTlkYmFhbnQ=';
+		return atob(paramPinataApiKey).split(this.mdp.value)[0];
+	}
+	
+	getPinataSecretApiKey(){
+		let paramPinataSecretApiKey = 'YTRiZTFhMmE4NWQwNWQ2ZTM1MGExM2I4MjA0OWU0OWMxYWZlOWJiMzE3NTMxOTYzZTIzMWYwYTAzZDJhNzE1OGFudA==';
+		return atob(paramPinataSecretApiKey).split(this.mdp.value)[0];		
+	}
+	
+	decryptKey = async() =>{
+		const { files, pinataSecretApiKey, pinataApiKey} = this.state;		
+		
+		let paramPinataApiKey = 'YWE2MGZmZTk3YjJlMTY0MTlkYmFhbnQ=';
+		var decodedPinataApiKey = atob(paramPinataApiKey).split(this.mdp.value)[0];
+		
+		let paramPinataSecretApiKey = 'YTRiZTFhMmE4NWQwNWQ2ZTM1MGExM2I4MjA0OWU0OWMxYWZlOWJiMzE3NTMxOTYzZTIzMWYwYTAzZDJhNzE1OGFudA==';
+		var decodedPinataSecretApiKey = atob(paramPinataSecretApiKey).split(this.mdp.value)[0];		
+		
+		this.setState({ pinataSecretApiKey : decodedPinataSecretApiKey, pinataApiKey: decodedPinataApiKey});
 	}
 		
 	
@@ -104,11 +128,16 @@ class DiplomeMulti extends Component {
 		return(
 		<div style={{display: 'flex', justifyContent: 'center'}}>
 		  <Card style={{ width: '50rem' }}>
+			
+			
             <Card.Header><strong>{t('diplome.sendNFT')}</strong></Card.Header>
             <Card.Body>			  
 				<input type="file" id="avatar" accept="image/png, image/jpeg" 
 				 multiple="multiple"	onChange={this.handleFile} />
 			</Card.Body>
+			Clé pour envoyer le NFT sur IPFS :
+			<Form.Control type="password" id="mdp" ref={(input) => { this.mdp = input }} />
+			
 			{ 
 				this.state.linkVisible ? 
 				<Card.Body>
@@ -116,10 +145,16 @@ class DiplomeMulti extends Component {
 				</Card.Body>
 				: null
 			}
-			 
-			<Card.Body>
+			
+			{ 
+				this.state.sendNFTVisibility ? 
+				<Card.Body>
 					<Button onClick={this.SendNFT}>Envoi NFT</Button>
 				</Card.Body>
+				: null
+			}
+			 
+			
           </Card>
         </div>	
 

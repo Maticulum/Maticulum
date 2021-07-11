@@ -10,7 +10,8 @@ class Diplome extends Component {
 	
 	state = { linkDiplome : 'Diplome', linkVisible:false,
 	hashImage:null,hashJson:null,fileToUpload:null, isButtonMetamaskVisible : false,
-	showDownload: false, firstname: '', lastname: '', title: '',formData:null};
+	showDownload: false, firstname: '', lastname: '', title: '',school : '', typeDiploma:'',formData:null,
+	grade:'',diplomaName:'', };
 	
 	handleFile = async(e) => {
 		let files = e.target.files[0];
@@ -52,34 +53,17 @@ class Diplome extends Component {
         }); 
 	 
 	};
-	
-	getUrlExtension = (url) => {
-		return url
-		  .split(/[#?]/)[0]
-		  .split(".")
-		  .pop()
-		  .trim();
-	}
-	
-	onImageEdit = async (imgUrl) => {
-		var imgExt = this.getUrlExtension(imgUrl);
-		const response = await fetch(imgUrl);
-		const blob = await response.blob();
-		const file = new File([blob], "profileImage." + imgExt, {
-		  type: blob.type,
-		});
-		return file;
-	} 
-
+		
 	onCreatePdf = async() => {
-		this.setState({ showDownload: true });    
-		
-		
-		const canvas = document.createElement('canvas');
+		this.setState({ showDownload: true });  		
+		document.getElementById('diplomaImage').innerHTML = "";
+		const canvas = document.createElement('canvas');		
 		console.log(canvas.toDataURL('image/png'));
 		const context = canvas.getContext('2d');
 		
-		const data = new TextEncoder().encode("texte à hacher")
+		let userDatas = this.state.firstname + this.state.lastname + this.state.school;
+		
+		const data = new TextEncoder().encode(userDatas);
 		const buffer = await window.crypto.subtle.digest('SHA-256', data);
 
 		const img = new Image();
@@ -90,13 +74,16 @@ class Diplome extends Component {
 		  context.drawImage(img, 0, 0);
 		  context.font = '20pt Verdana';
 
-		  context.fillText(this.state.title, 350, 120);
+		  //context.fillText(this.state.title, 350, 120);
 		  context.fillText(this.state.firstname, 125, 175);
-		  context.fillText(this.state.lastname, 125, 215);		  
+		  context.fillText(this.state.lastname, 125, 215);	
+		  context.fillText(this.state.school, 10, 35);	
+		  context.fillText(this.state.typeDiploma, 400, 215);	
+		  context.fillText(this.state.grade + " " + this.state.diplomaName, 175, 120);
+		  context.fillText("attribué à partir du 30/06/2017" , 200, 300);
 		  
 		  const hashString = Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');	
-	
-			
+				
           let formData = new FormData();			
 		  canvas.toBlob((blob) => {
 			formData.append("file", new File([blob], hashString + '.png'));
@@ -105,6 +92,9 @@ class Diplome extends Component {
 		};
 		
 		img.src = document.getElementById('bg').src;
+		
+		document.body.appendChild(canvas); 
+		document.getElementById('diplomaImage').appendChild(canvas);
 	}
 	
 	// gestion si annulation envoi diplôme
@@ -139,71 +129,100 @@ class Diplome extends Component {
 	}
 		
 	AddInMetamask = async() => {
-	const { accounts, contractStaking, web3 } = this.state; 
-	const tokenAddress = await this.context.contract.methods.nft().call();
-	const tokenSymbol = 'MTCF';
-	const tokenDecimals = 0;
-	const tokenImage = 'https://ipfs.io/ipfs/QmeYp7Et2owcGBinFiSsU2Tdjvpeq2BzaW1bEpzVyhE8WV?filename=hermes.png'; // get from IPFS
+		const { accounts, contractStaking, web3 } = this.state; 
+		const tokenAddress = await this.context.contract.methods.nft().call();
+		const tokenSymbol = 'MTCF';
+		const tokenDecimals = 0;
+		const tokenImage = 'https://ipfs.io/ipfs/QmeYp7Et2owcGBinFiSsU2Tdjvpeq2BzaW1bEpzVyhE8WV?filename=hermes.png'; // get from IPFS
 
-	try {
-	  // wasAdded is a boolean. Like any RPC method, an error may be thrown.
-	  const wasAdded = await window.ethereum.request({
-		method: 'wallet_watchAsset',
-		params: {
-		  type: 'ERC20', // Initially only supports ERC20, but eventually more!
-		  options: {
-			address: tokenAddress, // The address that the token is at.
-			symbol: tokenSymbol, // A ticker symbol or shorthand, up to 5 chars.
-			decimals: tokenDecimals, // The number of decimals in the token
-			image: tokenImage, // A string url of the token logo
-		  },
-		},
-	  });
+		try {
+		  // wasAdded is a boolean. Like any RPC method, an error may be thrown.
+		  const wasAdded = await window.ethereum.request({
+			method: 'wallet_watchAsset',
+			params: {
+			  type: 'ERC20', // Initially only supports ERC20, but eventually more!
+			  options: {
+				address: tokenAddress, // The address that the token is at.
+				symbol: tokenSymbol, // A ticker symbol or shorthand, up to 5 chars.
+				decimals: tokenDecimals, // The number of decimals in the token
+				image: tokenImage, // A string url of the token logo
+			  },
+			},
+		  });
 
-	  if (wasAdded) {
-		console.log('Thanks for your interest!');
-	  } else {
-		console.log('Your loss!');
-	  }
-	} catch (error) {
-	  console.log(error);
-	}
-  }	
+		  if (wasAdded) {
+			console.log('Thanks for your interest!');
+		  } else {
+			console.log('Your loss!');
+		  }
+		} catch (error) {
+		  console.log(error);
+		}
+    }	
 		
 	render() {
 		const { t } = this.props; 
 		
 		return(
+				
 		<div style={{display: 'flex', justifyContent: 'center'}}>
 			<Container>
 				<Form>
 					<Form.Group as={Row} >
-						<Form.Label column sm="2"></Form.Label>
-						<Form.Label column sm="10">{t('diplome.diplomaBuid')}</Form.Label>
+						<Form.Label column sm="3"></Form.Label>
+						<Form.Label column sm="9">{t('diplome.diplomaBuid')}</Form.Label>
 					</Form.Group>
 					<Form.Group as={Row} >
-						<Form.Label column sm="2">{t('formlabel.firstname')}</Form.Label>
-						<Col sm="10">
+						<Form.Label column sm="3">{t('formlabel.firstname')}</Form.Label>
+						<Col sm="9">
 						  <Form.Control type="text" value={this.state.lastname} onChange={(e) => this.setState({lastname: e.target.value})} />
 						</Col>
 					 </Form.Group>
 					<Form.Group as={Row} >
-						<Form.Label column sm="2">{t('formlabel.name')}</Form.Label>
-						<Col sm="10">
+						<Form.Label column sm="3">{t('formlabel.name')}</Form.Label>
+						<Col sm="9">
 						  <Form.Control type="text" value={this.state.firstname} onChange={(e) => this.setState({firstname: e.target.value})} />
 						</Col>
 					</Form.Group>
 					<Form.Group as={Row} >
-						<Form.Label column sm="2">{t('diplome.diploma')}</Form.Label>
-						<Col sm="10">
+						<Form.Label column sm="3">{t('diplome.diploma')}</Form.Label>
+						<Col sm="9">
 							<Form.Control type="text" value={this.state.title} onChange={(e) => this.setState({title: e.target.value})} />
 						</Col>
 					</Form.Group>
 					<Form.Group as={Row} >
-					  <Form.Label column sm="2"></Form.Label>
-					  <Col sm="10">
-					  { !this.state.showDownload && 
-						<Button onClick={ this.onCreatePdf }>{t('diplome.generateImage')}</Button> }
+						<Form.Label column sm="3">Type</Form.Label>
+						<Col sm="9">
+							<label> 
+								<select id="lang">
+								  <option value="Certificate" onChange={(e) => this.setState({title: e.target.value})}>Certificat</option>
+								  <option value="diploma" onChange={(e) => this.setState({title: e.target.value})}>Diplôme</option>
+							   </select>
+							</label>
+						</Col>
+					</Form.Group>
+					<Form.Group as={Row} >
+						<Form.Label column sm="3">Ecole</Form.Label>
+						<Col sm="9">
+							<Form.Control type="text" value={this.state.school} onChange={(e) => this.setState({school: e.target.value})} />
+						</Col>
+					</Form.Group>
+					<Form.Group as={Row} >
+						<Form.Label column sm="3">Niveau</Form.Label>
+						<Col sm="9">
+							<Form.Control type="text" value={this.state.grade} onChange={(e) => this.setState({grade: e.target.value})} />
+						</Col>
+					</Form.Group>
+					<Form.Group as={Row} >
+						<Form.Label column sm="3">Intitulé</Form.Label>
+						<Col sm="9">
+							<Form.Control type="text" value={this.state.diplomaName} onChange={(e) => this.setState({diplomaName: e.target.value})} />
+						</Col>
+					</Form.Group>
+					<Form.Group as={Row} >
+					  <Form.Label column sm="3"></Form.Label>
+					  <Col sm="9">
+						<Button onClick={ this.onCreatePdf }>{t('diplome.generateImage')}</Button> 
 						<img hidden id="bg" src={background} alt="" />
 					  </Col>
 					</Form.Group>
@@ -233,8 +252,14 @@ class Diplome extends Component {
 				: null
 			}
           </Card>
+		  
+		    
+		  
+		  <div id="diplomaImage">
+		
+		  </div>
         </div>	
-
+		
 		
 		);
 	}
