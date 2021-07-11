@@ -51,3 +51,7 @@ Dans le render, il faut utiliser:
 
 Et mettre à jour:
 /client/public/locales/<langue>/translation.js
+
+# contract natspec documents generation
+
+npx solidity-docgen --solc-module solc-0.8 
