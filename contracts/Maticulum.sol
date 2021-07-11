@@ -170,10 +170,10 @@ contract Maticulum is Ownable {
    /**
    * @notice Check that a user is jury of given training
    * @param _id   id of the training
-   * @
+   * @return true if user is a jury of the training
    */
-   function isSchoolJury(uint _id) public view returns (bool) {
-
+   function isTrainingJury(uint _id) public view returns (bool) {
+      return trainingJuries[_id].contains(msg.sender);
    }
 
 
