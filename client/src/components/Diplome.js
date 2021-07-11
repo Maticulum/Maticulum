@@ -11,15 +11,8 @@ class Diplome extends Component {
 	state = { linkDiplome : 'Diplome', linkVisible:false,
 	hashImage:null,hashJson:null,fileToUpload:null, isButtonMetamaskVisible : false,
 	showDownload: false, firstname: '', lastname: '', title: '',school : '', typeDiploma:'',formData:null,
-	grade:'',diplomaName:'', };
-	
-	handleFile = async(e) => {
-		let files = e.target.files[0];
-		let formData = new FormData();
-		formData.append("file", files);
-		this.setState({ formData : formData, linkVisible:true });
-	}
-	
+	grade:'',diplomaName:'',files:[], sendNFT:false, hashes:[] };
+		
 	getPinataApiKey(){
 		let paramPinataApiKey = 'YWE2MGZmZTk3YjJlMTY0MTlkYmFhbnQ=';
 		return atob(paramPinataApiKey).split(this.mdp.value)[0];
@@ -31,7 +24,7 @@ class Diplome extends Component {
 	}
 	
 	getJsonData = async () => {
-		const { linkDiplome, hashJson} = this.state; 				
+		const { linkDiplome, hashJson, hashes} = this.state; 				
 		const data ={ 
 			"name": "DiplomeMaticulum",
 			"image": this.state.linkDiplome,
@@ -54,20 +47,66 @@ class Diplome extends Component {
         .then(async (response) => {
             let ipfsHash = response.data.IpfsHash;	
 			let urlMetadata = "https://gateway.pinata.cloud/ipfs/" + ipfsHash;
-			await this.context.contract.methods.createDiplomeNFT(this.context.account,ipfsHash).send({from:this.context.account});
+			hashes.push(ipfsHash);
 			
-			this.setState({ hashJson : ipfsHash, isButtonMetamaskVisible:true});
+			this.setState({ hashJson : ipfsHash});
         })
         .catch(function (error) {
             //handle error here
         }); 
 	 
 	};
+	
+	publiPostage = async() => {
+		await this.createImageDiplome("Albert","Ména","Université de Tours","","Licence","Mathématiques");
+		await this.createImageDiplome("Léa","François","Université d'Angers","","Master","Cybernétique");		
+	}
+	
+	createImageDiplome = async(firstname, lastname,school,typeDiploma, grade, diplomaName) => {
+		const { files } = this.state; 
 		
-	onCreatePdf = async() => {
+		let userDatas = firstname + lastname + school;
+		const canvas = document.createElement('canvas');		
+		console.log(canvas.toDataURL('image/png'));
+		const context = canvas.getContext('2d');
+		const data = new TextEncoder().encode(userDatas);
+		const buffer = await window.crypto.subtle.digest('SHA-256', data);
 		
+		const img = new Image();
+		img.onload = () => {
+		  canvas.width = img.width;
+		  canvas.height = img.height;
+		  
+		  context.drawImage(img, 0, 0);
+		  context.font = '20pt Verdana';
+
+		  //context.fillText(this.state.title, 350, 120);
+		  context.fillText(firstname, 125, 175);
+		  context.fillText(lastname, 125, 215);	
+		  context.fillText(school, 10, 35);	
+		  context.fillText(typeDiploma, 400, 215);	
+		  context.fillText(grade + " " + diplomaName, 175, 120);
+		  context.fillText("attribué à partir du 12/08/2021" , 200, 300);
+		  
+		  const hashString = Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');	
+							
+		  canvas.toBlob((blob) => {
+			const file=  new File([blob], hashString + '.png');
+			files.push(file);
+		  });
+		  this.setState({ linkVisible:true});	  		  
+		};
+		
+		img.src = document.getElementById('bg').src;
+		
+		document.body.appendChild(canvas); 
+		document.getElementById('diplomaImage').appendChild(canvas);
+	}
+		
+	onCreateDiplome = async() => {
+		const { files } = this.state; 	
 		this.setState({ showDownload: true });  		
-		document.getElementById('diplomaImage').innerHTML = "";
+		//document.getElementById('diplomaImage').innerHTML = "";
 		const canvas = document.createElement('canvas');		
 		console.log(canvas.toDataURL('image/png'));
 		const context = canvas.getContext('2d');
@@ -94,12 +133,12 @@ class Diplome extends Component {
 		  context.fillText("attribué à partir du 30/06/2017" , 200, 300);
 		  
 		  const hashString = Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');	
-				
-          let formData = new FormData();			
+							
 		  canvas.toBlob((blob) => {
-			formData.append("file", new File([blob], hashString + '.png'));
+			const file=  new File([blob], hashString + '.png');
+			files.push(file);
 		  });
-		  this.setState({ linkVisible:true, formData:formData });	  		  
+		  this.setState({ linkVisible:true});	  		  
 		};
 		
 		img.src = document.getElementById('bg').src;
@@ -108,10 +147,26 @@ class Diplome extends Component {
 		document.getElementById('diplomaImage').appendChild(canvas);
 	}
 	
-	// gestion si annulation envoi diplôme
+	onSendOneImage = async(formData, recipeUrl, postHeader) => {	
+		axios({
+		  url: recipeUrl,
+		  method: "POST",
+		  headers: postHeader,
+		  data: formData,
+		})
+		  .then(async (res) => { 
+			let ipfsHash = res.data.IpfsHash;
+			let urlMetadata = "https://gateway.pinata.cloud/ipfs/" + ipfsHash;	
+						
+			this.setState({ linkDiplome : urlMetadata, linkVisible:true,
+			hashImage:ipfsHash});
+			await this.getJsonData(urlMetadata);
+		  }) 
+		  .catch((err) => { alert(err); });
+	}
 	
 	createImagePinataAxios = async(e) => {		
-		const { formData, linkDiplome} = this.state; 
+		const { formData, linkDiplome, files} = this.state; 
 		
 		let pinataApiKey = this.getPinataApiKey();
 		let pinataSecretApiKey = this.getPinataSecretApiKey();
@@ -121,33 +176,30 @@ class Diplome extends Component {
 			pinata_api_key: pinataApiKey,
 			pinata_secret_api_key: pinataSecretApiKey
 		};
-
-		axios({
-		  url: recipeUrl,
-		  method: "POST",
-		  headers: postHeader,
-		  data: formData,
-		})
-		  .then(async (res) => { 
-			let ipfsHash = res.data.IpfsHash;
-			alert(ipfsHash);
-			let urlMetadata = "https://gateway.pinata.cloud/ipfs/" + ipfsHash;	 
-			this.setState({ linkDiplome : urlMetadata, linkVisible:true,
-			hashImage:ipfsHash});
-			await this.getJsonData();
-		  }) 
-		  .catch((err) => { alert(err); }); 
-	}
 		
+		for(let i =0;i<files.length;i++){
+			let formData = new FormData();
+			formData.append("file", files[i]);
+			await this.onSendOneImage(formData, recipeUrl, postHeader);
+		}
+		
+		this.setState({ sendNFTVisibility : true});
+	}
+	
+	SendNFTToSmartContract = async() => {
+		const { hashes } = this.state; 
+		await this.context.contract.methods.createDiplomeNFTs(this.context.account,hashes).send({from:this.context.account});
+		this.setState({ isButtonMetamaskVisible:true});
+	}
+	
 	AddInMetamask = async() => {
 		const { accounts, contractStaking, web3 } = this.state; 
 		const tokenAddress = await this.context.contract.methods.nft().call();
 		const tokenSymbol = 'MTCF';
 		const tokenDecimals = 0;
-		const tokenImage = 'https://ipfs.io/ipfs/QmeYp7Et2owcGBinFiSsU2Tdjvpeq2BzaW1bEpzVyhE8WV?filename=hermes.png'; // get from IPFS
+		const tokenImage = 'https://gateway.pinata.cloud/ipfs/QmYFRV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC'; // get from IPFS
 
 		try {
-		  // wasAdded is a boolean. Like any RPC method, an error may be thrown.
 		  const wasAdded = await window.ethereum.request({
 			method: 'wallet_watchAsset',
 			params: {
@@ -169,6 +221,24 @@ class Diplome extends Component {
 		} catch (error) {
 		  console.log(error);
 		}
+    }	
+		
+	showFile = async (e) => {
+		e.preventDefault()
+		const reader = new FileReader();
+		reader.onload = async (e) => { 
+		  const text = (e.target.result);
+		  const lines = text.split(/\r\n|\n/);
+		  
+		  for(let i =0;i<lines.length;i++){
+			alert(lines[i]);
+			const line = lines[i].split(',');
+			await this.createImageDiplome(line[0],line[1],line[2],"",line[3],line[4]);	
+		  }
+		};
+		
+		reader.onerror = (e) => alert(e.target.error.name);
+		reader.readAsText(e.target.files[0])		
     }	
 		
 	render() {
@@ -233,7 +303,7 @@ class Diplome extends Component {
 					<Form.Group as={Row} >
 					  <Form.Label column sm="3"></Form.Label>
 					  <Col sm="1">
-						<Button onClick={ this.onCreatePdf }>{t('diplome.generateImage')}</Button> 
+						<Button onClick={ this.onCreateDiplome }>{t('diplome.generateImage')}</Button> 
 						<img hidden id="bg" src={background} alt="" />
 					  </Col>					  
 					</Form.Group>
@@ -255,12 +325,33 @@ class Diplome extends Component {
 						: null
 					  }
 					  { 
+						this.state.sendNFTVisibility ? 
+						<Card.Body>
+							<Button onClick={this.SendNFTToSmartContract}>Envoi NFT</Button>
+						</Card.Body>
+						: null
+					  }				  
+					  { 
 						this.state.isButtonMetamaskVisible ? 
-						<Col sm="2">
+						<Col sm="3">
 							<Button onClick={this.AddInMetamask}>{t('diplome.addMetamask')}</Button>
-						  </Col>
+						</Col>
 						: null
 					  }
+					</Form.Group>
+					<Form.Group as={Row} >
+						<Form.Label column sm="3">Création en masse</Form.Label>
+						<Col sm="9">
+							<Button onClick={this.publiPostage}>Créer diplômes</Button>
+						</Col>
+					</Form.Group>
+					<Form.Group as={Row} >
+						<Form.Label column sm="3">Vue</Form.Label>
+						<Col sm="9">
+							<div>
+							  <input type="file" onChange={(e) => this.showFile(e)} />
+							</div>
+						</Col>
 					</Form.Group>
 					<Form.Group as={Row} >
 						<Form.Label column sm="3">Vue</Form.Label>

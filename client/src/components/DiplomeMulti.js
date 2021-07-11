@@ -164,6 +164,14 @@ class DiplomeMulti extends Component {
 			}
 			
 			{ 
+				this.state.linkVisible ? 
+				<Card.Body>
+					Loading...
+				</Card.Body>
+				: null
+			}
+			
+			{ 
 				this.state.sendNFTVisibility ? 
 				<Card.Body>
 					<Button onClick={this.SendNFT}>Envoi NFT</Button>
@@ -178,6 +186,8 @@ class DiplomeMulti extends Component {
 				</Card.Body>
 				: null
 			}
+			
+			
 			 
 			
           </Card>
