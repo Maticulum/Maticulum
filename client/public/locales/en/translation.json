@@ -9,7 +9,8 @@
         "add": "Add new",
         "edit": "Edit",
         "validate": "Validate",
-        "save": "Save"
+        "save": "Save",
+        "delete": "Delete"
     },
     "table": {
         "name": "Name",
@@ -55,6 +56,8 @@
       "level": "Level",
       "duration": "Duration",
       "hours": "hours",
-      "validationThreshold": "Number of validations"
+      "validationThreshold": "Number of validations",
+      "jury": "Jury",
+      "addJury": "Add jury"
    }
 }

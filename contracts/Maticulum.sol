@@ -2,10 +2,15 @@
 pragma solidity 0.8.4;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "./MaticulumNFT.sol";
 
 contract Maticulum is Ownable {
+
+   using EnumerableSet for EnumerableSet.UintSet;
+   using EnumerableSet for EnumerableSet.AddressSet;
    
+
    struct User {
       string name;
       string firstname;
@@ -33,31 +38,28 @@ contract Maticulum is Ownable {
       string level;
       uint16 duration;
       uint16 validationThreshold;
-      address[] juries;      
    }
    
 
    uint8 constant SUPER_ADMIN_MASK = 0x80;
-   uint8 constant ADMIN_MASK = 0x08;
-   uint8 constant JURY_MASK = 0x04;
-   uint8 constant STUDENT_MASK = 0x02;
+   uint8 constant VALIDATED_MASK = 0x02;
    uint8 constant REGISTERED_MASK = 0x01;
 
 
    MaticulumNFT public nft;
 
    mapping(address => User) users;
-   mapping(address => bool) userIsCreated;
-   mapping(address => bool) userIsRegistered;
    address firstAdminUniveristy;
    bool hasAdmin;
    
    School[] schools;
    uint256 public schoolRegistrationFees = 0.1 ether;
    uint8 public schoolValidationThreshold = 2;
+   address feesReceiver;
    
    Training[] trainings;
-   mapping(uint256 => mapping(address => address[])) juryValidators;
+   mapping(uint256 => EnumerableSet.AddressSet) trainingJuries;
+   mapping(address => EnumerableSet.UintSet) userJuryTrainings;
 
 
    event UserCreated(address userAdress);
@@ -70,7 +72,10 @@ contract Maticulum is Ownable {
    event SchoolValidated(uint256 id, string name, address validator, uint256 count);
 
    event TrainingAdded(uint256 schoolId, uint256 trainingId, string name, string level, uint16 duration, uint16 validationThreshold, address addedBy);
+   event TrainingUpdated(uint256 schoolId, uint256 trainingId, string name, string level, uint16 duration, uint16 validationThreshold, address updatedBy);
+
    event JuryAdded(uint256 schoolId, uint256 trainingId, address jury, address addedBy);
+   event JuryRemoved(uint256 schoolId, uint256 trainingId, address jury, address removedBy);
    event JuryValidated(uint256 schoolId, uint256 trainingId, address jury, address validator, uint16 count);
    
 
@@ -79,33 +84,9 @@ contract Maticulum is Ownable {
       _;
    }
 
-   modifier onlyAdmin() {
-      require((users[msg.sender].role & ADMIN_MASK) == ADMIN_MASK, "!Admin");
-      _;
-   }
+   modifier onlySchoolAdmin(uint256 _id) {
+      require(isSchoolAdmin(_id), "!SchoolAdmin");
 
-   modifier onlySchoolAdmin(uint256 id) {
-      School memory school = schools[id];
-      bool isSchoolAdmin = false;
-      for (uint256 i = 0; i < school.administrators.length; i++) {
-         if (school.administrators[i] == msg.sender) {
-            isSchoolAdmin = true;
-            break;
-         }
-      }
-      require(isSchoolAdmin, "!SchoolAdmin");
-
-      _;
-   }
-
-   modifier onlyJury() {
-      require((users[msg.sender].role & JURY_MASK) == JURY_MASK, "!Jury");
-      _;
-   }
-
-
-   modifier onlyStudent() {
-      require((users[msg.sender].role & STUDENT_MASK) == STUDENT_MASK, "!Student");
       _;
    }
 
@@ -122,6 +103,7 @@ contract Maticulum is Ownable {
 
    constructor() {
       nft = new MaticulumNFT();
+      feesReceiver = msg.sender;
    }
 
 
@@ -164,7 +146,36 @@ contract Maticulum is Ownable {
    function isRegistered(address _user) public view returns(bool) {
       return users[_user].role != 0;
    }
+
+
+   /**
+   * @notice Checks that a user is admin of a given school
+   * @param _id   id of the school
+   * @return true if the user is admin of the school
+   */
+   function isSchoolAdmin(uint256 _id) public view returns (bool) {
+      School memory school = schools[_id];
+      bool found = false;
+      for (uint256 i = 0; i < school.administrators.length; i++) {
+         if (school.administrators[i] == msg.sender) {
+            found = true;
+            break;
+         }
+      }
+
+      return found;
+   }
    
+
+   /**
+   * @notice Check that a user is jury of given training
+   * @param _id   id of the training
+   * @
+   */
+   function isSchoolJury(uint _id) public view returns (bool) {
+
+   }
+
 
    function addSchool(string memory _name, string memory _town, string memory _country, address _admin1, address _admin2) 
          external
@@ -181,9 +192,6 @@ contract Maticulum is Ownable {
       school.administrators = administrators;
       schools.push(school);
 
-      users[_admin1].role |= ADMIN_MASK;
-      users[_admin2].role |= ADMIN_MASK;
-
       uint256 id = schools.length - 1;
       emit SchoolAdded(id, _name, _town, _country, msg.sender);
       emit SchoolAdminAdded(id, _admin1, msg.sender);
@@ -193,9 +201,8 @@ contract Maticulum is Ownable {
    }
 
 
-   function addSchoolAdministrator(uint256 _id, address _administrator) external onlyAdmin {
+   function addSchoolAdministrator(uint256 _id, address _administrator) external onlySchoolAdmin(_id) {
       schools[_id].administrators.push(_administrator);
-      users[_administrator].role |= ADMIN_MASK;
 
       emit SchoolAdminAdded(_id, _administrator, msg.sender);
    }
@@ -259,9 +266,19 @@ contract Maticulum is Ownable {
    }
 
 
+   /**
+   * @notice Registers a school's training 
+   * @param _schoolId   id of the school
+   * @param _name       training name
+   * @param _level      training level
+   * @param _duration   training duration, in hours
+   * @param _validationThreshold  number of validation by a jury to validate a user diploma
+   * @return the id of the saved training
+   */
    function addTraining(uint256 _schoolId, string memory _name, string memory _level, uint16 _duration, uint16 _validationThreshold) 
          external onlySchoolAdmin(_schoolId) schoolValidated(_schoolId) returns (uint256) {
       Training memory training;
+      training.school = _schoolId;
       training.name = _name;
       training.level = _level;
       training.duration = _duration;
@@ -276,21 +293,99 @@ contract Maticulum is Ownable {
    }
 
 
-   function getTraining(uint256 _id) external view
-         returns (string memory name, string memory level, uint16 duration, uint16 validationThreshold, address[] memory juries) {
-      Training memory training = trainings[_id];
+   /**
+   * @notice Update a school's training 
+   * @param _name       training name
+   * @param _level      training level
+   * @param _duration   training duration, in hours
+   * @param _validationThreshold  number of validation by a jury to validate a user diploma
+   * @param _juries     list of the jury
+   */
+   function updateTraining(uint256 _id, string memory _name, string memory _level, uint16 _duration, uint16 _validationThreshold, address[] memory _juries)
+         external {
+      Training storage training = trainings[_id];
+      require(isSchoolAdmin(training.school), '!SchoolAdmin');
+      training.name = _name;
+      training.level = _level;
+      training.duration = _duration;
+      training.validationThreshold = _validationThreshold;
 
-      return (training.name, training.level, training.duration, training.validationThreshold, training.juries);
+      emit TrainingUpdated(training.school, _id, _name, _level, _duration, _validationThreshold, msg.sender);
+
+      for (uint256 i = 0; i < _juries.length; i++) {
+         addJury(training.school, _id, _juries[i]);
+      }
    }
 
 
-   function addJury(uint256 _schoolId, uint256 _trainingId, address _jury) external onlySchoolAdmin(_schoolId) schoolValidated(_schoolId) {
-      require(isRegistered(_jury), "Jury !registered");
+   /**
+   * @notice Returns training data
+   * @param _id   id of training
+   * @return name       training name
+   * @return level      training level
+   * @return duration   training duration, in hours
+   * @return validationThreshold jury validation needed
+   */
+   function getTraining(uint256 _id) external view
+         returns (string memory name, string memory level, uint16 duration, uint16 validationThreshold) {
+      Training memory training = trainings[_id];
 
-      trainings[_trainingId].juries.push(_jury);
-      users[_jury].role |= JURY_MASK;
+      return (training.name, training.level, training.duration, training.validationThreshold);
+   }
+
+
+   /**
+   * @notice Get the number of juries for a training
+   * @param _id   id of training
+   * @return number of juries
+   */
+   function getTrainingNbJuries(uint256 _id) external view returns (uint256) {
+      return trainingJuries[_id].length();
+   }
+
+
+   /**
+   * @notice Get a jury for specified training
+   * @param _id      id of training
+   * @param _index   index of jury
+   * @return address of jury
+   */
+   function getTrainingJury(uint256 _id, uint256 _index) external view returns (address) {
+      return trainingJuries[_id].at(_index);
+   }
+
+
+   /**
+   * @notice Add a jury to a training
+   * @param _schoolId   id of the school
+   * @param _trainingId if of the training
+   * @param _jury       added jury
+   */
+   function addJury(uint256 _schoolId, uint256 _trainingId, address _jury) public onlySchoolAdmin(_schoolId) schoolValidated(_schoolId) /* TODO ?? */ {
+      require(isRegistered(_jury), "Jury !registered");
+      require(trainings[_trainingId].school == _schoolId, "Mismatched school");
+
+      users[_jury].role |= VALIDATED_MASK;
+      trainingJuries[_trainingId].add(_jury);
+      userJuryTrainings[_jury].add(_trainingId);
 
       emit JuryAdded(_schoolId, _trainingId, _jury, msg.sender);
+   }
+
+
+   /**
+   * @notice Remove a jury from a training
+   * @param _trainingId id of the training
+   * @param _jury       jury to remove
+   */
+   function removeJury(uint256 _trainingId, address _jury) external {
+      Training storage training = trainings[_trainingId];
+      require(isSchoolAdmin(training.school));
+
+      trainingJuries[_trainingId].remove(_jury);
+      userJuryTrainings[_jury].remove(_trainingId);
+
+      emit JuryRemoved(training.school, _trainingId, _jury, msg.sender);
    }
 
 
@@ -303,10 +398,12 @@ contract Maticulum is Ownable {
       return address(nft);
    }
    
+
    function getlastUriId() public view returns(uint256){
         return nft.getlastUriId();
    }
     
+
    function createDiplomeNFTs(address ownerAddressNFT, string[] memory hashes) external returns(uint256){
         uint256 last;
         for(uint i =0;i < hashes.length;i++){

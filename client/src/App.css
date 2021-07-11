@@ -11,3 +11,7 @@
   font-size: 1.5 em;
   vertical-align: 0 !important;
 }
+
+button:hover {
+   cursor: pointer;
+}

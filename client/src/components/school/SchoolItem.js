@@ -10,34 +10,37 @@ class SchoolItem extends Component {
   
    static contextType = Web3Context;
 
-   state = { id: null, name: '', town: '', country: '', administrators: ['', ''], validators: [], trainings: [] };
+   state = { create: null, id: null, name: '', town: '', country: '', administrators: ['', ''], validators: [], trainings: [] };
    
 
    async componentDidMount() {
       const id = this.props.match.params.schoolId;
-      this.create = id === 'new';
-      if (!this.create) {
-         const school = await this.context.contract.methods.getSchool(id).call();
-         console.log(school);
-         this.setState({ id, ...school, trainings: [] });
-         this.loadTrainings(school.trainings);
+      const create = id === 'new';
+      if (create) {
+         this.setState({ create: true, administrators: [ this.context.account, '']});
       }
       else {
-         this.setState({ school: { name: ''}, administrators: [ this.context.account, '']});
+         const school = await this.context.contract.methods.getSchool(id).call();
+         console.log(school);
+         this.loadTrainings(school._trainings);
+         this.setState({ create: false, id, ...school });
       }
    }
 
 
    async loadTrainings(trainings) {
+      console.log(trainings);
+      const list = [];
       if (trainings) {
          for (let i = 0; i < trainings.length; i++) {
             const id = trainings[i];
             const training = await this.context.contract.methods.getTraining(id).call();
-            const list = [...this.state.trainings];
+            console.log(training);
             list.push({ id: id, name: training.name });
-            this.setState({ trainings: list });
          }
       }
+
+      this.setState({ trainings: list });
    }
 
 
@@ -50,26 +53,26 @@ class SchoolItem extends Component {
       if (this.create) {
          await this.context.contract.methods.addSchool(this.state.name, this.state.town, this.state.country, 
             this.state.administrators[0], this.state.administrators[1])
-            .send({ from: this.context.account });
-         this.props.history.push(`/schools`);
+            .send({ from: this.context.account });         
       }
       else {
          await this.context.contract.methods.updateSchool(this.state.id, this.state.name, this.state.town, this.state.country)
             .send({ from: this.context.account });
-         this.props.history.push(`/schools`);
       }
+
+      this.props.history.push(`/schools`);
    }
 
 
    render() {
-      if (this.state.id === null) {
+      if (this.state.create === null) {
          return <div>Loading...</div>;
       }
 
       const { t } = this.props;
 
       return (
-         <Container fluid>
+         <Container fluid={!this.state.create} >
             <Row>
                <Col>
                   <Form>
@@ -107,20 +110,23 @@ class SchoolItem extends Component {
                            </Col>
                         </Form.Group>
                      ))}
-                     <Form.Group>
-                        <Form.Label>{t('school.validators')}</Form.Label>
-                        { this.state.validators &&
-                           <ListGroup>
-                                 { this.state.validators.map((validator, index) => (
-                                    <ListGroup.Item key={index}>{validator}</ListGroup.Item>
-                                 ))}
-                           </ListGroup>
-                        }
-                     </Form.Group>
+                     { !this.state.create && 
+                        <Form.Group>
+                           <Form.Label>{t('school.validators')}</Form.Label>
+                           { this.state.validators &&
+                              <ListGroup>
+                                    { this.state.validators.map((validator, index) => (
+                                       <ListGroup.Item key={index}>{validator}</ListGroup.Item>
+                                    ))}
+                              </ListGroup>
+                           }
+                        </Form.Group>
+                     }
                      <Button onClick={ this.onSave }>{t('button.save')}</Button>
                   </Form>
                </Col>
 
+               { !this.state.create &&
                <Col>
                   <Row>
                      <Col>
@@ -140,6 +146,7 @@ class SchoolItem extends Component {
                   }
                   </Row>
                </Col>
+               }
             </Row>
                
          </Container>

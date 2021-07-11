@@ -24,8 +24,7 @@ import i18n from "./i18n";
 var roles = {
    REGISTERED: 0x01,
    STUDENT: 0x02,
-   JURY: 0x04,
-   ADMIN: 0x08,
+   ADMIN: 0x04,
    SUPER_ADMIN: 0x80
 }
 
@@ -33,7 +32,7 @@ var roles = {
 class App extends Component {
 
    state = { web3: null, networkId: -1, accounts: null, contract: null,
-      isRegistered: false, isStudent: false, isJury: false, isAdmin: false, isSuperAdmin: false };
+      isRegistered: false, isStudent: false, isAdmin: false, isSuperAdmin: false };
 
    componentDidMount = async () => {
       try {
@@ -88,11 +87,10 @@ class App extends Component {
       if (user) {
          const isRegistered = (user.role & roles.REGISTERED) ===roles.REGISTERED;
          const isStudent = (user.role & roles.STUDENT) === roles.STUDENT;
-         const isJury = (user.role & roles.JURY) === roles.JURY;
          const isAdmin = (user.role & roles.ADMIN) === roles.ADMIN;
          const isSuperAdmin = (user.role & roles.SUPER_ADMIN) === roles.SUPER_ADMIN;
 
-         this.setState({ isRegistered, isStudent, isJury, isAdmin, isSuperAdmin });
+         this.setState({ isRegistered, isStudent, isAdmin, isSuperAdmin });
          console.log(this.state);
       }
    };
@@ -153,7 +151,6 @@ class App extends Component {
 
             isRegistered: this.state.isRegistered, 
             isStudent: this.state.isStudent, 
-            isJury: this.state.isJury, 
             isAdmin: this.state.isAdmin, 
             isSuperAdmin: this.state.isSuperAdmin
          }} >

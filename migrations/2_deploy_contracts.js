@@ -12,7 +12,7 @@ module.exports = async (deployer, network, accounts) => {
 
       await instance.updateSchoolValidationThreshold(1);
 
-      await instance.addSchool('Université de La Rochelle', 'La Rochelle', 'France', accounts[0], accounts[1]);
+      await instance.addSchool('Alyra', 'Paris', 'France', accounts[0], accounts[1]);
       await instance.validateSchool(0);
    }
 };

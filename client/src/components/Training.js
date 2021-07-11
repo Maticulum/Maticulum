@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Button, Col,Container, Form, ListGroup, Row } from 'react-bootstrap';
+import { Button, Col,Container, Form, InputGroup, ListGroup, Row } from 'react-bootstrap';
 import { withTranslation } from "react-i18next";
 
 import Web3Context from '../Web3Context';
@@ -10,12 +10,15 @@ class Training extends Component {
   
    static contextType = Web3Context;
 
-   state = { create: null, schoolId: null, schoolName: null, name: '', level: '', duration: 0, validationThreshold: 0, juries: [] };
+   state = { create: null, isAdmin: false, id: null, schoolId: null, schoolName: null, name: '', level: '', duration: 0, validationThreshold: 0, juries: [] };
    
 
    async componentDidMount() {
       const schoolId = this.props.match.params.schoolId;
       const trainingId = this.props.match.params.trainingId;
+
+      const isAdmin = await this.context.contract.methods.isSchoolAdmin(schoolId).call;
+      this.setState({ isAdmin });
 
       const school = await this.context.contract.methods.getSchool(schoolId).call();
       this.setState({ schoolId, schoolName: school.name });
@@ -26,8 +29,31 @@ class Training extends Component {
       }
       else {
          const training = await this.context.contract.methods.getTraining(trainingId).call();
-         this.setState({ create: false, ...training });
+         console.log(training);
+         this.setState({ create: false, id: trainingId, ...training });
+         
+         const nbJuries = await this.context.contract.methods.getTrainingNbJuries(trainingId).call();
+         const juries = [];
+         for (let i = 0; i < nbJuries; i++) {
+            const jury = await this.context.contract.methods.getTrainingJury(trainingId, i).call();
+            juries.push(jury);
+         }
+         this.setState({ juries });
       }
+   }
+
+
+   onAddJury = () => {
+      const list = this.state.juries;
+      list.push('');
+      this.setState({ juries: list });
+   }
+
+
+   onJuryChange = (value, index) => {
+      const juries = [...this.state.juries];
+      juries[index] = value;
+      this.setState({ juries });
    }
 
 
@@ -37,9 +63,8 @@ class Training extends Component {
             .send({ from: this.context.account });
       }
       else {
-         // TODO
-         //await this.context.contract.methods.updateSchool(this.state.school.id, this.state.editedName, this.state.editedTown, this.state.editedCountry)
-         //   .send({ from: this.context.account });
+         await this.context.contract.methods.updateTraining(this.state.id, this.state.name, this.state.level, this.state.duration, this.state.validationThreshold, this.state.juries)
+            .send({ from: this.context.account });
       }
 
       this.props.history.push(`/schools/${this.state.schoolId}`);
@@ -80,9 +105,34 @@ class Training extends Component {
                   <Col sm="10">
                      <Form.Control type="text" value={this.state.validationThreshold} onChange={(e) => this.setState({validationThreshold: e.target.value})} />
                   </Col>
-               </Form.Group>
+               </Form.Group>               
                
-               <Button onClick={ this.onSave }>{t('button.save')}</Button>
+               { !this.state.create && <>
+                  <hr />
+                  <Row>
+                     <Col><h3>{t('training.jury')}</h3></Col>
+                     <Col>
+                        { this.state.isAdmin && <Button onClick={ this.onAddJury }>{t('training.addJury')}</Button> }
+                     </Col>
+                  </Row>
+                  { this.state.juries.map((jury, index) => (
+                     <Form.Group as={Row} key={index}>
+                        <Form.Label column sm="2">{t('training.jury')} {index + 1}</Form.Label>
+                        <Col sm="10">
+                           <InputGroup>
+                              <Form.Control type="text" value={this.state.juries[index]} onChange={(e) => this.onJuryChange(e.target.value, index)} />
+                              <InputGroup.Append>
+                                 <Button variant="outline-danger">{t('button.delete')}</Button>
+                              </InputGroup.Append>
+                           </InputGroup>
+                        </Col>
+                     </Form.Group>
+                  ))}
+                  </>
+               }
+
+               <hr />
+               { this.state.isAdmin && <Button onClick={ this.onSave }>{t('button.save')}</Button> }
             </Form>
          </Container>
       );
