@@ -76,20 +76,21 @@ class App extends Component {
 
 
    init = async () => {
-      const { networkId, contract } = this.state;
+      const { networkId, accounts, contract } = this.state;
 		
       if (networkId !== config.NETWORK_ID) {
          return;
       }
 
-      const user = await contract.methods.getUser().call();
+      const user = await contract.methods.users(accounts[0]).call();
+      console.log("user", user);
       if (user) {
          const isRegistered = (user.role & roles.REGISTERED) ===roles.REGISTERED;
          const isStudent = (user.role & roles.STUDENT) === roles.STUDENT;
          const isSuperAdmin = (user.role & roles.SUPER_ADMIN) === roles.SUPER_ADMIN;
 
          this.setState({ isRegistered, isStudent, isSuperAdmin });
-         console.log(this.state);
+         console.log("state", this.state);
       }
    };
 

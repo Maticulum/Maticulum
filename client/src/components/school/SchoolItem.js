@@ -25,7 +25,6 @@ class SchoolItem extends Component {
       }
       else {
          const school = await this.context.contract.methods.getSchool(id).call();
-         console.log(school);
          this.loadTrainings(id);
          this.setState({ create: false, id, ...school });
       }
@@ -37,7 +36,7 @@ class SchoolItem extends Component {
       const nbTrainings = await this.context.contract.methods.getSchoolNbTrainings(schoolId).call();
       for (let i = 0; i < nbTrainings; i++) {
          const id = await this.context.contract.methods.getSchoolTraining(schoolId, i).call();
-         const training = await this.context.contract.methods.getTraining(id).call();
+         const training = await this.context.contract.methods.trainings(id).call();
          list.push({ id: id, name: training.name });
       }
 

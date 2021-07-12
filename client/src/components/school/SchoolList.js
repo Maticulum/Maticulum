@@ -15,7 +15,6 @@ class SchoolList extends Component {
 
    async componentDidMount() {
       const schools = await this.getSchools();
-      console.log(schools);
       const validationThreshold = await this.context.contract.methods.schoolValidationThreshold().call();
 
       this.setState({ schools: schools, validationThreshold });
@@ -23,7 +22,6 @@ class SchoolList extends Component {
 
    getSchools = async () => {
       const size = await this.context.contract.methods.getNbSchools().call();
-      console.log("Size", size);
 
       let schools = [];
       for (let i = 0; i < size; i++) {
@@ -60,7 +58,7 @@ class SchoolList extends Component {
       return (
          <Container>
             <Row className="main">
-               <Button onClick={ this.onNewSchool }>{t('button.add')}</Button>
+               <Button variant="outline-success" onClick={ this.onNewSchool }>{t('button.add')}</Button>
             </Row>
 
             <Row>

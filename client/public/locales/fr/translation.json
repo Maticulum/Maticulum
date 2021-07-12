@@ -10,7 +10,8 @@
         "edit": "Editer",
         "validate": "Valider",
         "save": "Enregistrer",
-        "delete": "Effacer"
+        "delete": "Effacer",
+        "cancel": "Annuler"
     },
     "table": {
         "name": "Nom",

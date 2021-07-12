@@ -25,5 +25,8 @@ module.exports = async (deployer, network, accounts) => {
 
       await instance.addSchool('Alyra', 'Paris', 'France', superAdmin, schoolAdmin);
       await instance.validateSchool(0);
+
+      await instance.addTraining(0, 'Chef de projet', 'Aucun', 350, 1, [ jury ]);
+      await instance.addTraining(0, 'Developpeur', 'Aucun', 350, 1, [ jury ]);
    }
 };
