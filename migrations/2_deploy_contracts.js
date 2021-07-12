@@ -1,7 +1,7 @@
 var Maticulum = artifacts.require("./Maticulum.sol");
 
 module.exports = async (deployer, network, accounts) => {
-   await deployer.deploy(Maticulum);
+   await deployer.deploy(Maticulum, "https://gateway.pinata.cloud/ipfs/");
    const instance = await Maticulum.deployed();
 
    if (network === 'develop') {

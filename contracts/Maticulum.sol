@@ -7,6 +7,11 @@ import "./MaticulumNFT.sol";
 
 contract Maticulum is Ownable {
 
+   constructor(string memory gatewayUrl_) {
+      nft = new MaticulumNFT(gatewayUrl_);
+      feesReceiver = msg.sender;
+   }
+
    using EnumerableSet for EnumerableSet.UintSet;
    using EnumerableSet for EnumerableSet.AddressSet;
    
@@ -99,13 +104,6 @@ contract Maticulum is Ownable {
       require(isSchoolValidated(id), "!schoolValidated");
       _;
    }
-
-
-   constructor() {
-      nft = new MaticulumNFT();
-      feesReceiver = msg.sender;
-   }
-
 
    function setSuperAdmin(address userAdress) external onlyOwner {
       users[userAdress].role |= SUPER_ADMIN_MASK;
@@ -416,12 +414,6 @@ contract Maticulum is Ownable {
       emit JuryRemoved(training.school, _trainingId, _jury, msg.sender);
    }
 
-
-   function createDiplomeNFT(address ownerAddressNFT, string memory hash) public returns(uint256){
-      return nft.AddNFTToAdress(ownerAddressNFT, hash);
-   }
-   
-
    function getNFTAddress() public view returns(address){
       return address(nft);
    }
@@ -430,21 +422,13 @@ contract Maticulum is Ownable {
    function getlastUriId() public view returns(uint256){
         return nft.getlastUriId();
    }
-    
 
    function createDiplomeNFTs(address ownerAddressNFT, string[] memory hashes) external returns(uint256){
-        uint256 last;
-        for(uint i =0;i < hashes.length;i++){
-            last = createDiplomeNFT(ownerAddressNFT, hashes[i]);
-        }
-        
-        return last;
+        return nft.AddNFTsToAdress(ownerAddressNFT, hashes);
    }
 	
-
-   // For test purposes, should be removed
+	// For test purposes, should be removed
    function addUser(address _user, uint8 role) external onlyOwner {
       users[_user].role = role;
    }
-
 }
