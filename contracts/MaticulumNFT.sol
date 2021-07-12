@@ -13,7 +13,6 @@ contract MaticulumNFT is ERC721URIStorage, Ownable{
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
     mapping(string => uint8) hashesStored;
-    uint256 lastId;
     string gatewayUrl;
     
     event NFTMinted(address recipient, string hash, uint256 newItemId);
@@ -24,7 +23,6 @@ contract MaticulumNFT is ERC721URIStorage, Ownable{
         _tokenIds.increment();
         uint256 newItemId = _tokenIds.current();
         _mint(recipient, newItemId);
-        lastId = newItemId;
         string memory metadata = string(abi.encodePacked(gatewayUrl, hash)); 
         _setTokenURI(newItemId, metadata);
         
@@ -49,11 +47,11 @@ contract MaticulumNFT is ERC721URIStorage, Ownable{
     }
     
     function getlastUriId() public view returns(uint256){
-        return lastId;
+        return _tokenIds.current();
     }
     
     function getURI(uint256 id) public view returns(string memory){
-        // test if error
+        require(_tokenIds.current() >= id,"Uri not yet stored");
         return tokenURI(id);
     }
 }

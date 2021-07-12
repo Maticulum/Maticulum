@@ -52,7 +52,7 @@ contract('Maticulum', accounts => {
   it("Gateway init", async () => {
     await this.Maticulum.AddNFTsToAdress(owner, hashes, { from: owner })	
     let tokenURI = await this.Maticulum.tokenURI(1);
-	assert.equal(gatewayUrl + hashDefaut, tokenURI, "The NFT stored has not value awaited uri.");
+	assert.equal(gatewayUrl + hashDefaut, tokenURI, "The initial gateway should be https://gateway.pinata.cloud/ipfs/.");
   });
   
   it("Gateway change", async () => {
@@ -60,7 +60,27 @@ contract('Maticulum', accounts => {
 	await this.Maticulum.changeGateway(gatewayMaticulumUrl, { from: owner })
     await this.Maticulum.AddNFTsToAdress(owner, hashes, { from: owner })	
     let tokenURI = await this.Maticulum.tokenURI(1);	
-	assert.equal(gatewayMaticulumUrl + hashDefaut, tokenURI, "The NFT stored has not value awaited uri.");
+	assert.equal(gatewayMaticulumUrl + hashDefaut, tokenURI, "The current gateway should be https://maticulumOwnGateway.cloud/ipfs/.");
+  });
+  
+  it("Get lasturi init", async () => {	
+    let lastUri = await this.Maticulum.getlastUriId();	
+	assert.equal(lastUri, 0, "The Last URI should be 0.");
+  });
+  
+  it("Get lasturi ", async () => {
+    await this.Maticulum.AddNFTsToAdress(owner, hashes, { from: owner })	
+    let lastUri = await this.Maticulum.getlastUriId();	
+	assert.equal(lastUri, 1, "The Last URI should be 1.");
+  });
+  
+  it("Error Uri not yet stored when called 1 and no NFT added", async () => {	
+	await expectRevert(this.Maticulum.getURI(1, { from: owner }), "Uri not yet stored");
+  });
+  
+  it("Error Uri not yet stored when called 2 and 1 NFT added", async () => {	
+    await this.Maticulum.AddNFTsToAdress(owner, hashes, { from: owner });	
+	await expectRevert(this.Maticulum.getURI(2, { from: owner }), "Uri not yet stored");
   });
   
   
