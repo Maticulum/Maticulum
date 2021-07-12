@@ -22,22 +22,19 @@ class SchoolItem extends Component {
       else {
          const school = await this.context.contract.methods.getSchool(id).call();
          console.log(school);
-         this.loadTrainings(school._trainings);
+         this.loadTrainings(id);
          this.setState({ create: false, id, ...school });
       }
    }
 
 
-   async loadTrainings(trainings) {
-      console.log(trainings);
+   async loadTrainings(schoolId) {
       const list = [];
-      if (trainings) {
-         for (let i = 0; i < trainings.length; i++) {
-            const id = trainings[i];
-            const training = await this.context.contract.methods.getTraining(id).call();
-            console.log(training);
-            list.push({ id: id, name: training.name });
-         }
+      const nbTrainings = await this.context.contract.methods.getSchoolNbTrainings(schoolId).call();
+      for (let i = 0; i < nbTrainings; i++) {
+         const id = await this.context.contract.methods.getSchoolTraining(schoolId, i).call();
+         const training = await this.context.contract.methods.getTraining(id).call();
+         list.push({ id: id, name: training.name });
       }
 
       this.setState({ trainings: list });

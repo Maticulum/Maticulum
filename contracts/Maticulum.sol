@@ -29,7 +29,6 @@ contract Maticulum is Ownable {
       string country;
       address[] administrators;
       address[] validators;
-      uint256[] trainings;
    }
 
    struct Training {
@@ -56,8 +55,9 @@ contract Maticulum is Ownable {
    uint256 public schoolRegistrationFees = 0.1 ether;
    uint8 public schoolValidationThreshold = 2;
    address feesReceiver;
+   mapping(uint256 => EnumerableSet.UintSet) schoolTrainings;
    
-   Training[] trainings;
+   Training[] trainings;   
    mapping(uint256 => EnumerableSet.AddressSet) trainingJuries;
    mapping(address => EnumerableSet.UintSet) userJuryTrainings;
 
@@ -254,10 +254,31 @@ contract Maticulum is Ownable {
 
 
    function getSchool(uint256 _id) external view onlyRegistered 
-         returns(string memory name, string memory town, string memory country, address[] memory administrators, address[] memory validators, uint256[] memory _trainings) {
+         returns(string memory name, string memory town, string memory country, address[] memory administrators, address[] memory validators) {
       School storage school = schools[_id];
 
-      return (school.name, school.town, school.country, school.administrators, school.validators, school.trainings);
+      return (school.name, school.town, school.country, school.administrators, school.validators);
+   }
+
+
+   /**
+   * @notice Get the number of trainings for a school
+   * @param _id   id of school
+   * @return number of trainings
+   */
+   function getSchoolNbTrainings(uint256 _id) external view returns (uint256) {
+      return schoolTrainings[_id].length();
+   }
+
+
+   /**
+   * @notice Get a training for specified school
+   * @param _id      id of school
+   * @param _index   index of training
+   * @return address of jury
+   */
+   function getSchoolTraining(uint256 _id, uint256 _index) external view returns (uint256) {
+      return schoolTrainings[_id].at(_index);
    }
 
 
@@ -286,7 +307,8 @@ contract Maticulum is Ownable {
       trainings.push(training);      
 
       uint256 id = trainings.length - 1;
-      schools[_schoolId].trainings.push(id);
+      schoolTrainings[_schoolId].add(id);
+
       emit TrainingAdded(_schoolId, id, _name, _level, _duration, _validationThreshold, msg.sender);
 
       return id;
@@ -299,9 +321,11 @@ contract Maticulum is Ownable {
    * @param _level      training level
    * @param _duration   training duration, in hours
    * @param _validationThreshold  number of validation by a jury to validate a user diploma
-   * @param _juries     list of the jury
+   * @param _addJuries  list of the jury to add
+   * @param _removeJuries  list of the jury to remove
    */
-   function updateTraining(uint256 _id, string memory _name, string memory _level, uint16 _duration, uint16 _validationThreshold, address[] memory _juries)
+   function updateTraining(uint256 _id, string memory _name, string memory _level, uint16 _duration, uint16 _validationThreshold, 
+         address[] memory _addJuries, address[] memory _removeJuries)
          external {
       Training storage training = trainings[_id];
       require(isSchoolAdmin(training.school), '!SchoolAdmin');
@@ -312,8 +336,11 @@ contract Maticulum is Ownable {
 
       emit TrainingUpdated(training.school, _id, _name, _level, _duration, _validationThreshold, msg.sender);
 
-      for (uint256 i = 0; i < _juries.length; i++) {
-         addJury(training.school, _id, _juries[i]);
+      for (uint256 i = 0; i < _addJuries.length; i++) {
+         addJury(_id, _addJuries[i]);
+      }
+      for (uint256 i = 0; i < _removeJuries.length; i++) {
+         removeJury(_id, _removeJuries[i]);
       }
    }
 
@@ -357,19 +384,20 @@ contract Maticulum is Ownable {
 
    /**
    * @notice Add a jury to a training
-   * @param _schoolId   id of the school
    * @param _trainingId if of the training
    * @param _jury       added jury
    */
-   function addJury(uint256 _schoolId, uint256 _trainingId, address _jury) public onlySchoolAdmin(_schoolId) schoolValidated(_schoolId) /* TODO ?? */ {
+   function addJury(uint256 _trainingId, address _jury) public {
       require(isRegistered(_jury), "Jury !registered");
-      require(trainings[_trainingId].school == _schoolId, "Mismatched school");
+
+      uint256 school = trainings[_trainingId].school;
+      require(isSchoolAdmin(school));
 
       users[_jury].role |= VALIDATED_MASK;
       trainingJuries[_trainingId].add(_jury);
       userJuryTrainings[_jury].add(_trainingId);
 
-      emit JuryAdded(_schoolId, _trainingId, _jury, msg.sender);
+      emit JuryAdded(school, _trainingId, _jury, msg.sender);
    }
 
 
@@ -378,7 +406,7 @@ contract Maticulum is Ownable {
    * @param _trainingId id of the training
    * @param _jury       jury to remove
    */
-   function removeJury(uint256 _trainingId, address _jury) external {
+   function removeJury(uint256 _trainingId, address _jury) public {
       Training storage training = trainings[_trainingId];
       require(isSchoolAdmin(training.school));
 
@@ -411,6 +439,12 @@ contract Maticulum is Ownable {
         }
         
         return last;
-    }
+   }
 	
+
+   // For test purposes, should be removed
+   function addUser(address _user, uint8 role) external onlyOwner {
+      users[_user].role = role;
+   }
+
 }

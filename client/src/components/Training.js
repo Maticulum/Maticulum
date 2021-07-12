@@ -10,7 +10,8 @@ class Training extends Component {
   
    static contextType = Web3Context;
 
-   state = { create: null, isAdmin: false, id: null, schoolId: null, schoolName: null, name: '', level: '', duration: 0, validationThreshold: 0, juries: [] };
+   state = { create: null, isAdmin: false, id: null, schoolId: null, schoolName: null, name: '', level: '', duration: 0, validationThreshold: 0, 
+      juries: [], previousJuries: [] };
    
 
    async componentDidMount() {
@@ -29,16 +30,16 @@ class Training extends Component {
       }
       else {
          const training = await this.context.contract.methods.getTraining(trainingId).call();
-         console.log(training);
          this.setState({ create: false, id: trainingId, ...training });
          
          const nbJuries = await this.context.contract.methods.getTrainingNbJuries(trainingId).call();
          const juries = [];
+         if (nbJuries != 0) {
          for (let i = 0; i < nbJuries; i++) {
             const jury = await this.context.contract.methods.getTrainingJury(trainingId, i).call();
             juries.push(jury);
-         }
-         this.setState({ juries });
+         }}
+         this.setState({ juries, previousJuries: juries });
       }
    }
 
@@ -46,6 +47,12 @@ class Training extends Component {
    onAddJury = () => {
       const list = this.state.juries;
       list.push('');
+      this.setState({ juries: list });
+   }
+
+
+   onRemoveJury = (jury) => {
+      const list = this.state.juries.filter(value => value !== jury);
       this.setState({ juries: list });
    }
 
@@ -63,7 +70,14 @@ class Training extends Component {
             .send({ from: this.context.account });
       }
       else {
-         await this.context.contract.methods.updateTraining(this.state.id, this.state.name, this.state.level, this.state.duration, this.state.validationThreshold, this.state.juries)
+         console.log('juries', this.state.juries.length);
+         console.log('prevJuries', this.state.previousJuries.length);
+         const addJuries = this.state.juries.filter(value => value !== '' && !this.state.previousJuries.includes(value));
+         console.log('addJuries', addJuries);
+         const removeJuries = this.state.previousJuries.filter(value => value !== '' && !this.state.juries.includes(value));
+         console.log('removeJuries', removeJuries);
+         await this.context.contract.methods.updateTraining(this.state.id, this.state.name, this.state.level, this.state.duration, this.state.validationThreshold, 
+            addJuries, removeJuries)
             .send({ from: this.context.account });
       }
 
@@ -110,10 +124,8 @@ class Training extends Component {
                { !this.state.create && <>
                   <hr />
                   <Row>
-                     <Col><h3>{t('training.jury')}</h3></Col>
-                     <Col>
-                        { this.state.isAdmin && <Button onClick={ this.onAddJury }>{t('training.addJury')}</Button> }
-                     </Col>
+                     <h3>{t('training.jury')}</h3>&nbsp;
+                     { this.state.isAdmin && <Button variant="outline-success" onClick={ this.onAddJury }>{t('training.addJury')}</Button> }
                   </Row>
                   { this.state.juries.map((jury, index) => (
                      <Form.Group as={Row} key={index}>
@@ -122,7 +134,7 @@ class Training extends Component {
                            <InputGroup>
                               <Form.Control type="text" value={this.state.juries[index]} onChange={(e) => this.onJuryChange(e.target.value, index)} />
                               <InputGroup.Append>
-                                 <Button variant="outline-danger">{t('button.delete')}</Button>
+                                 <Button variant="outline-danger" onClick={ () => this.onRemoveJury(jury) } >{t('button.delete')}</Button>
                               </InputGroup.Append>
                            </InputGroup>
                         </Col>
