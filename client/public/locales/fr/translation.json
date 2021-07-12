@@ -8,7 +8,9 @@
     "button": {
         "add": "Ajouter",
         "edit": "Editer",
-        "validate": "Valider"
+        "validate": "Valider",
+        "save": "Enregistrer",
+        "delete": "Effacer"
     },
     "table": {
         "name": "Nom",
@@ -50,13 +52,19 @@
       "country": "Pays",
       "administrators": "Administrateurs",
       "administrator": "Administrateur",
-      "validators": "Validateurs"
+      "validators": "Validateurs",
+      "details": "Détails",
+      "trainings": "Formations",
+      "addTraining": "Ajouter formation"
    },
    "training": {
       "name": "Nom",
       "level": "Niveau",
       "duration": "Durée",
       "hours": "heures",
-      "validationThreshold": "Nombre de validations"
+      "validationThreshold": "Nombre de validations",
+      "jury": "Jury",
+      "addJury": "Ajouter jury",
+      "training": "Formation"
    }
 }

@@ -321,8 +321,8 @@ contract Maticulum is Ownable {
    * @param _level      training level
    * @param _duration   training duration, in hours
    * @param _validationThreshold  number of validation by a jury to validate a user diploma
-   * @param _addJuries  list of the jury to add
-   * @param _removeJuries  list of the jury to remove
+   * @param _addJuries  list of the juries to add
+   * @param _removeJuries  list of the juries to remove
    */
    function updateTraining(uint256 _id, string memory _name, string memory _level, uint16 _duration, uint16 _validationThreshold, 
          address[] memory _addJuries, address[] memory _removeJuries)
