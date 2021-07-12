@@ -70,12 +70,8 @@ class Training extends Component {
             .send({ from: this.context.account });
       }
       else {
-         console.log('juries', this.state.juries.length);
-         console.log('prevJuries', this.state.previousJuries.length);
          const addJuries = this.state.juries.filter(value => value !== '' && !this.state.previousJuries.includes(value));
-         console.log('addJuries', addJuries);
          const removeJuries = this.state.previousJuries.filter(value => value !== '' && !this.state.juries.includes(value));
-         console.log('removeJuries', removeJuries);
          await this.context.contract.methods.updateTraining(this.state.id, this.state.name, this.state.level, this.state.duration, this.state.validationThreshold, 
             addJuries, removeJuries)
             .send({ from: this.context.account });
@@ -94,7 +90,7 @@ class Training extends Component {
 
       return (
          <Container>
-            <h3>{this.state.schoolName} - Training</h3>
+            <h3>{this.state.schoolName} - {t('training.training')}</h3>
             <Form>
                <Form.Group as={Row} >
                   <Form.Label column sm="2">{t('training.name')}</Form.Label>

@@ -52,7 +52,10 @@
       "country": "Country",
       "administrators": "Administrators",
       "administrator": "Administrator",
-      "validators": "Validators"
+      "validators": "Validators",
+      "details": "Details",
+      "trainings": "Trainings",
+      "addTraining": "Add training"
    },
    "training": {
       "name": "Name",
@@ -61,6 +64,7 @@
       "hours": "hours",
       "validationThreshold": "Number of validations",
       "jury": "Jury",
-      "addJury": "Add jury"
+      "addJury": "Add jury",
+      "training": "Training"
    }
 }
