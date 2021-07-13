@@ -81,7 +81,11 @@ class Diplome extends Component {
 		  context.fillText(lastname, 125, 215);	
 		  context.fillText(school, 10, 35);		
 		  context.fillText(grade + " " + diplomaName, 175, 120);
-		  context.fillText(t('diplome.attribution') + "12/08/2021" , 200, 300);
+		  
+		  const timeElapsed = Date.now();
+		  const today = new Date(timeElapsed);
+		  
+		  context.fillText(t('diplome.attribution') + today.toLocaleDateString(), 200, 300);
 		  
 		  const hashString = Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');	
 							
@@ -105,8 +109,14 @@ class Diplome extends Component {
 		"", this.state.grade, this.state.diplomaName);
 	}
 	
-	clearDiplomas() {
+	clearDiplomas = async() =>  {
 		document.getElementById('diplomaImage').innerHTML = "";	
+		this.tbxDiplomaName.value = "";
+		this.tbxGrade.value = "";
+		this.tbxSchool.value = "";
+		this.tbxFirstname.value = "";
+		this.tbxLastname.value = "";
+		this.setState({ linkVisible:false,isButtonMetamaskVisible:false});
 	}
 	
 	onSendOneImage = async(formData, recipeUrl, postHeader) => {	
@@ -193,7 +203,6 @@ class Diplome extends Component {
 		  const lines = text.split(/\r\n|\n/);
 		  
 		  for(let i =0;i<lines.length;i++){
-			alert(lines[i]);
 			const line = lines[i].split(',');	
 			await this.createImageDiplome(line[0],line[1],line[2],"",line[3],line[4]);	
 		  }
@@ -207,42 +216,56 @@ class Diplome extends Component {
 		const { t } = this.props; 
 		
 		return(
-				
 		<div style={{display: 'flex', justifyContent: 'center'}}>
 			<Container>
 				<Form>
 					<Form.Group as={Row} >
 						<Form.Label column sm="3"></Form.Label>
 						<Form.Label column sm="9">{t('diplome.diplomaBuid')}</Form.Label>
+					</Form.Group>	 
+					<Form.Group as={Row} >
+						<Form.Label column sm="3">{t('formlabel.name')}</Form.Label>
+						<Col sm="9">
+						  <Form.Control type="text" 
+						  onChange={(e) => this.setState({firstname: e.target.value})} 
+						  id="tbxLastname" ref={(input) => { this.tbxLastname = input }}
+						  />
+						</Col>
 					</Form.Group>
 					<Form.Group as={Row} >
 						<Form.Label column sm="3">{t('formlabel.firstname')}</Form.Label>
 						<Col sm="9">
-						  <Form.Control type="text" value={this.state.lastname} onChange={(e) => this.setState({lastname: e.target.value})} />
-						</Col>
-					 </Form.Group>
-					<Form.Group as={Row} >
-						<Form.Label column sm="3">{t('formlabel.name')}</Form.Label>
-						<Col sm="9">
-						  <Form.Control type="text" value={this.state.firstname} onChange={(e) => this.setState({firstname: e.target.value})} />
-						</Col>
-					</Form.Group>					
+						  <Form.Control type="text"  
+						  onChange={(e) => this.setState({lastname: e.target.value})}
+						  id="tbxFirstname " ref={(input) => { this.tbxFirstname = input }}
+						  />
+						</Col>						
+					 </Form.Group>					
 					<Form.Group as={Row} >
 						<Form.Label column sm="3">{t('diplome.school')}</Form.Label>
 						<Col sm="9">
-							<Form.Control type="text" value={this.state.school} onChange={(e) => this.setState({school: e.target.value})} />
+							<Form.Control type="text" 
+							onChange={(e) => this.setState({school: e.target.value})} 
+							id="tbxSchool" ref={(input) => { this.tbxSchool = input }}
+							/>
 						</Col>
 					</Form.Group>
 					<Form.Group as={Row} >
 						<Form.Label column sm="3">{t('diplome.grade')}</Form.Label>
 						<Col sm="9">
-							<Form.Control type="text" value={this.state.grade} onChange={(e) => this.setState({grade: e.target.value})} />
+							<Form.Control type="text"  
+							onChange={(e) => this.setState({grade: e.target.value})} 
+							id="tbxGrade" ref={(input) => { this.tbxGrade = input }}
+							/>
 						</Col>
 					</Form.Group>
 					<Form.Group as={Row} >
 						<Form.Label column sm="3">{t('diplome.diplomaName')}</Form.Label>
 						<Col sm="9">
-							<Form.Control type="text" value={this.state.diplomaName} onChange={(e) => this.setState({diplomaName: e.target.value})} />
+							<Form.Control type="text" 
+							onChange={(e) => this.setState({diplomaName: e.target.value})} 
+							id="tbxDiplomaName" ref={(input) => { this.tbxDiplomaName = input }}
+							/>
 						</Col>
 					</Form.Group>
 					<Form.Group as={Row} >
@@ -310,7 +333,6 @@ class Diplome extends Component {
 					</Form.Group>
 				</Form>
 			</Container>
-		  
         </div>	
 		
 		
