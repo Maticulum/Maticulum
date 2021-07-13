@@ -12,7 +12,10 @@ import './i18n';
 
 import Home from './components/Home';
 import Registration from './components/Registration';
-import School from './components/school/School';
+import SchoolList from './components/school/SchoolList';
+import SchoolItem from './components/school/SchoolItem';
+import Training from './components/Training';
+import Validation from './components/Validation';
 import Whitelisted from './components/Whitelisted';
 import ImgTest from "./components/pdf/ImgTest";
 import Diplome from './components/Diplome';
@@ -20,6 +23,7 @@ import DiplomeMulti from './components/DiplomeMulti';
 
 import "./App.css";
 import i18n from "./i18n";
+
 
 var roles = {
    REGISTERED: 0x01,
@@ -76,20 +80,21 @@ class App extends Component {
 
 
    init = async () => {
-      const { networkId, contract } = this.state;
+      const { networkId, accounts, contract } = this.state;
 		
       if (networkId !== config.NETWORK_ID) {
          return;
       }
 
-      const user = await contract.methods.getUser().call();
+      const user = await contract.methods.users(accounts[0]).call();
+      console.log("user", user);
       if (user) {
          const isRegistered = (user.role & roles.REGISTERED) ===roles.REGISTERED;
          const isStudent = (user.role & roles.STUDENT) === roles.STUDENT;
          const isSuperAdmin = (user.role & roles.SUPER_ADMIN) === roles.SUPER_ADMIN;
 
          this.setState({ isRegistered, isStudent, isSuperAdmin });
-         console.log(this.state);
+         console.log("state", this.state);
       }
    };
 
@@ -188,8 +193,13 @@ class App extends Component {
                   <Route exact path='/' component={Home} />
                   <Route exact path='/whitelisted' component={Whitelisted} />	
                   <Route exact path='/registration' component={Registration} />
-                  <Route path='/schools' component={School} /> 
-                  <Route exact path='/img-test' component={ImgTest} /> 
+                  
+                  <Route exact path={'/schools'} component={ SchoolList} />
+                  <Route path={'/schools/:schoolId/trainings/:trainingId'} component={ Training } />
+                  <Route path={'/schools/:schoolId'} component={ SchoolItem } />
+                  
+                  <Route path='/validation/:trainingId' component={Validation} /> 
+                  <Route exact path='/img-test' component={ImgTest} />
                   <Route exact path='/diplome' component={Diplome} /> 
 				  <Route exact path='/diplomeMulti' component={DiplomeMulti} /> 
                </Switch>

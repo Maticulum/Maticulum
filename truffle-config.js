@@ -16,21 +16,21 @@ module.exports = {
          gas: 67219750
       },
       mumbai: {
-         provider: () => new HDWalletProvider([ process.env.PRIVATE_KEY ], `https://polygon-mumbai.infura.io/v3/${process.env.INFURA_API_KEY}`),
+         provider: () => new HDWalletProvider(process.env.MNEMONICS, `https://polygon-mumbai.infura.io/v3/${process.env.INFURA_API_KEY}`),
          network_id: 80001,
          confirmations: 2,
          timeoutBlocks: 200,
          skipDryRun: true
       },
       matic: {
-         provider: () => new HDWalletProvider([ process.env.PRIVATE_KEY ], `https://polygon-mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`),
+         provider: () => new HDWalletProvider(process.env.MNEMONICS, `https://polygon-mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`),
          network_id: 137,
          confirmations: 2,
          timeoutBlocks: 200,
          skipDryRun: true
       },
       rinkeby: { 
-         provider: () => new HDWalletProvider([ process.env.PRIVATE_KEY ],`https://rinkeby.infura.io/v3/${process.env.INFURA_API_KEY}`),
+         provider: () => new HDWalletProvider(process.env.MNEMONICS,`https://rinkeby.infura.io/v3/${process.env.INFURA_API_KEY}`),
          network_id:    4,       	
          confirmations: 2,
          timeoutBlocks: 200,     
