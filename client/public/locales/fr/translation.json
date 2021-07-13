@@ -15,8 +15,9 @@
     },
     "table": {
         "name": "Nom",
-        "validated": "Validée",
-        "action": "Action"
+        "validated": "Validé",
+        "action": "Action",
+        "address": "Adresse"
     },
 	"formlabel":{
 		"birthDate": "Date de naissance",
@@ -65,7 +66,6 @@
       "hours": "heures",
       "validationThreshold": "Nombre de validations",
       "jury": "Jury",
-      "addJury": "Ajouter jury",
       "training": "Formation"
    }
 }

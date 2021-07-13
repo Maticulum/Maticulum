@@ -6,7 +6,7 @@
         "schools": "Schools"
     },
     "button": {
-        "add": "Add new",
+        "add": "Add",
         "edit": "Edit",
         "validate": "Validate",
         "save": "Save",
@@ -16,7 +16,8 @@
     "table": {
         "name": "Name",
         "validated": "Validated",
-        "action": "Action"
+        "action": "Action",
+        "address": "Address"
     },
 	"formlabel":{
 		"birthDate": "Birth date",
@@ -65,7 +66,6 @@
       "hours": "hours",
       "validationThreshold": "Number of validations",
       "jury": "Jury",
-      "addJury": "Add jury",
       "training": "Training"
    }
 }

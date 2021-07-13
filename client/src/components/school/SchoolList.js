@@ -42,7 +42,7 @@ class SchoolList extends Component {
 
 
    onValidate = async (id) => {
-      const tx = await this.context.contract.methods.validateSchool(id).send({from: this.context.account});
+      await this.context.contract.methods.validateSchool(id).send({from: this.context.account});
       this.props.history.push('/temp');
       this.props.history.replace('/schools');
    }
@@ -77,14 +77,14 @@ class SchoolList extends Component {
                         <td>{ school.id }</td>
                         <td>{ school.name }</td>
                         <td>
-                        { school.validators && school.validators.length >= this.state.validationThreshold ?
-                           (<i className="bi bi-check2-all" style={{color:'green'}}></i>) :
+                        { school.validated ?
+                           <i className="bi bi-check2-all" style={{color:'green'}}></i> :
                            ((school.validators ? school.validators.length : 0) + ' / 3')
                         }
                         </td>
                         <td valign="top">
                         <Link to={`/schools/${school.id}`}><i className="bi bi-pencil-square"></i>{t('button.edit')}</Link>
-                        { this.context.isSuperAdmin && (!school.validators || !school.validators.includes(this.context.account)) &&
+                        { this.context.isSuperAdmin && !school.validated && !school.validators.includes(this.context.account) &&
                            (<a href="" onClick={() => this.onValidate(school.id)} className="next"><i className="bi bi-check-square"></i>{t('button.validate')}</a>)
                         }
                         </td>

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Container } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 
 import Web3Context from '../Web3Context';
 
@@ -19,7 +19,7 @@ class Home extends Component {
          const trainingId = await this.context.contract.methods.getTrainingForJury(this.context.account, i).call();
          const training = await this.context.contract.methods.trainings(trainingId).call();
 
-         juryTrainings.push(training);
+         juryTrainings.push({ id: trainingId, ...training });
       }
 
       this.setState({ juryTrainings });
@@ -38,7 +38,7 @@ class Home extends Component {
                <h3>Jury pour les formations</h3>
                <ul>
                { this.state.juryTrainings.map((training, index) => 
-                  <li key={index}>{ training.name }</li>
+                  <li key={index}><a href={`/validation/${training.id}`}>{ training.name }</a></li>
                )}
                </ul>
                </>

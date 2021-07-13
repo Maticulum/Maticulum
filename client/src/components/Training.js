@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Button, Col,Container, Form, InputGroup, ListGroup, Row } from 'react-bootstrap';
+import { Button, Col,Container, Form, InputGroup, Row } from 'react-bootstrap';
 import { withTranslation } from "react-i18next";
 
 import Web3Context from '../Web3Context';
@@ -125,7 +125,7 @@ class Training extends Component {
                <hr />
                <Row>
                   <h3>{t('training.jury')}</h3>&nbsp;
-                  { this.state.isAdmin && <Button variant="outline-success" onClick={ this.onAddJury }>{t('training.addJury')}</Button> }
+                  { this.state.isAdmin && <Button variant="outline-success" onClick={ this.onAddJury }>{t('button.add')}</Button> }
                </Row>
                { this.state.juries.map((jury, index) => (
                   <Form.Group as={Row} key={index}>
