@@ -6,12 +6,16 @@ var TrainingContract = artifacts.require("./MaticulumTraining.sol");
 
 module.exports = async (deployer, network, accounts) => {
 
-   await deployer.deploy(NFTContract, "https://gateway.pinata.cloud/ipfs/",
+   await deployer.deploy(NFTContract, 
+   "https://gateway.pinata.cloud/ipfs/",
    "https://api.pinata.cloud/pinning/pinJSONToIPFS/",
    "https://api.pinata.cloud/pinning/pinFileToIPFS/",
-   "QmYFRV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC",
-   'YWE2MGZmZTk3YjJlMTY0MTlkYmFhbnQ=',
-   'YTRiZTFhMmE4NWQwNWQ2ZTM1MGExM2I4MjA0OWU0OWMxYWZlOWJiMzE3NTMxOTYzZTIzMWYwYTAzZDJhNzE1OGFudA==');
+   "https://api.pinata.cloud/pinning/unpin/",
+   'MWE1OWNlMDNhYTA0NmU4MjM2MTVhbnQ',
+   'MjMwZWNlZDljNDk3Mzc1MmFhZDE0MTMwYzI0NTI5ZGQ2YjljNDY1ZmI4ZTQ5OGEyYmZmMjNmZGEyOTljYTVkNGFudA==',
+   "DiplomeNFT",
+   "MTCF",
+   "QmYFRV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC");
    const nft = await NFTContract.deployed();
    
    await deployer.deploy(MaticulumContract, NFTContract.address);

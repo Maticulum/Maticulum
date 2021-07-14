@@ -13,18 +13,27 @@ class Diplome extends Component {
 	showDownload: false, firstname: '', lastname: '', school : '', formData:null,
 	grade:'',diplomaName:'',files:[], sendNFT:false, hashes:[], sizeFile:0,
 	loading:false, gateway:null, jsonUrlApi:null, imageUrlAPi:null,
-	paramPinataApiKey:null, paramPinataSecretApiKey:null};
+	paramPinataApiKey:null, paramPinataSecretApiKey:null, hashesImage:[],
+	urlPinAPI:null};
 		
 	componentDidMount = async () => {
-		const { gateway, jsonUrlApi, imageUrlAPi,paramPinataApiKey,paramPinataSecretApiKey } = this.state; 
-		let gatewayURL = await this.context.contractNFT.methods.getGateway().call();
-		let jsonAPI = await this.context.contractNFT.methods.getUrlToJsonAPI().call();
-		let imageAPI = await this.context.contractNFT.methods.getUrlToImageAPI().call();
-		let paramPinataApi = await this.context.contractNFT.methods.getHashToAPIKey().call();
-		let paramPinataSecretApi = await this.context.contractNFT.methods.getHashToSecretAPIKey().call();
-				
-		this.setState({ gateway : gatewayURL, jsonUrlApi: jsonAPI, imageUrlAPi: imageAPI,
-		paramPinataApiKey:	paramPinataApi, paramPinataSecretApiKey:paramPinataSecretApi});
+		const { gateway, jsonUrlApi, imageUrlAPi,paramPinataApiKey,paramPinataSecretApiKey
+		,urlPinAPI} = this.state; 
+		
+		let gatewaysData = await this.context.contractNFT.methods.getGatewaysData().call();
+		
+		let gatewayURL = gatewaysData[0];
+		let jsonAPI = gatewaysData[1];
+		let imageAPI = gatewaysData[2];
+		let pinAPI = gatewaysData[3];
+		let paramPinataApi = gatewaysData[4];
+		let paramPinataSecretApi = gatewaysData[5];
+		let hashToken = gatewaysData[5];
+		
+		this.setState({ gateway : gatewayURL, 
+		jsonUrlApi: jsonAPI, imageUrlAPi: imageAPI,urlPinAPI:pinAPI,
+		paramPinataApiKey:paramPinataApi, paramPinataSecretApiKey:paramPinataSecretApi
+		});
 	}		
 		
 	getPinataApiKey(){ 
@@ -37,9 +46,9 @@ class Diplome extends Component {
 		return atob(paramPinataSecretApiKey).split(this.mdp.value)[0];		
 	}
 	
-	// gestion suppression Pinata
 	getJsonData = async (linkDiplome) => {
-		const { hashJson, hashes, sendNFTVisibility, sizeFile, loading, gateway, jsonUrlApi} = this.state; 				
+		const { hashJson, hashes, sendNFTVisibility, sizeFile, 
+				loading, gateway, jsonUrlApi, revert} = this.state; 				
 		const { t } = this.props;  
 		
 		const data ={ 
@@ -74,7 +83,6 @@ class Diplome extends Component {
 			}
         })
         .catch(function (error) {
-			alert(error);
             alert("error in sendind NFT contact our developpement team");
         }); 
 	 
@@ -137,26 +145,30 @@ class Diplome extends Component {
 		this.tbxSchool.value = "";
 		this.tbxFirstname.value = "";
 		this.tbxLastname.value = "";
-		this.setState({ linkVisible:false,isButtonMetamaskVisible:false});
+		this.setState({ linkVisible:false,isButtonMetamaskVisible:false, 
+		hashes : [],hashesImage : []});
 	}
 	
 	onSendOneImage = async(formData, recipeUrl, postHeader) => {	
-	    const { gateway } = this.state; 
+	    const { gateway, hashesImage } = this.state; 
+		let cancelTransaction = false;
+		
 		axios({
 		  url: recipeUrl,
 		  method: "POST",
 		  headers: postHeader,
 		  data: formData,
 		})
-		  .then(async (res) => { 
+	    .then(async (res) => { 
 			let ipfsHash = res.data.IpfsHash;
-			let urlMetadata = gateway + ipfsHash;	
-						
-			this.setState({ linkDiplome : urlMetadata, linkVisible:true,
-			hashImage:ipfsHash});
-			await this.getJsonData(urlMetadata);
-		  }) 
-		  .catch((err) => { alert("error in sendind NFT contact our developpement team"); });
+		    let urlMetadata = gateway + ipfsHash;	
+		    hashesImage.push(ipfsHash);			
+		    this.setState({ linkDiplome : urlMetadata, linkVisible:true,hashImage:ipfsHash});
+		    await this.getJsonData(urlMetadata);			
+	    }) 
+	    .catch((err) => { 
+		   alert("error in sendind NFT contact our developpement team :" + err); 
+	    });
 	}
 	
 	createImagePinataAxios = async(e) => {		
@@ -183,27 +195,79 @@ class Diplome extends Component {
 	}
 	
 	SendNFTToSmartContract = async() => {
-		const { hashes } = this.state; 
-		await this.context.contractNFT.methods.AddNFTsToAdress(this.context.account,hashes).send({from:this.context.account});
+		const { hashes, hashesImage, urlPinAPI } = this.state; 
+		
+		let pinataApiKey = this.getPinataApiKey();
+		let pinataSecretApiKey = this.getPinataSecretApiKey();
+		
+		this.context.contractNFT.methods.AddNFTsToAdress(this.context.account,hashes)
+		.send({from:this.context.account}) 
+		.then(async (response) => {
+			
+		})
+		.catch(function (error, receipt) {
+			for(let i = 0;i<hashes.length;i++){	
+				const axios = require('axios');
+				let url = urlPinAPI + hashes[i];
+				axios
+					.delete(url, {
+						headers: {
+							pinata_api_key: pinataApiKey,
+							pinata_secret_api_key: pinataSecretApiKey
+						}
+					})
+					.then(function (response) {
+						alert("ok");
+					})
+					.catch(function (error) {
+						
+					});
+				url = urlPinAPI + hashesImage[i];
+				axios
+					.delete(url, {
+						headers: {
+							pinata_api_key: pinataApiKey,
+							pinata_secret_api_key: pinataSecretApiKey
+						}
+					})
+					.then(function (response) {
+						alert("ok");
+					})
+					.catch(function (error) {
+						
+					});
+			}
+		});
+		/*.on("error",function(error,receipt){
+			hasError = true;
+			alert("onError");
+		});	*/
 		this.setState({ isButtonMetamaskVisible:true});
 	}
 	
 	AddInMetamask = async() => {
+		const { hashTokenNFT, gateway}= this.state; 
 		const tokenAddress = await this.context.contract.methods.nft().call();
-		const tokenSymbol = 'MTCF';
+		
+		let nftDatas = await this.context.contractNFT.methods.getNFTDatas().call();
+		
+		const tokenSymbol = nftDatas[0];		
+		const tokenImage = gateway + nftDatas[1];
+		
+		alert(tokenSymbol);
+		alert(tokenImage);
 		const tokenDecimals = 0;
-		let tokenImage = await this.context.contractNFT.methods.getIPFSImageToken().call();
 
 		try {
 		  const wasAdded = await window.ethereum.request({
 			method: 'wallet_watchAsset',
 			params: {
-			  type: 'ERC20', // Initially only supports ERC20, but eventually more!
+			  type: 'ERC20', // works for ERC721 too
 			  options: {
-				address: tokenAddress, // The address that the token is at.
-				symbol: tokenSymbol, // A ticker symbol or shorthand, up to 5 chars.
-				decimals: tokenDecimals, // The number of decimals in the token
-				image: tokenImage, // A string url of the token logo
+				address: tokenAddress, 
+				symbol: tokenSymbol, 
+				decimals: tokenDecimals, 
+				image: tokenImage, 
 			  },
 			},
 		  });
@@ -216,7 +280,7 @@ class Diplome extends Component {
 		} catch (error) {
 		  console.log(error);
 		}
-    }	
+    }
 		
 	showFile = async (e) => {
 		e.preventDefault()
@@ -307,6 +371,12 @@ class Diplome extends Component {
 							<Form.Control type="password" id="mdp" ref={(input) => { this.mdp = input }} />
 						</Col>
 					</Form.Group>
+					<Form.Group as={Row} >
+						<Form.Label column sm="3">Delete PIN</Form.Label>
+						<Col sm="9">
+							<Button onClick={this.deleteAllPins}>Delete</Button>
+						</Col>
+					</Form.Group>					
 					<Form.Group as={Row} >
 					    <Form.Label column sm="3"></Form.Label>
 						{ 

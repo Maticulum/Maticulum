@@ -23,6 +23,7 @@ import Whitelisted from './components/Whitelisted';
 import ImgTest from "./components/pdf/ImgTest";
 import Diplome from './components/Diplome';
 import DiplomeMulti from './components/DiplomeMulti';
+import AdminSetPinataData from './components/AdminSetPinataData';
 
 import "./App.css";
 import i18n from "./i18n";
@@ -181,6 +182,8 @@ class App extends Component {
                      { this.state.isSuperAdmin && <NavLink className="nav-link" to={'/schools'}>{t('nav.schools')}</NavLink> }
                      <NavLink className="nav-link" to={'/diplome'}>{t('diplome.diploma')}</NavLink>
 					 <NavLink className="nav-link" to={'/diplomeMulti'}>{t('diplome.diploma')}</NavLink>
+					 <NavLink className="nav-link" to={'/adminSetPinataData'}>Set Pinata</NavLink>
+					 
                   </Nav>
                </Navbar.Collapse>
                <Navbar.Collapse className="justify-content-end">
@@ -211,6 +214,7 @@ class App extends Component {
                   <Route exact path='/img-test' component={ImgTest} />
                   <Route exact path='/diplome' component={Diplome} /> 
 				  <Route exact path='/diplomeMulti' component={DiplomeMulti} /> 
+				  <Route exact path='/adminSetPinataData' component={AdminSetPinataData} />
                </Switch>
             </div>
          </Router>
