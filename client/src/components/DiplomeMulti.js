@@ -13,13 +13,19 @@ class DiplomeMulti extends Component {
 	showDownload: false, firstname: '', lastname: '', title: '',formData:null,
 	files:null, hashes:[], pinataApiKey: '',
 	pinataSecretApiKey:'',sendNFTVisibility:false, sizeFile:0, 
-	gateway:null, loading:false	};
+	gateway:null, loading:false,	jsonUrlApi:null, imageUrlAPi:null,
+	paramPinataApiKey:null, paramPinataSecretApiKey:null};
 	
 	componentDidMount = async () => {
-		const { gateway } = this.state; 
+		const { gateway, jsonUrlApi, imageUrlAPi,paramPinataApiKey,paramPinataSecretApiKey } = this.state; 
 		let gatewayURL = await this.context.contractNFT.methods.getGateway().call();
-		this.setState({ gateway : gatewayURL});
-	}	
+		let jsonAPI = await this.context.contractNFT.methods.getUrlToJsonAPI().call();
+		let imageAPI = await this.context.contractNFT.methods.getUrlToImageAPI().call();
+		let paramPinataApi = await this.context.contractNFT.methods.getHashToAPIKey().call();
+		let paramPinataSecretApi = await this.context.contractNFT.methods.getHashToSecretAPIKey().call();
+		this.setState({ gateway : gatewayURL, jsonUrlApi: jsonAPI, imageUrlAPi: imageAPI,
+		paramPinataApiKey:	paramPinataApi, paramPinataSecretApiKey:paramPinataSecretApi});
+	}		
 	
 	handleFile = async(e) => {
 		const { files, pinataSecretApiKey, pinataApiKey, file} = this.state; 	
@@ -28,7 +34,7 @@ class DiplomeMulti extends Component {
 	}
 	
 	getJsonData = async (linkDiplome) => {
-		const { hashes, file, sendNFTVisibility, sizeFile, loading, gateway} = this.state; 	
+		const { hashes, file, sendNFTVisibility, sizeFile, loading, gateway, jsonUrlApi} = this.state; 	
 		const { t } = this.props; 
 		
 		const data ={ 
@@ -40,11 +46,9 @@ class DiplomeMulti extends Component {
 		const JSONBody = JSON.parse(JSON.stringify(data));
 		
 		const pinataApiKey = this.getPinataApiKey();
-		const pinataSecretApiKey = this.getPinataSecretApiKey();
-			
+		const pinataSecretApiKey = this.getPinataSecretApiKey();		
 		
-		const url = `https://api.pinata.cloud/pinning/pinJSONToIPFS/`;
-		return axios.post(url, JSONBody, {
+		return axios.post(jsonUrlApi, JSONBody, {
             headers: {
                 pinata_api_key: pinataApiKey,
                 pinata_secret_api_key: pinataSecretApiKey
@@ -75,7 +79,7 @@ class DiplomeMulti extends Component {
 		const tokenAddress = await this.context.contract.methods.nft().call();
 		const tokenSymbol = 'MTCF';
 		const tokenDecimals = 0;
-		const tokenImage = 'https://gateway.pinata.cloud/ipfs/QmYFRV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC'; // get from IPFS
+		let tokenImage = await this.context.contractNFT.methods.getIPFSImageToken().call();
 
 		try {
 		  // wasAdded is a boolean. Like any RPC method, an error may be thrown.
@@ -103,9 +107,11 @@ class DiplomeMulti extends Component {
     }	
 	
 	// gestion si annulation envoi diplôme
-	onSendOneImage = async(formData, recipeUrl, postHeader, gateway) =>{	
+	onSendOneImage = async(formData, postHeader) =>{	
+		const { imageUrlAPi, gateway } = this.state; 
+		
 		axios({
-		  url: recipeUrl,
+		  url: imageUrlAPi,
 		  method: "POST",
 		  headers: postHeader,
 		  data: formData,
@@ -121,12 +127,14 @@ class DiplomeMulti extends Component {
 		  .catch((err) => { alert(err); });
 	}
 	
-	createImagePinataAxios = async(e) => {		
-		const { files} = this.state; 
-		const recipeUrl = 'https://api.pinata.cloud/pinning/pinFileToIPFS/';		
+	createImagePinataAxios = async(e) => { 		
+		const { files} = this.state; 		
 		
 		const pinataApiKey = this.getPinataApiKey();
 		const pinataSecretApiKey = this.getPinataSecretApiKey();
+		
+		alert(pinataApiKey);
+		alert(pinataSecretApiKey);
 		
 	    const postHeader = {
 			pinata_api_key: pinataApiKey,
@@ -139,7 +147,7 @@ class DiplomeMulti extends Component {
 		for(let i =0;i<files.length;i++){
 			let formData = new FormData();
 			formData.append("file", files[i]);
-			await this.onSendOneImage(formData, recipeUrl, postHeader);
+			await this.onSendOneImage(formData, postHeader);
 		}
 		
 		this.setState({ loading:true});
@@ -152,12 +160,12 @@ class DiplomeMulti extends Component {
 	}
 	
 	getPinataApiKey(){
-		let paramPinataApiKey = 'YWE2MGZmZTk3YjJlMTY0MTlkYmFhbnQ=';
+		const { paramPinataApiKey} = this.state;
 		return atob(paramPinataApiKey).split(this.mdp.value)[0];
 	}
 	
 	getPinataSecretApiKey(){
-		let paramPinataSecretApiKey = 'YTRiZTFhMmE4NWQwNWQ2ZTM1MGExM2I4MjA0OWU0OWMxYWZlOWJiMzE3NTMxOTYzZTIzMWYwYTAzZDJhNzE1OGFudA==';
+		const { paramPinataSecretApiKey} = this.state;
 		return atob(paramPinataSecretApiKey).split(this.mdp.value)[0];		
 	}
 		
@@ -170,7 +178,7 @@ class DiplomeMulti extends Component {
             <Card.Header><strong>{t('diplome.sendNFT')}</strong></Card.Header>
             <Card.Body>			  
 				<input type="file" id="avatar" accept="image/png, image/jpeg" 
-				 multiple="multiple"	onChange={this.handleFile} />
+				 multiple="multiple" onChange={this.handleFile} />
 			</Card.Body>
 			{t('diplome.IPFSkey')}
 			<Form.Control type="password" id="mdp" ref={(input) => { this.mdp = input }} />

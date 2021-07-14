@@ -1,7 +1,12 @@
 var Maticulum = artifacts.require("./Maticulum.sol");
 
 module.exports = async (deployer, network, accounts) => {
-   await deployer.deploy(Maticulum, "https://gateway.pinata.cloud/ipfs/");
+   await deployer.deploy(Maticulum, "https://gateway.pinata.cloud/ipfs/",
+   "https://api.pinata.cloud/pinning/pinJSONToIPFS/",
+   "https://api.pinata.cloud/pinning/pinFileToIPFS/",
+   "QmYFRV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC",
+   'YWE2MGZmZTk3YjJlMTY0MTlkYmFhbnQ=',
+   'YTRiZTFhMmE4NWQwNWQ2ZTM1MGExM2I4MjA0OWU0OWMxYWZlOWJiMzE3NTMxOTYzZTIzMWYwYTAzZDJhNzE1OGFudA==');
    const instance = await Maticulum.deployed();
 
    if (network === 'develop') {

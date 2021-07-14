@@ -6,14 +6,27 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract MaticulumNFT is ERC721URIStorage, Ownable{
-    constructor(string memory gatewayUrl_) ERC721("DiplomeNFT", "MTCF") {
-        gatewayUrl = gatewayUrl_;
+    constructor(string memory _gatewayUrl, string memory _urltoJsonApi, 
+                string memory _urltoImageApi, string memory _hashImageToken,
+                string memory _hashtoApikey,string memory _hashtoSecretApikey) ERC721("DiplomeNFT", "MTCF") {
+        gatewayUrl = _gatewayUrl;
+        urltoJSonApi = _urltoJsonApi;
+        urltoImageApi = _urltoImageApi;
+        hashImageToken = _hashImageToken;
+        hashtoApikey = _hashtoApikey;
+        hashtoSecretApikey = _hashtoSecretApikey;
     }
     
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
     mapping(string => uint8) hashesStored;
     string gatewayUrl;
+    string hashImageToken;
+    string urltoJSonApi;
+    string urltoImageApi;
+    string urltoTokenApi;
+    string hashtoApikey;
+    string hashtoSecretApikey;
     
     event NFTMinted(address recipient, string hash, uint256 newItemId);
     event GatewayChanged(string gatewayUrl);
@@ -92,4 +105,84 @@ contract MaticulumNFT is ERC721URIStorage, Ownable{
         require(_tokenIds.current() >= _id,"Uri not yet stored");
         return tokenURI(_id);
     }
+    
+    /**
+   * @notice Get the URL of the image of the token 
+   * @return the url address
+   */
+    function getIPFSImageToken() view public returns(string memory){
+        return string(abi.encodePacked(gatewayUrl, hashImageToken));
+    }
+    
+    /**
+   * @notice Modify the hash of the image
+   * @param _hashImageToken   hash of the token image
+   */
+    function changeIPFSImageToken(string memory _hashImageToken) public {
+        hashImageToken = _hashImageToken;
+    }
+    
+    /**
+   * @notice Get the URL of the JSON API 
+   * @return the url address
+   */
+    function getUrlToJsonAPI() view public returns(string memory){
+        return urltoJSonApi;
+    }
+    
+    /**
+   * @notice Modify the hash of the image
+   * @param _urltoJsonApi   url to JSON API
+   */
+    function changeUrlToJsonAPI(string memory _urltoJsonApi) public {
+        urltoJSonApi = _urltoJsonApi;
+    }
+    
+    /**
+   * @notice Get the URL of the image API 
+   * @return the url address
+   */
+    function getUrlToImageAPI() view public returns(string memory){
+        return urltoImageApi;
+    }
+    
+    /**
+   * @notice Modify the hash of the image
+   * @param _urltoImageApi   url to image API
+   */
+    function changeUrlToImageAPI(string memory _urltoImageApi) public {
+        urltoImageApi = _urltoImageApi;
+    }
+    
+    
+    /**
+   * @notice Modify the hash of the image
+   * @param _hashtoApikey   url to image API
+   */
+    function changeHashToAPIKey(string memory _hashtoApikey) public {
+        hashtoApikey = _hashtoApikey;
+    }
+    
+    /**
+   * @notice get the the crypted hash to get the API key
+   */
+    function getHashToAPIKey() public view returns(string memory) {
+        return hashtoApikey;
+    }
+    
+    /**
+   * @notice Modify the crypted hash to get the API key
+   * @param _hashtoSecretApikey crypted hash to get the secret API key
+   */
+    function changeHashToSecretAPIKey(string memory _hashtoSecretApikey) public {
+        hashtoSecretApikey = _hashtoSecretApikey;
+    }
+    
+    /**
+   * @notice get the crypted hash to get the secret API key
+   */
+    function getHashToSecretAPIKey() public view returns(string memory){
+        return hashtoSecretApikey;
+    }
+    
 }

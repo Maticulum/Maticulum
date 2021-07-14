@@ -12,27 +12,34 @@ class Diplome extends Component {
 	hashImage:null,hashJson:null,fileToUpload:null, isButtonMetamaskVisible : false,
 	showDownload: false, firstname: '', lastname: '', school : '', formData:null,
 	grade:'',diplomaName:'',files:[], sendNFT:false, hashes:[], sizeFile:0,
-	loading:false, gateway:null	};
+	loading:false, gateway:null, jsonUrlApi:null, imageUrlAPi:null,
+	paramPinataApiKey:null, paramPinataSecretApiKey:null};
 		
 	componentDidMount = async () => {
-		const { gateway } = this.state; 
+		const { gateway, jsonUrlApi, imageUrlAPi,paramPinataApiKey,paramPinataSecretApiKey } = this.state; 
 		let gatewayURL = await this.context.contractNFT.methods.getGateway().call();
-		alert(gatewayURL);
-		this.setState({ gateway : gatewayURL});
+		let jsonAPI = await this.context.contractNFT.methods.getUrlToJsonAPI().call();
+		let imageAPI = await this.context.contractNFT.methods.getUrlToImageAPI().call();
+		let paramPinataApi = await this.context.contractNFT.methods.getHashToAPIKey().call();
+		let paramPinataSecretApi = await this.context.contractNFT.methods.getHashToSecretAPIKey().call();
+			
+		this.setState({ gateway : gatewayURL, jsonUrlApi: jsonAPI, imageUrlAPi: imageAPI,
+		paramPinataApiKey:	paramPinataApi, paramPinataSecretApiKey:paramPinataSecretApi});
 	}		
 		
-	getPinataApiKey(){
-		let paramPinataApiKey = 'YWE2MGZmZTk3YjJlMTY0MTlkYmFhbnQ=';
+	getPinataApiKey(){ 
+		const { paramPinataApiKey} = this.state;
 		return atob(paramPinataApiKey).split(this.mdp.value)[0];
 	}
 	
 	getPinataSecretApiKey(){
-		let paramPinataSecretApiKey = 'YTRiZTFhMmE4NWQwNWQ2ZTM1MGExM2I4MjA0OWU0OWMxYWZlOWJiMzE3NTMxOTYzZTIzMWYwYTAzZDJhNzE1OGFudA==';
+		const { paramPinataSecretApiKey} = this.state;
 		return atob(paramPinataSecretApiKey).split(this.mdp.value)[0];		
 	}
+	
 	// gestion suppression Pinata
 	getJsonData = async (linkDiplome) => {
-		const { hashJson, hashes, sendNFTVisibility, sizeFile, loading, gateway} = this.state; 				
+		const { hashJson, hashes, sendNFTVisibility, sizeFile, loading, gateway, jsonUrlApi} = this.state; 				
 		const { t } = this.props;  
 		
 		const data ={ 
@@ -43,11 +50,13 @@ class Diplome extends Component {
 		
 	  	let pinataApiKey = this.getPinataApiKey();
 		let pinataSecretApiKey = this.getPinataSecretApiKey();
-						
-		const JSONBody = JSON.parse(JSON.stringify(data));
-			
 		
-		const url = `https://api.pinata.cloud/pinning/pinJSONToIPFS/`;
+		alert(pinataApiKey);
+		alert(pinataSecretApiKey);
+		
+		const JSONBody = JSON.parse(JSON.stringify(data));			
+		
+		const url = jsonUrlApi;
 		return axios.post(url, JSONBody, {
             headers: {
                 pinata_api_key: pinataApiKey,
@@ -153,12 +162,12 @@ class Diplome extends Component {
 	}
 	
 	createImagePinataAxios = async(e) => {		
-		const { formData, linkDiplome, files} = this.state; 
+		const { formData, linkDiplome, files, imageUrlAPi} = this.state; 
 		
 		let pinataApiKey = this.getPinataApiKey();
 		let pinataSecretApiKey = this.getPinataSecretApiKey();
 		
-		const recipeUrl = 'https://api.pinata.cloud/pinning/pinFileToIPFS/';
+		const recipeUrl = imageUrlAPi;
 	    const postHeader = {
 			pinata_api_key: pinataApiKey,
 			pinata_secret_api_key: pinataSecretApiKey  
@@ -186,7 +195,7 @@ class Diplome extends Component {
 		const tokenAddress = await this.context.contract.methods.nft().call();
 		const tokenSymbol = 'MTCF';
 		const tokenDecimals = 0;
-		const tokenImage = 'https://gateway.pinata.cloud/ipfs/QmYFRV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC'; // get from IPFS
+		let tokenImage = await this.context.contractNFT.methods.getIPFSImageToken().call();
 
 		try {
 		  const wasAdded = await window.ethereum.request({

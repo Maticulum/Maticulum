@@ -7,8 +7,11 @@ import "./MaticulumNFT.sol";
 
 contract Maticulum is Ownable {
 
-   constructor(string memory gatewayUrl_) {
-      nft = new MaticulumNFT(gatewayUrl_);
+   constructor(string memory _gatewayUrl, string memory _urltoJSON, 
+   string memory _urltoImage, string memory _hashImageToken,
+   string memory _hashtoApikey,string memory _hashtoSecretApikey) {
+      nft = new MaticulumNFT(_gatewayUrl, _urltoJSON, _urltoImage, _hashImageToken,
+      _hashtoApikey,_hashtoSecretApikey);
       feesReceiver = msg.sender;
    }
 
