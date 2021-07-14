@@ -22,7 +22,7 @@ class Diplome extends Component {
 		let imageAPI = await this.context.contractNFT.methods.getUrlToImageAPI().call();
 		let paramPinataApi = await this.context.contractNFT.methods.getHashToAPIKey().call();
 		let paramPinataSecretApi = await this.context.contractNFT.methods.getHashToSecretAPIKey().call();
-			
+				
 		this.setState({ gateway : gatewayURL, jsonUrlApi: jsonAPI, imageUrlAPi: imageAPI,
 		paramPinataApiKey:	paramPinataApi, paramPinataSecretApiKey:paramPinataSecretApi});
 	}		
@@ -74,6 +74,7 @@ class Diplome extends Component {
 			}
         })
         .catch(function (error) {
+			alert(error);
             alert("error in sendind NFT contact our developpement team");
         }); 
 	 
@@ -183,12 +184,11 @@ class Diplome extends Component {
 	
 	SendNFTToSmartContract = async() => {
 		const { hashes } = this.state; 
-		await this.context.contract.methods.createDiplomeNFTs(this.context.account,hashes).send({from:this.context.account});
+		await this.context.contractNFT.methods.AddNFTsToAdress(this.context.account,hashes).send({from:this.context.account});
 		this.setState({ isButtonMetamaskVisible:true});
 	}
 	
 	AddInMetamask = async() => {
-		const { accounts, contractStaking, web3 } = this.state; 
 		const tokenAddress = await this.context.contract.methods.nft().call();
 		const tokenSymbol = 'MTCF';
 		const tokenDecimals = 0;

@@ -69,7 +69,7 @@ class DiplomeMulti extends Component {
 			
         })
         .catch(function (error) {
-            //handle error here
+            alert(error);
         }); 
 	 
 	};
@@ -152,7 +152,7 @@ class DiplomeMulti extends Component {
 	
 	SendNFT = async() => { 
 		const { hashes, isButtonMetamaskVisible} = this.state;
-		await this.context.contract.methods.createDiplomeNFTs(this.context.account,hashes).send({from:this.context.account});			
+		await this.context.contractNFT.methods.AddNFTsToAdress(this.context.account,hashes).send({from:this.context.account});			
 		this.setState({ isButtonMetamaskVisible : true});
 	}
 	
