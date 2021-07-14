@@ -14,10 +14,11 @@ class Home extends Component {
    async componentDidMount() {
       const juryTrainings = [];
 
-      const nbTrainings = await this.context.contract.methods.getTrainingsNbForJury(this.context.account).call();
+      const cm = this.context.contractTraining.methods;
+      const nbTrainings = await cm.getTrainingsNbForJury(this.context.account).call();
       for (let i = 0; i < nbTrainings; i++) {
-         const trainingId = await this.context.contract.methods.getTrainingForJury(this.context.account, i).call();
-         const training = await this.context.contract.methods.trainings(trainingId).call();
+         const trainingId = await cm.getTrainingForJury(this.context.account, i).call();
+         const training = await cm.trainings(trainingId).call();
 
          juryTrainings.push({ id: trainingId, ...training });
       }

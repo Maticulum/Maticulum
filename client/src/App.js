@@ -8,6 +8,8 @@ import Web3Context from "./Web3Context";
 import config from './config';
 import Maticulum from "./contracts/Maticulum.json";
 import MaticulumNFT from "./contracts/MaticulumNFT.json";
+import MaticulumSchool from "./contracts/MaticulumSchool.json";
+import MaticulumTraining from "./contracts/MaticulumTraining.json";
 
 import './i18n';
 
@@ -28,15 +30,15 @@ import i18n from "./i18n";
 
 var roles = {
    REGISTERED: 0x01,
-   STUDENT: 0x02,
+   VALIDATED: 0x02,
    SUPER_ADMIN: 0x80
 }
 
 
 class App extends Component {
 
-   state = { web3: null, networkId: -1, accounts: null, contract: null,
-      isRegistered: false, isStudent: false, isSuperAdmin: false };
+   state = { web3: null, networkId: -1, accounts: null, contract: null, contractNFT: null,
+      isRegistered: false, isValidated: false, isSuperAdmin: false };
 
    componentDidMount = async () => {
       try {
@@ -54,8 +56,11 @@ class App extends Component {
             deployedNetwork && deployedNetwork.address,
          );
 		 
-		 const NFTAddress = await instance.methods.getNFTAddress().call({from:this.context.account});
-		 const instanceNFT = new web3.eth.Contract(MaticulumNFT.abi, NFTAddress);
+		   const NFTAddress = await instance.methods.nft().call();
+		   const instanceNFT = new web3.eth.Contract(MaticulumNFT.abi, NFTAddress);
+
+         const instanceSchool = new web3.eth.Contract(MaticulumSchool.abi, MaticulumSchool.networks[networkId].address);
+         const instanceTraining = new web3.eth.Contract(MaticulumTraining.abi, MaticulumTraining.networks[networkId].address);
 
          window.ethereum.on('accountsChanged', accounts => {
             console.log('Accounts changed ', accounts);
@@ -75,8 +80,8 @@ class App extends Component {
 
          // Set web3, accounts, and contract to the state, and then proceed with an
          // example of interacting with the contract's methods.
-         this.setState({ web3, networkId, accounts, contract: instance
-		 , contractNFT:instanceNFT}, this.init);
+         this.setState({ web3, networkId, accounts, contract: instance, contractNFT: instanceNFT,
+            contractSchool: instanceSchool, contractTraining: instanceTraining}, this.init);
       } catch (error) {
          alert(`Failed to load web3, accounts, or contract. Check console for details.`,);
          console.error(error);
@@ -95,10 +100,10 @@ class App extends Component {
       console.log("user", user);
       if (user) {
          const isRegistered = (user.role & roles.REGISTERED) ===roles.REGISTERED;
-         const isStudent = (user.role & roles.STUDENT) === roles.STUDENT;
+         const isValidated = (user.role & roles.VALIDATED) === roles.VALIDATED;
          const isSuperAdmin = (user.role & roles.SUPER_ADMIN) === roles.SUPER_ADMIN;
 
-         this.setState({ isRegistered, isStudent, isSuperAdmin });
+         this.setState({ isRegistered, isValidated, isSuperAdmin });
          console.log("state", this.state);
       }
    };
@@ -160,10 +165,9 @@ class App extends Component {
             web3: this.state.web3,
             contract: this.state.contract,
             account: this.state.accounts[0],
-			contractNFT:this.state.contractNFT,
-            isRegistered: this.state.isRegistered, 
-            isStudent: this.state.isStudent, 
-            isAdmin: this.state.isAdmin, 
+			   contractNFT: this.state.contractNFT,
+            contractSchool: this.state.contractSchool,
+            contractTraining: this.state.contractTraining,
             isSuperAdmin: this.state.isSuperAdmin
          }} >
          <Router>

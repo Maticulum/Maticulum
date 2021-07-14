@@ -17,11 +17,13 @@ class Training extends Component {
    async componentDidMount() {
       const schoolId = this.props.match.params.schoolId;
       const trainingId = this.props.match.params.trainingId;
+      const cmSchool = this.context.contractSchool.methods;
+      const cmTraining = this.context.contractTraining.methods;
 
-      const isAdmin = await this.context.contract.methods.isSchoolAdmin(schoolId).call;
+      const isAdmin = await cmSchool.isSchoolAdmin(schoolId, this.context.account).call;
       this.setState({ isAdmin });
 
-      const school = await this.context.contract.methods.getSchool(schoolId).call();
+      const school = await cmSchool.getSchool(schoolId).call();
       this.setState({ schoolId, schoolName: school.name });
 
       const create = trainingId === 'new';
@@ -29,13 +31,13 @@ class Training extends Component {
          this.setState({ create: true });
       }
       else {
-         const training = await this.context.contract.methods.trainings(trainingId).call();
+         const training = await cmTraining.trainings(trainingId).call();
          this.setState({ create: false, id: trainingId, ...training });
          
-         const nbJuries = await this.context.contract.methods.getTrainingNbJuries(trainingId).call();
+         const nbJuries = await cmTraining.getTrainingNbJuries(trainingId).call();
          const juries = [];
          for (let i = 0; i < nbJuries; i++) {
-            const jury = await this.context.contract.methods.getTrainingJury(trainingId, i).call();
+            const jury = await cmTraining.getTrainingJury(trainingId, i).call();
             juries.push(jury);
          }
          this.setState({ juries, previousJuries: juries });
@@ -65,14 +67,14 @@ class Training extends Component {
 
    onSave = async () => {
       if (this.state.create) {
-         await this.context.contract.methods.addTraining(this.state.schoolId, this.state.name, this.state.level, this.state.duration, this.state.validationThreshold,
+         await this.context.contractTraining.methods.addTraining(this.state.schoolId, this.state.name, this.state.level, this.state.duration, this.state.validationThreshold,
             this.state.juries)
             .send({ from: this.context.account });
       }
       else {
          const addJuries = this.state.juries.filter(value => value !== '' && !this.state.previousJuries.includes(value));
          const removeJuries = this.state.previousJuries.filter(value => value !== '' && !this.state.juries.includes(value));
-         await this.context.contract.methods.updateTraining(this.state.id, this.state.name, this.state.level, this.state.duration, this.state.validationThreshold, 
+         await this.context.contractTraining.methods.updateTraining(this.state.id, this.state.name, this.state.level, this.state.duration, this.state.validationThreshold, 
             addJuries, removeJuries)
             .send({ from: this.context.account });
       }

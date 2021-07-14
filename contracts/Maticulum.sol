@@ -5,13 +5,10 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "./MaticulumNFT.sol";
 
-contract Maticulum is Ownable {
+contract Maticulum is IMaticulum, Ownable {
 
-   constructor(string memory _gatewayUrl, string memory _urltoJSON, 
-   string memory _urltoImage, string memory _hashImageToken,
-   string memory _hashtoApikey,string memory _hashtoSecretApikey) {
-      nft = new MaticulumNFT(_gatewayUrl, _urltoJSON, _urltoImage, _hashImageToken,
-      _hashtoApikey,_hashtoSecretApikey);
+   constructor(address NFTaddress) {
+      nft = MaticulumNFT(NFTaddress);      
       feesReceiver = msg.sender;
    }
 

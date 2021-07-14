@@ -10,15 +10,25 @@ class Validation extends Component {
 
    static contextType = Web3Context;
 
-   state = { users: null, training: null, school: null }
+   state = { users: null, training: null, school: null, checkedUsers: [] }
 
 
    async componentDidMount() {
+      this.init();
+   }
+
+
+   init = async () => {
       const users = [];
+      const cm = this.context.contract.methods;
 
       const trainingId = this.props.match.params.trainingId;
-      // TODO check user is jury 
-      const cm = this.context.contract.methods;
+      const isJury = cm.isTrainingJury(this.context.account, trainingId);
+      if (!isJury) {
+         this.props.history.push('/');
+         return;
+      }
+      
       const training = await cm.trainings(trainingId).call();
       const school = await cm.schools(training.school).call();
 
@@ -26,17 +36,44 @@ class Validation extends Component {
       for (let i = 0; i < nbUsers; i++) {
          const userId = await cm.getUserForTraining(trainingId, i).call();
          const user = await cm.users(userId).call();
-         console.log(userId);
+         const validation = await cm.getTrainingValidation(trainingId, userId, this.context.account).call();
 
-         users.push({ id: userId, ...user });
+         users.push({ id: userId, ...user, ...validation });
       }
 
       this.setState({ users, training, school });
+      console.log(this.state.users);
+   }
+
+
+   onCheck = (userId, checked) => {
+      if (checked) {
+         this.setState({ checkedUsers: [...this.state.checkedUsers, userId ]});
+      }
+      else {
+         const checkedUsers = [...this.state.checkedUsers];
+         const index = checkedUsers.indexOf(userId);
+         if (index !== -1) {
+            checkedUsers.splice(index, 1);
+            this.setState({ checkedUsers });
+         }
+      }
    }
 
 
    onValidate = () => {
-      
+      if (this.state.checkedUsers) {
+         const trainingId = this.props.match.params.trainingId;
+
+         //if (this.state.checkedUsers.length === 1) {
+         //   this.context.contract.methods.validateTraining(trainingId, this.state.checkedUsers[0]).send({ from: this.context.account });
+         //}
+         //else {
+            this.context.contract.methods.validateTrainingMultipleUsers(trainingId, this.state.checkedUsers).send({ from: this.context.account });
+         //}
+
+         this.init();
+      }
    }
 
 
@@ -53,11 +90,11 @@ class Validation extends Component {
             <Form>
                <Table>
                   <thead>
-                  <tr>
-                     <th>{t('table.address')}</th>
-                     <th>{t('table.name')}</th>
-                     <th>{t('table.validated')}</th>
-                  </tr>
+                     <tr>
+                        <th>{t('table.address')}</th>
+                        <th>{t('table.name')}</th>
+                        <th colSpan="2">{t('table.validated')}</th>
+                     </tr>
                   </thead>
                   <tbody>
                   { this.state.users.map(user => (
@@ -65,13 +102,15 @@ class Validation extends Component {
                         <td>{ user.id }</td>
                         <td>{ user.name }&nbsp;{ user.firstname }</td>
                         <td>
-                           <Form.Check id={user.id} />
+                           <Form.Check id={user.id} checked={ user.validatedByJury } readOnly={user.validated || user.validatedByJury}
+                              onChange={ (e) => this.onCheck(user.id, e.target.checked) } />
                         </td>
+                        <td>{ user.validatedCount }&nbsp;/&nbsp;{ this.state.training.validationThreshold }</td>
                      </tr>
                   ))}
                   </tbody>
                </Table>
-               <Button onClick={ this.onValidate } >{t('button.save')}</Button>
+               <Button onClick={ this.onValidate } disabled={ !this.state.checkedUsers || this.state.checkedUsers.length === 0 } >{t('button.save')}</Button>
             </Form>
          </Container>
       );

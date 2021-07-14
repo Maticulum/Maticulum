@@ -8,7 +8,7 @@ state = {isRegistered : false, isCreated: false}
   static contextType = Web3Context; 	
  
   componentDidMount = async () => {
-	const isRegistered = await this.context.contract.methods.isRegistered().call();
+	const isRegistered = await this.context.contract.methods.isRegistered(this.context.account).call();
 	if(isRegistered){
 	  this.GetThisUser();
 	}
@@ -45,7 +45,7 @@ state = {isRegistered : false, isCreated: false}
   }	
 
   TestRegistration = async() => {
-    const registered = await this.context.contract.methods.isRegistered().call();	  
+    const registered = await this.context.contract.methods.isRegistered(this.context.account).call();	  
 	alert(registered);
   }		
 	

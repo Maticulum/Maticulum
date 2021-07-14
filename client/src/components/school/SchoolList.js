@@ -15,17 +15,18 @@ class SchoolList extends Component {
 
    async componentDidMount() {
       const schools = await this.getSchools();
-      const validationThreshold = await this.context.contract.methods.schoolValidationThreshold().call();
+      const validationThreshold = await this.context.contractSchool.methods.schoolValidationThreshold().call();
 
       this.setState({ schools: schools, validationThreshold });
    }
 
    getSchools = async () => {
-      const size = await this.context.contract.methods.getNbSchools().call();
+      const cm = this.context.contractSchool.methods;
+      const size = await cm.getNbSchools().call();
 
       let schools = [];
       for (let i = 0; i < size; i++) {
-         const school = await this.context.contract.methods.getSchool(i).call();
+         const school = await cm.getSchool(i).call();
          schools.push({
             id: i,
             ...school

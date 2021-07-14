@@ -15,8 +15,9 @@ class SchoolItem extends Component {
 
    async componentDidMount() {
       const id = this.props.match.params.schoolId;
+      const cm = this.context.contractSchool.methods;
 
-      const isAdmin = await this.context.contract.methods.isSchoolAdmin(id).call;
+      const isAdmin = await cm.isSchoolAdmin(id, this.context.account).call;
       this.setState({ isAdmin });
 
       const create = id === 'new';
@@ -24,7 +25,7 @@ class SchoolItem extends Component {
          this.setState({ create: true, administrators: [ this.context.account, '']});
       }
       else {
-         const school = await this.context.contract.methods.getSchool(id).call();
+         const school = await cm.getSchool(id).call();
          this.loadTrainings(id);
          this.setState({ create: false, id, ...school });
       }
@@ -33,10 +34,12 @@ class SchoolItem extends Component {
 
    async loadTrainings(schoolId) {
       const list = [];
-      const nbTrainings = await this.context.contract.methods.getSchoolNbTrainings(schoolId).call();
+      const cm = this.context.contractSchool.methods;
+
+      const nbTrainings = await cm.getSchoolNbTrainings(schoolId).call();
       for (let i = 0; i < nbTrainings; i++) {
-         const id = await this.context.contract.methods.getSchoolTraining(schoolId, i).call();
-         const training = await this.context.contract.methods.trainings(id).call();
+         const id = await cm.getSchoolTraining(schoolId, i).call();
+         const training = await this.context.contractTraining.trainings(id).call();
          list.push({ id: id, name: training.name });
       }
 
@@ -50,13 +53,15 @@ class SchoolItem extends Component {
 
 
    onSave = async () => {
+      const cm = this.context.contractSchool.methods;
+
       if (this.create) {
-         await this.context.contract.methods.addSchool(this.state.name, this.state.town, this.state.country, 
+         await cm.addSchool(this.state.name, this.state.town, this.state.country, 
             this.state.administrators[0], this.state.administrators[1])
             .send({ from: this.context.account });         
       }
       else {
-         await this.context.contract.methods.updateSchool(this.state.id, this.state.name, this.state.town, this.state.country)
+         await cm.updateSchool(this.state.id, this.state.name, this.state.town, this.state.country)
             .send({ from: this.context.account });
       }
 
