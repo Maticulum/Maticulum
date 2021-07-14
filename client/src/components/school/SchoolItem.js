@@ -39,7 +39,7 @@ class SchoolItem extends Component {
       const nbTrainings = await cm.getSchoolNbTrainings(schoolId).call();
       for (let i = 0; i < nbTrainings; i++) {
          const id = await cm.getSchoolTraining(schoolId, i).call();
-         const training = await this.context.contractTraining.trainings(id).call();
+         const training = await this.context.contractTraining.methods.trainings(id).call();
          list.push({ id: id, name: training.name });
       }
 

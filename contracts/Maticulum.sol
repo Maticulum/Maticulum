@@ -32,6 +32,7 @@ contract Maticulum is IMaticulum, Ownable {
    uint8 constant REGISTERED_MASK = 0x01;
 
    MaticulumNFT public nft;
+   address trainingContract;
    address feesReceiver;
 
 
@@ -55,6 +56,11 @@ contract Maticulum is IMaticulum, Ownable {
    }
 
 
+   function registerTrainingContract(address _trainingContract) external onlyOwner {
+      trainingContract = _trainingContract;
+   }
+
+
    function isSuperAdmin(address _user) external view override returns (bool) {
       return (users[_user].role & SUPER_ADMIN_MASK) == SUPER_ADMIN_MASK;
    }
@@ -65,7 +71,9 @@ contract Maticulum is IMaticulum, Ownable {
    }
 
 
-   function validateUser(address _user) external override onlyRegistered {
+   function validateUser(address _user) external override {
+      require(msg.sender == trainingContract || msg.sender == owner(), "!owner|training");
+      
       users[_user].role |= VALIDATED_MASK;
    }
 
