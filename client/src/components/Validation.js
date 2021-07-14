@@ -64,7 +64,7 @@ class Validation extends Component {
    }
 
 
-   onValidate = () => {
+   onValidate = async () => {
       if (this.state.checkedUsers) {
          const trainingId = this.props.match.params.trainingId;
 
