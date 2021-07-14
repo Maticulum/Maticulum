@@ -7,6 +7,7 @@ import getWeb3 from "./getWeb3";
 import Web3Context from "./Web3Context";
 import config from './config';
 import Maticulum from "./contracts/Maticulum.json";
+import MaticulumNFT from "./contracts/MaticulumNFT.json";
 
 import './i18n';
 
@@ -52,6 +53,9 @@ class App extends Component {
             Maticulum.abi,
             deployedNetwork && deployedNetwork.address,
          );
+		 
+		 const NFTAddress = await instance.methods.getNFTAddress().call({from:this.context.account});
+		 const instanceNFT = new web3.eth.Contract(MaticulumNFT.abi, NFTAddress);
 
          window.ethereum.on('accountsChanged', accounts => {
             console.log('Accounts changed ', accounts);
@@ -71,7 +75,8 @@ class App extends Component {
 
          // Set web3, accounts, and contract to the state, and then proceed with an
          // example of interacting with the contract's methods.
-         this.setState({ web3, networkId, accounts, contract: instance}, this.init);
+         this.setState({ web3, networkId, accounts, contract: instance
+		 , contractNFT:instanceNFT}, this.init);
       } catch (error) {
          alert(`Failed to load web3, accounts, or contract. Check console for details.`,);
          console.error(error);
@@ -155,7 +160,7 @@ class App extends Component {
             web3: this.state.web3,
             contract: this.state.contract,
             account: this.state.accounts[0],
-
+			contractNFT:this.state.contractNFT,
             isRegistered: this.state.isRegistered, 
             isStudent: this.state.isStudent, 
             isAdmin: this.state.isAdmin, 

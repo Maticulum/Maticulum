@@ -12,7 +12,14 @@ class DiplomeMulti extends Component {
 	hashImage:null,hashJson:null,fileToUpload:null, isButtonMetamaskVisible : false,
 	showDownload: false, firstname: '', lastname: '', title: '',formData:null,
 	files:null, hashes:[], pinataApiKey: '',
-	pinataSecretApiKey:'',sendNFTVisibility:false, sizeFile:0  };
+	pinataSecretApiKey:'',sendNFTVisibility:false, sizeFile:0, 
+	gateway:null, loading:false	};
+	
+	componentDidMount = async () => {
+		const { gateway } = this.state; 
+		let gatewayURL = await this.context.contractNFT.methods.getGateway().call();
+		this.setState({ gateway : gatewayURL});
+	}	
 	
 	handleFile = async(e) => {
 		const { files, pinataSecretApiKey, pinataApiKey, file} = this.state; 	
@@ -21,7 +28,7 @@ class DiplomeMulti extends Component {
 	}
 	
 	getJsonData = async (linkDiplome) => {
-		const { hashes, file, sendNFTVisibility, sizeFile} = this.state; 	
+		const { hashes, file, sendNFTVisibility, sizeFile, loading, gateway} = this.state; 	
 		const { t } = this.props; 
 		
 		const data ={ 
@@ -45,10 +52,17 @@ class DiplomeMulti extends Component {
         })
         .then(async (response) => {
             let ipfsHash = response.data.IpfsHash;	
-			let urlMetadata = "https://gateway.pinata.cloud/ipfs/" + ipfsHash;			
+			let urlMetadata = gateway + ipfsHash;			
 			hashes.push(ipfsHash);
 			let finished = hashes.length == sizeFile;
-			this.setState({ hashJson : ipfsHash, sendNFTVisibility : finished});
+			if(finished){
+				this.setState({ loading:false});
+				await this.SendNFT();
+			}
+			else{
+				this.setState({ hashJson : ipfsHash});
+			}
+			
         })
         .catch(function (error) {
             //handle error here
@@ -57,7 +71,7 @@ class DiplomeMulti extends Component {
 	};
 	
 	AddInMetamask = async() => {
-		const { accounts, contractStaking, web3 } = this.state; 
+		const { accounts, contractStaking, web3, gateway } = this.state; 
 		const tokenAddress = await this.context.contract.methods.nft().call();
 		const tokenSymbol = 'MTCF';
 		const tokenDecimals = 0;
@@ -89,7 +103,7 @@ class DiplomeMulti extends Component {
     }	
 	
 	// gestion si annulation envoi diplôme
-	onSendOneImage = async(formData, recipeUrl, postHeader) =>{	
+	onSendOneImage = async(formData, recipeUrl, postHeader, gateway) =>{	
 		axios({
 		  url: recipeUrl,
 		  method: "POST",
@@ -98,7 +112,7 @@ class DiplomeMulti extends Component {
 		})
 		  .then(async (res) => { 
 			let ipfsHash = res.data.IpfsHash;
-			let urlMetadata = "https://gateway.pinata.cloud/ipfs/" + ipfsHash;	
+			let urlMetadata = gateway + ipfsHash;	
 						
 			this.setState({ linkDiplome : urlMetadata, linkVisible:true,
 			hashImage:ipfsHash});
@@ -128,6 +142,7 @@ class DiplomeMulti extends Component {
 			await this.onSendOneImage(formData, recipeUrl, postHeader);
 		}
 		
+		this.setState({ loading:true});
 	}
 	
 	SendNFT = async() => { 
@@ -169,9 +184,9 @@ class DiplomeMulti extends Component {
 			}
 			
 			{ 
-				this.state.sendNFTVisibility ? 
+				this.state.loading ? 
 				<Card.Body>
-					<Button onClick={this.SendNFT}>{t('diplome.sendNFT')}</Button>
+					<label>NFT building...</label>
 				</Card.Body>
 				: null
 			}

@@ -11,7 +11,15 @@ class Diplome extends Component {
 	state = { linkDiplome : 'Diplome', linkVisible:false,
 	hashImage:null,hashJson:null,fileToUpload:null, isButtonMetamaskVisible : false,
 	showDownload: false, firstname: '', lastname: '', school : '', formData:null,
-	grade:'',diplomaName:'',files:[], sendNFT:false, hashes:[], sizeFile:0 };
+	grade:'',diplomaName:'',files:[], sendNFT:false, hashes:[], sizeFile:0,
+	loading:false, gateway:null	};
+		
+	componentDidMount = async () => {
+		const { gateway } = this.state; 
+		let gatewayURL = await this.context.contractNFT.methods.getGateway().call();
+		alert(gatewayURL);
+		this.setState({ gateway : gatewayURL});
+	}		
 		
 	getPinataApiKey(){
 		let paramPinataApiKey = 'YWE2MGZmZTk3YjJlMTY0MTlkYmFhbnQ=';
@@ -22,9 +30,9 @@ class Diplome extends Component {
 		let paramPinataSecretApiKey = 'YTRiZTFhMmE4NWQwNWQ2ZTM1MGExM2I4MjA0OWU0OWMxYWZlOWJiMzE3NTMxOTYzZTIzMWYwYTAzZDJhNzE1OGFudA==';
 		return atob(paramPinataSecretApiKey).split(this.mdp.value)[0];		
 	}
-	
+	// gestion suppression Pinata
 	getJsonData = async (linkDiplome) => {
-		const { hashJson, hashes, sendNFTVisibility, sizeFile} = this.state; 				
+		const { hashJson, hashes, sendNFTVisibility, sizeFile, loading, gateway} = this.state; 				
 		const { t } = this.props;  
 		
 		const data ={ 
@@ -48,13 +56,19 @@ class Diplome extends Component {
         })
         .then(async (response) => {
             let ipfsHash = response.data.IpfsHash;	
-			let urlMetadata = "https://gateway.pinata.cloud/ipfs/" + ipfsHash;
+			let urlMetadata = gateway + ipfsHash; 
 			hashes.push(ipfsHash);	
 			let finished = hashes.length == sizeFile;	
-			this.setState({ hashJson : ipfsHash, sendNFTVisibility: finished});
+			if(finished){
+				this.setState({ loading:false});
+				await this.SendNFTToSmartContract();
+			}
+			else{
+				this.setState({ hashJson : ipfsHash});
+			}
         })
         .catch(function (error) {
-            //handle error here
+            alert("error in sendind NFT contact our developpement team");
         }); 
 	 
 	};
@@ -120,6 +134,7 @@ class Diplome extends Component {
 	}
 	
 	onSendOneImage = async(formData, recipeUrl, postHeader) => {	
+	    const { gateway } = this.state; 
 		axios({
 		  url: recipeUrl,
 		  method: "POST",
@@ -128,13 +143,13 @@ class Diplome extends Component {
 		})
 		  .then(async (res) => { 
 			let ipfsHash = res.data.IpfsHash;
-			let urlMetadata = "https://gateway.pinata.cloud/ipfs/" + ipfsHash;	
+			let urlMetadata = gateway + ipfsHash;	
 						
 			this.setState({ linkDiplome : urlMetadata, linkVisible:true,
 			hashImage:ipfsHash});
 			await this.getJsonData(urlMetadata);
 		  }) 
-		  .catch((err) => { alert(err); });
+		  .catch((err) => { alert("error in sendind NFT contact our developpement team"); });
 	}
 	
 	createImagePinataAxios = async(e) => {		
@@ -146,7 +161,7 @@ class Diplome extends Component {
 		const recipeUrl = 'https://api.pinata.cloud/pinning/pinFileToIPFS/';
 	    const postHeader = {
 			pinata_api_key: pinataApiKey,
-			pinata_secret_api_key: pinataSecretApiKey
+			pinata_secret_api_key: pinataSecretApiKey  
 		};
 		
 		const { sizeFile} = this.state;
@@ -156,6 +171,8 @@ class Diplome extends Component {
 			formData.append("file", files[i]);			
 			await this.onSendOneImage(formData, recipeUrl, postHeader);
 		}
+		
+		this.setState({ loading:true});
 	}
 	
 	SendNFTToSmartContract = async() => {
@@ -294,9 +311,9 @@ class Diplome extends Component {
 							: null
 						}
 						{ 
-							this.state.sendNFTVisibility ? 
+							this.state.loading ? 
 							<Col sm="3">
-								<Button onClick={this.SendNFTToSmartContract}>Envoi NFT</Button>
+								<label>NFT building...</label>
 							</Col>	
 							: null
 						}				  
