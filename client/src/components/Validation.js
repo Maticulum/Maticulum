@@ -42,16 +42,12 @@ class Validation extends Component {
       }
 
       this.setState({ users, training, school });
-      console.log(this.state.users);
    }
 
 
    onCheck = (userId, index, checked) => {
-
-      console.log(index);
       const users = [...this.state.users];
-      console.log(users);
-      users[index].validatedByJury = checked;
+      users[index].currentValidation = checked;
       this.setState({ users });
 
       if (checked) {
@@ -72,7 +68,7 @@ class Validation extends Component {
       if (this.state.checkedUsers) {
          const trainingId = this.props.match.params.trainingId;
 
-         this.context.contractTraining.methods.validateTrainingMultipleUsers(trainingId, this.state.checkedUsers).send({ from: this.context.account });
+         await this.context.contractTraining.methods.validateTrainingMultipleUsers(trainingId, this.state.checkedUsers).send({ from: this.context.account });
          this.init();
       }
    }
@@ -103,7 +99,7 @@ class Validation extends Component {
                         <td>{ user.id }</td>
                         <td>{ user.name }&nbsp;{ user.firstname }</td>
                         <td>
-                           <Form.Check id={user.id} checked={ user.validatedByJury } disabled={user.validated || user.validatedByJury}
+                           <Form.Check id={user.id} checked={ user.currentValidation || user.validatedByJury } disabled={user.validated || user.validatedByJury}
                               onChange={ (e) => this.onCheck(user.id, index, e.target.checked) } />
                         </td>
                         <td>{ user.validatedCount }&nbsp;/&nbsp;{ this.state.training.validationThreshold }</td>
