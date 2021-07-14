@@ -51,9 +51,6 @@ class Diplome extends Component {
 	  	let pinataApiKey = this.getPinataApiKey();
 		let pinataSecretApiKey = this.getPinataSecretApiKey();
 		
-		alert(pinataApiKey);
-		alert(pinataSecretApiKey);
-		
 		const JSONBody = JSON.parse(JSON.stringify(data));			
 		
 		const url = jsonUrlApi;

@@ -132,10 +132,7 @@ class DiplomeMulti extends Component {
 		
 		const pinataApiKey = this.getPinataApiKey();
 		const pinataSecretApiKey = this.getPinataSecretApiKey();
-		
-		alert(pinataApiKey);
-		alert(pinataSecretApiKey);
-		
+				
 	    const postHeader = {
 			pinata_api_key: pinataApiKey,
 			pinata_secret_api_key: pinataSecretApiKey
