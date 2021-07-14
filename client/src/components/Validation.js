@@ -20,22 +20,22 @@ class Validation extends Component {
 
    init = async () => {
       const users = [];
-      const cm = this.context.contract.methods;
+      const cm = this.context.contractTraining.methods;
 
       const trainingId = this.props.match.params.trainingId;
-      const isJury = cm.isTrainingJury(this.context.account, trainingId);
+      const isJury = cm.isTrainingJury(trainingId, this.context.account);
       if (!isJury) {
          this.props.history.push('/');
          return;
       }
       
       const training = await cm.trainings(trainingId).call();
-      const school = await cm.schools(training.school).call();
+      const school = await this.context.contractSchool.methods.schools(training.school).call();
 
       const nbUsers = await cm.getUsersNbForTraining(trainingId).call()
       for (let i = 0; i < nbUsers; i++) {
          const userId = await cm.getUserForTraining(trainingId, i).call();
-         const user = await cm.users(userId).call();
+         const user = await this.context.contract.methods.users(userId).call();
          const validation = await cm.getTrainingValidation(trainingId, userId, this.context.account).call();
 
          users.push({ id: userId, ...user, ...validation });
@@ -46,15 +46,22 @@ class Validation extends Component {
    }
 
 
-   onCheck = (userId, checked) => {
+   onCheck = (userId, index, checked) => {
+
+      console.log(index);
+      const users = [...this.state.users];
+      console.log(users);
+      users[index].validatedByJury = checked;
+      this.setState({ users });
+
       if (checked) {
          this.setState({ checkedUsers: [...this.state.checkedUsers, userId ]});
       }
       else {
-         const checkedUsers = [...this.state.checkedUsers];
-         const index = checkedUsers.indexOf(userId);
-         if (index !== -1) {
-            checkedUsers.splice(index, 1);
+         const checkedUsers = [...this.state.checkedUsers];   
+         const i  = checkedUsers.indexOf(userId);
+         if (i !== -1) {
+            checkedUsers.splice(i, 1);
             this.setState({ checkedUsers });
          }
       }
@@ -65,13 +72,7 @@ class Validation extends Component {
       if (this.state.checkedUsers) {
          const trainingId = this.props.match.params.trainingId;
 
-         //if (this.state.checkedUsers.length === 1) {
-         //   this.context.contract.methods.validateTraining(trainingId, this.state.checkedUsers[0]).send({ from: this.context.account });
-         //}
-         //else {
-            this.context.contract.methods.validateTrainingMultipleUsers(trainingId, this.state.checkedUsers).send({ from: this.context.account });
-         //}
-
+         this.context.contractTraining.methods.validateTrainingMultipleUsers(trainingId, this.state.checkedUsers).send({ from: this.context.account });
          this.init();
       }
    }
@@ -97,13 +98,13 @@ class Validation extends Component {
                      </tr>
                   </thead>
                   <tbody>
-                  { this.state.users.map(user => (
+                  { this.state.users.map((user, index) => (
                      <tr key={user.id}>
                         <td>{ user.id }</td>
                         <td>{ user.name }&nbsp;{ user.firstname }</td>
                         <td>
-                           <Form.Check id={user.id} checked={ user.validatedByJury } readOnly={user.validated || user.validatedByJury}
-                              onChange={ (e) => this.onCheck(user.id, e.target.checked) } />
+                           <Form.Check id={user.id} checked={ user.validatedByJury } disabled={user.validated || user.validatedByJury}
+                              onChange={ (e) => this.onCheck(user.id, index, e.target.checked) } />
                         </td>
                         <td>{ user.validatedCount }&nbsp;/&nbsp;{ this.state.training.validationThreshold }</td>
                      </tr>

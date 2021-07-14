@@ -21,8 +21,10 @@ module.exports = async (deployer, network, accounts) => {
    await deployer.deploy(SchoolContract, MaticulumContract.address);
    const school = await SchoolContract.deployed();
 
-   await deployer.deploy(TrainingContract, SchoolContract.address);
+   await deployer.deploy(TrainingContract, MaticulumContract.address, SchoolContract.address);
    const training = await TrainingContract.deployed();
+
+   await maticulum.registerTrainingContract(TrainingContract.address);
 
    if (network === 'develop') {
       console.log('---=== Adding test data ===---');
@@ -46,14 +48,12 @@ module.exports = async (deployer, network, accounts) => {
       await school.addSchool('Alyra', 'Paris', 'France', superAdmin, schoolAdmin);
       await school.validateSchool(0);
 
-      /*
       await training.addTraining(0, 'Chef de projet', 'Aucun', 350, 1, [ jury ]);
       await training.addTraining(0, 'Developpeur', 'Aucun', 350, 1, [ jury ]);
 
       await training.addUserTraining(student1, 0);
       await training.addUserTraining(student1, 1);
       await training.addUserTraining(student2, 1);
-      */
    }
 
 };

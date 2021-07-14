@@ -48,7 +48,8 @@ contract MaticulumTraining is Ownable {
    event JuryValidated(uint256 schoolId, uint256 trainingId, address jury, address validator, uint16 count);
 
 
-   constructor(address _school) {
+   constructor(address _maticulum, address _school) {
+      maticulum = IMaticulum(_maticulum);
       school = ISchool(_school);
    }
 
@@ -68,13 +69,7 @@ contract MaticulumTraining is Ownable {
       require(school.isSchoolAdmin(_schoolId, msg.sender), "!SchoolAdmin");
       require(school.isValidated(_schoolId), "!SchoolValidated");
 
-      Training memory training;
-      training.school = _schoolId;
-      training.name = _name;
-      training.level = _level;
-      training.duration = _duration;
-      training.validationThreshold = _validationThreshold;
-      trainings.push(training);      
+      trainings.push(Training(_schoolId, _name, _level, _duration, _validationThreshold));      
 
       uint256 id = trainings.length - 1;
       school.linkTraining(_schoolId, id);
@@ -168,7 +163,6 @@ contract MaticulumTraining is Ownable {
    */
    function addJury(uint256 _trainingId, address _jury) internal {
       require(maticulum.isRegistered(_jury), "Jury !registered");
-
       require(school.isSchoolAdmin(trainings[_trainingId].school, msg.sender));
 
       maticulum.validateUser(_jury);
