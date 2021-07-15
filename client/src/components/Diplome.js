@@ -196,9 +196,12 @@ class Diplome extends Component {
 	
 	SendNFTToSmartContract = async() => {
 		const { hashes, hashesImage, urlPinAPI } = this.state; 
+		const { t } = this.props;
 		
 		let pinataApiKey = this.getPinataApiKey();
 		let pinataSecretApiKey = this.getPinataSecretApiKey();
+		
+		let annulationNotYetShown = true;
 		
 		this.context.contractNFT.methods.AddNFTsToAdress(this.context.account,hashes)
 		.send({from:this.context.account}) 
@@ -217,7 +220,10 @@ class Diplome extends Component {
 						}
 					})
 					.then(function (response) {
-						alert("ok");
+						if(annulationNotYetShown){
+						   annulationNotYetShown = false;
+						   alert(t('diplome.cancelTransaction'));
+						}
 					})
 					.catch(function (error) {
 						
@@ -231,7 +237,10 @@ class Diplome extends Component {
 						}
 					})
 					.then(function (response) {
-						alert("ok");
+						if(annulationNotYetShown){
+						   annulationNotYetShown = false;
+						   alert(t('diplome.cancelTransaction'));
+						}
 					})
 					.catch(function (error) {
 						
@@ -381,7 +390,7 @@ class Diplome extends Component {
 						{ 
 							this.state.loading ? 
 							<Col sm="3">
-								<label>NFT building...</label>
+								<label>{t('diplome.loading')}</label>
 							</Col>	
 							: null
 						}				  

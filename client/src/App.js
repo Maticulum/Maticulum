@@ -22,7 +22,7 @@ import Validation from './components/Validation';
 import Whitelisted from './components/Whitelisted';
 import ImgTest from "./components/pdf/ImgTest";
 import Diplome from './components/Diplome';
-import DiplomeMulti from './components/DiplomeMulti';
+import OldDiplome from './components/OldDiplome';
 import AdminSetPinataData from './components/AdminSetPinataData';
 
 import "./App.css";
@@ -166,7 +166,7 @@ class App extends Component {
             web3: this.state.web3,
             contract: this.state.contract,
             account: this.state.accounts[0],
-			   contractNFT: this.state.contractNFT,
+			contractNFT: this.state.contractNFT,
             contractSchool: this.state.contractSchool,
             contractTraining: this.state.contractTraining,
             isSuperAdmin: this.state.isSuperAdmin
@@ -180,7 +180,7 @@ class App extends Component {
                      { this.state.isSuperAdmin && <NavLink className="nav-link" visibility="hidden" to={'/whitelisted'}>{t('nav.whitelisted')}</NavLink> }
                      <NavLink className="nav-link" to={'/registration'}>{t('nav.registration')}</NavLink>
                      { this.state.isSuperAdmin && <NavLink className="nav-link" to={'/schools'}>{t('nav.schools')}</NavLink> }
-                     <NavLink className="nav-link" to={'/diplomeMulti'}>{t('diplome.diplomas')}</NavLink>
+                     <NavLink className="nav-link" to={'/oldDiplome'}>{t('diplome.diplomas')}</NavLink>					 
 					 <NavLink className="nav-link" to={'/diplome'}>{t('diplome.diploma')}</NavLink>					 
 					 <NavLink className="nav-link" to={'/adminSetPinataData'}>Set Pinata</NavLink>
 					 
@@ -213,7 +213,7 @@ class App extends Component {
                   <Route path='/validation/:trainingId' component={Validation} /> 
                   <Route exact path='/img-test' component={ImgTest} />
                   <Route exact path='/diplome' component={Diplome} /> 
-				  <Route exact path='/diplomeMulti' component={DiplomeMulti} /> 
+				  <Route exact path='/oldDiplome' component={OldDiplome} /> 
 				  <Route exact path='/adminSetPinataData' component={AdminSetPinataData} />
                </Switch>
             </div>

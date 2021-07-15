@@ -45,7 +45,9 @@
 		"attribution":"Attribué le ",
 		"awaitedFormat":"Format attendu pour le fichier .csv",
 		"description":"Ce jeton a été produit en toute sécurité par le smart contract MaticulumNFT. La clé privée d'un administrateur a été requise pour la production et l'intégration sur la blockchain.",
-		"jsonName":"Jeton Maticulum certifié"
+		"jsonName":"Jeton Maticulum certifié",
+		"loading":"envoi vers IPFS...",
+		"cancelTransaction":"La transaction a bien été annulée."
 		
 	},
    "school": {
