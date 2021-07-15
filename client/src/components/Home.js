@@ -39,7 +39,7 @@ class Home extends Component {
                <h3>Jury pour les formations</h3>
                <ul>
                { this.state.juryTrainings.map((training, index) => 
-                  <li key={index}><a href={`/validation/${training.id}`}>{ training.name }</a></li>
+                  <li key={index}><a href={`/trainings/${training.id}/validation`}>{ training.name }</a></li>
                )}
                </ul>
                </>

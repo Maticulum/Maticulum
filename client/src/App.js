@@ -18,9 +18,8 @@ import Registration from './components/Registration';
 import SchoolList from './components/school/SchoolList';
 import SchoolItem from './components/school/SchoolItem';
 import Training from './components/Training';
-import Validation from './components/Validation';
+import TrainingValidation from './components/TrainingValidation';
 import Whitelisted from './components/Whitelisted';
-import ImgTest from "./components/pdf/ImgTest";
 import Diplome from './components/Diplome';
 import OldDiplome from './components/OldDiplome';
 import ShowDiplomas from './components/ShowDiplomas';
@@ -206,12 +205,11 @@ class App extends Component {
                   <Route exact path='/whitelisted' component={Whitelisted} />	
                   <Route exact path='/registration' component={Registration} />
                   
-                  <Route exact path={'/schools'} component={ SchoolList} />
-                  <Route path={'/schools/:schoolId/trainings/:trainingId'} component={ Training } />
-                  <Route path={'/schools/:schoolId'} component={ SchoolItem } />
-                  
-                  <Route path='/validation/:trainingId' component={Validation} /> 
-                  <Route exact path='/img-test' component={ImgTest} />
+                  <Route exact path='/schools' component={ SchoolList} />
+                  <Route path='/schools/:schoolId/trainings/:trainingId' component={ Training } />
+                  <Route path='/schools/:schoolId' component={ SchoolItem } />
+                  <Route path='/trainings/:trainingId/validation' component={TrainingValidation} /> 
+
                   <Route exact path='/diplome' component={Diplome} /> 
 				  <Route exact path='/oldDiplome' component={OldDiplome} /> 
 				  <Route exact path='/showDiplomas' component={ShowDiplomas} /> 

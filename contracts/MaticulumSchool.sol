@@ -23,6 +23,8 @@ contract MaticulumSchool is ISchool, Ownable {
    }
 
    IMaticulum private maticulum;
+   address trainingContract;
+
 
    School[] public schools;
    uint256 public schoolRegistrationFees = 0.1 ether;
@@ -52,6 +54,11 @@ contract MaticulumSchool is ISchool, Ownable {
 
    constructor(address _maticulum) {
       maticulum = IMaticulum(_maticulum);
+   }
+
+
+   function registerTrainingContract(address _trainingContract) external onlyOwner {
+      trainingContract = _trainingContract;
    }
 
 
@@ -197,8 +204,13 @@ contract MaticulumSchool is ISchool, Ownable {
    }
 
 
-   // TODO restreindre l'accès
+   /**
+   * @notice link a training to a school
+   * @param _schoolId   id of school
+   * @param _trainingId id of training
+   */
    function linkTraining(uint256 _schoolId, uint256 _trainingId) external override {
+      require(msg.sender == trainingContract, "!auth");
       schoolTrainings[_schoolId].add(_trainingId);
    }
 

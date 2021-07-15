@@ -6,7 +6,7 @@ import { withTranslation } from 'react-i18next';
 import Web3Context from '../Web3Context';
 
 
-class Validation extends Component {
+class TrainingValidation extends Component {
 
    static contextType = Web3Context;
 
@@ -114,4 +114,4 @@ class Validation extends Component {
    }
 }
 
-export default withTranslation()(withRouter(Validation));
+export default withTranslation()(withRouter(TrainingValidation));
