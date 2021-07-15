@@ -5,6 +5,7 @@ const {expectRevert} = require('@openzeppelin/test-helpers');
 
 contract('Maticulum', accounts => {
   const owner = accounts[0];
+  const user2 = accounts[1];
   const hashDefaut = "tmTRqsdvJGPViJFHoCdQ4jcWhDDqb7D4H1Ynpk15EgKXua"
   const hashes = [hashDefaut]; 
   const gatewayUrl = "https://gateway.pinata.cloud/ipfs/";
@@ -13,15 +14,15 @@ contract('Maticulum', accounts => {
   const urlToPinApi = "https://api.pinata.cloud/pinning/unpin/";
   const hashtoApikey = "MWE1OWNlMDNhYTA0NmU4MjM2MTVhbnQ";
   const hashtoSecretApikey = "MjMwZWNlZDljNDk3Mzc1MmFhZDE0MTMwYzI0NTI5ZGQ2YjljNDY1ZmI4ZTQ5OGEyYmZmMjNmZGEyOTljYTVkNGFudA==";
-  const hashToImageToken = "QmYFRV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC";
   const name = "DiplomeNFT";
-  const symbol = "MTCF";
+  const symbol = "MTCF"
+  const hashToImageToken = "QmYFRV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC";;
   
   
 			   
   beforeEach(async () => {
 		this.Maticulum = await Maticulum.new(gatewayUrl,urltoJSonApi,urltoImageApi,urlToPinApi,
-		hashtoApikey, hashtoSecretApikey,hashToImageToken,name,symbol);
+		hashtoApikey, hashtoSecretApikey,name,symbol, hashToImageToken);
 	 });	
 
   it("init URI id", async () => {    
@@ -29,7 +30,7 @@ contract('Maticulum', accounts => {
 	assert.equal(uriId, 0, "The NFT stored has not value 1.");
   });
 
-  it("Mint a NFT and get URI id", async () => {
+  it("Mint a NFT and get URI id", async () => {	  
     let uriId = await this.Maticulum.AddNFTsToAdress(owner, hashes, { from: owner })
     let uriIdCall = await this.Maticulum.getlastUriId();
 	assert.equal(uriIdCall, 1, "The NFT stored has not value 1.");
@@ -69,6 +70,10 @@ contract('Maticulum', accounts => {
   });
 
   it("Gateway init", async () => {
+	const hashTwo = "zmTRqsdvJGPViJFHoCdQ4jcWhDDqb7D4H1Ynpk15EgKXua";
+	const hashThree= "rmTRqsdvJGPViJFHoCdQ4jcWhDDqb7D4H1Ynpk15EgKXua";
+	hashes.push(hashTwo);
+	hashes.push(hashThree);
     await this.Maticulum.AddNFTsToAdress(owner, hashes, { from: owner })	
     let tokenURI = await this.Maticulum.tokenURI(1);
 	assert.equal(gatewayUrl + hashDefaut, tokenURI, "The initial gateway should be https://gateway.pinata.cloud/ipfs/.");
@@ -79,8 +84,8 @@ contract('Maticulum', accounts => {
 	assert.equal(lastUri, 0, "The Last URI should be 0.");
   });
   
-  it("Get lasturi ", async () => {
-    await this.Maticulum.AddNFTsToAdress(owner, hashes, { from: owner })	
+  it("Get last uri after inserted one NFT", async () => {
+    await this.Maticulum.AddNFTsToAdress(owner, ["rmTRqsdvJGPViJFHoCdQ4jcWhDDqb7D4H1Ynpk15EgKXua"], { from: owner })	
     let lastUri = await this.Maticulum.getlastUriId();	
 	assert.equal(lastUri, 1, "The Last URI should be 1.");
   });
@@ -90,7 +95,7 @@ contract('Maticulum', accounts => {
   });
   
   it("Error Uri not yet stored when called 2 and 1 NFT added", async () => {	
-    await this.Maticulum.AddNFTsToAdress(owner, hashes, { from: owner });	
+    await this.Maticulum.AddNFTsToAdress(owner, ["rmTRqsdvJGPViJFHoCdQ4jcWhDDqb7D4H1Ynpk15EgKXua"], { from: owner });	
 	await expectRevert(this.Maticulum.getURI(2, { from: owner }), "Uri not yet stored");
   });
   
@@ -140,6 +145,33 @@ contract('Maticulum', accounts => {
 	let nftDatas = await this.Maticulum.getNFTDatas({ from: owner });
 	
 	assert.equal(nftDatas[2], hasItemToken, "not awaited field");
+  });
+  
+  it("Mint a list of NFTs and get list of uris", async () => {
+	const hashOne = "7mYFRV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC";
+	const hashTwo = "QmYFRV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC";
+	const hashThree = "gmYFRV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC";
+	hashes.push(hashTwo);
+	hashes.push(hashThree);
+    await this.Maticulum.AddNFTsToAdress(owner, [hashOne,hashTwo, hashThree], { from: owner })
+	const hashFour = "YmYFRV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC";
+	const hashFive = "ZmYFRV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC";
+	
+	const hashesUser2 = [hashFour,hashFive];
+	await this.Maticulum.AddNFTsToAdress(user2, hashesUser2, { from: owner })
+	let gatewayDatas = await this.Maticulum.getGatewaysData();
+	let gatewayUrl = gatewayDatas[0];
+	
+    let urisOwner = await this.Maticulum.getUrisByAddress(owner);
+	assert.equal(urisOwner.length, 3, "The length of the uri stored by user should be 3");
+	assert.equal(await this.Maticulum.getURI(urisOwner[0],{ from: owner }),gatewayUrl + hashOne, "Not awaited hash");
+	assert.equal(await this.Maticulum.getURI(urisOwner[1],{ from: owner }),gatewayUrl + hashTwo, "Not awaited hash");
+	assert.equal(await this.Maticulum.getURI(urisOwner[2],{ from: owner }),gatewayUrl + hashThree, "Not awaited hash");
+	
+	let urisUser2 = await this.Maticulum.getUrisByAddress(user2);
+	assert.equal(urisUser2.length, 2, "The length of the uri stored by user should be 2");
+	assert.equal(await this.Maticulum.getURI(urisUser2[0],{ from: owner }),gatewayUrl + hashFour, "Not awaited hash");
+	assert.equal(await this.Maticulum.getURI(urisUser2[1],{ from: owner }),gatewayUrl + hashFive, "Not awaited hash");
   });
   
 });
