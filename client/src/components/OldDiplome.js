@@ -121,6 +121,7 @@ class OldDiplome extends Component {
 	
 	onSendOneImage = async(formData, postHeader, recipeUrl) =>{	
 		const { hashesImage, gateway } = this.state; 
+		const { t } = this.props; 
 		
 		axios({
 		  url: recipeUrl,
@@ -136,7 +137,9 @@ class OldDiplome extends Component {
 			hashImage:ipfsHash});
 			await this.getJsonData(urlMetadata);
 		  }) 
-		  .catch((err) => { alert(err); });
+		  .catch((err) => { 
+			alert(t('diplome.errorSendingNFT') + err); 
+		  });
 	}
 	
 	createImagePinataAxios = async(e) => { 		
@@ -219,7 +222,7 @@ class OldDiplome extends Component {
 			hasError = true;
 			alert("onError");
 		});	*/
-		this.setState({ isButtonMetamaskVisible:true});
+		this.setState({ isButtonMetamaskVisible:true, hashes:[],hashesImage:[]});		
 	}
 	
 	getPinataApiKey(){

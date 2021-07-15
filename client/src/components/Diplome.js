@@ -46,8 +46,8 @@ class Diplome extends Component {
 		return atob(paramPinataSecretApiKey).split(this.mdp.value)[0];		
 	}
 	
-	getJsonData = async (linkDiplome) => {
-		const { hashJson, hashes, sendNFTVisibility, sizeFile, 
+	getJsonData = async (linkDiplome, hashes ) => {
+		const { hashJson, sendNFTVisibility, sizeFile, 
 				loading, gateway, jsonUrlApi, revert} = this.state; 				
 		const { t } = this.props;  
 		
@@ -73,6 +73,7 @@ class Diplome extends Component {
             let ipfsHash = response.data.IpfsHash;	
 			let urlMetadata = gateway + ipfsHash; 
 			hashes.push(ipfsHash);	
+			alert(ipfsHash);
 			let finished = hashes.length == sizeFile;	
 			if(finished){
 				this.setState({ loading:false});
@@ -139,18 +140,22 @@ class Diplome extends Component {
 	}
 	
 	clearDiplomas = async() =>  {
+		const { linkVisible,isButtonMetamaskVisible, hashes,hashesImage} = this.state;
 		document.getElementById('diplomaImage').innerHTML = "";	
 		this.tbxDiplomaName.value = "";
 		this.tbxGrade.value = "";
 		this.tbxSchool.value = "";
 		this.tbxFirstname.value = "";
 		this.tbxLastname.value = "";
+		
+		
 		this.setState({ linkVisible:false,isButtonMetamaskVisible:false, 
-		hashes : [],hashesImage : []});
+		hashes:[],hashesImage:[],isButtonMetamaskVisible:true, files:[]});
 	}
 	
-	onSendOneImage = async(formData, recipeUrl, postHeader) => {	
-	    const { gateway, hashesImage } = this.state; 
+	onSendOneImage = async(formData, recipeUrl, postHeader, hashes, hashesImage ) => {	
+	    const { gateway } = this.state; 
+		const { t } = this.props; 
 		let cancelTransaction = false;
 		
 		axios({
@@ -161,18 +166,19 @@ class Diplome extends Component {
 		})
 	    .then(async (res) => { 
 			let ipfsHash = res.data.IpfsHash;
-		    let urlMetadata = gateway + ipfsHash;	
+		    let urlMetadata = gateway + ipfsHash;
+			alert(ipfsHash);
 		    hashesImage.push(ipfsHash);			
 		    this.setState({ linkDiplome : urlMetadata, linkVisible:true,hashImage:ipfsHash});
-		    await this.getJsonData(urlMetadata);			
+		    await this.getJsonData(urlMetadata, hashes);			
 	    }) 
 	    .catch((err) => { 
-		   alert("error in sendind NFT contact our developpement team :" + err); 
+		   alert(t('diplome.errorSendingNFT') + err); 
 	    });
 	}
 	
 	createImagePinataAxios = async(e) => {		
-		const { formData, linkDiplome, files, imageUrlAPi} = this.state; 
+		const { formData, linkDiplome, files, imageUrlAPi, hashes, hashesImage} = this.state; 
 		
 		let pinataApiKey = this.getPinataApiKey();
 		let pinataSecretApiKey = this.getPinataSecretApiKey();
@@ -188,7 +194,7 @@ class Diplome extends Component {
 		for(let i = 0;i<files.length;i++){
 			let formData = new FormData();
 			formData.append("file", files[i]);			
-			await this.onSendOneImage(formData, recipeUrl, postHeader);
+			await this.onSendOneImage(formData, recipeUrl, postHeader, hashes, hashesImage);
 		}
 		
 		this.setState({ loading:true});
@@ -197,7 +203,7 @@ class Diplome extends Component {
 	SendNFTToSmartContract = async() => {
 		const { hashes, hashesImage, urlPinAPI } = this.state; 
 		const { t } = this.props;
-		
+						
 		let pinataApiKey = this.getPinataApiKey();
 		let pinataSecretApiKey = this.getPinataSecretApiKey();
 		
@@ -251,7 +257,8 @@ class Diplome extends Component {
 			hasError = true;
 			alert("onError");
 		});	*/
-		this.setState({ isButtonMetamaskVisible:true});
+		
+		await this.clearDiplomas();
 	}
 	
 	AddInMetamask = async() => {
