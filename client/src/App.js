@@ -180,8 +180,8 @@ class App extends Component {
                      { this.state.isSuperAdmin && <NavLink className="nav-link" visibility="hidden" to={'/whitelisted'}>{t('nav.whitelisted')}</NavLink> }
                      <NavLink className="nav-link" to={'/registration'}>{t('nav.registration')}</NavLink>
                      { this.state.isSuperAdmin && <NavLink className="nav-link" to={'/schools'}>{t('nav.schools')}</NavLink> }
-                     <NavLink className="nav-link" to={'/diplome'}>{t('diplome.diploma')}</NavLink>
-					 <NavLink className="nav-link" to={'/diplomeMulti'}>{t('diplome.diploma')}</NavLink>
+                     <NavLink className="nav-link" to={'/diplomeMulti'}>{t('diplome.diplomas')}</NavLink>
+					 <NavLink className="nav-link" to={'/diplome'}>{t('diplome.diploma')}</NavLink>					 
 					 <NavLink className="nav-link" to={'/adminSetPinataData'}>Set Pinata</NavLink>
 					 
                   </Nav>

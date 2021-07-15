@@ -6,25 +6,39 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract MaticulumNFT is ERC721URIStorage, Ownable{
-    constructor(string memory _gatewayUrl, string memory _urltoJsonApi, string memory _urltoImageApi, string memory _urlToPinApi,
+    
+     /**
+   * @notice Create the datas for the gateway and for the NFT
+   * @param _gatewayUrl           url https of the gateway to IPFS
+   * @param _urltoJsonApi         url of the API to store a json file     
+   * @param _urlToUnPinApi        url of the API to delete a hash
+   * @param _urltoImageApi        url of the API to store an image
+   * @param _hashtoApikey         crypted hash to access Api key to load metadata and image 
+   * @param _hashtoSecretApikey   crypted hash to access secret Api key to load metadata and image
+   * * @param _hashImageToken   crypted hash to access secret Api key to load metadata and image
+   * * @param _name   crypted hash to access secret Api key to load metadata and image
+   * * @param _symbol   crypted hash to access secret Api key to load metadata and image
+   */
+    constructor(string memory _gatewayUrl, string memory _urltoJsonApi, string memory _urltoImageApi, string memory _urlToUnPinApi,
                 string memory _hashtoApikey,string memory _hashtoSecretApikey,
-                string memory _hashImageToken,
-                string memory name,
-                string memory symbol) ERC721(name, symbol) {
+                string memory _name,
+                string memory _symbol,
+                string memory _hashImageToken) ERC721(_name, _symbol) {
         
-        datas = gatewayApiDatas(_gatewayUrl, _urltoJsonApi, _urltoImageApi, _urlToPinApi, _hashtoApikey, _hashtoSecretApikey);
-        NFTDatas_ = NFTdatas(name, symbol, _hashImageToken);
+        datas = gatewayApiDatas(_gatewayUrl, _urltoJsonApi, _urltoImageApi, _urlToUnPinApi, _hashtoApikey, _hashtoSecretApikey);
+        NFTDatas_ = NFTdatas(_name, _symbol, _hashImageToken);
     }
     
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
-    mapping(string => uint8) hashesStored;
+    mapping(string => bool) hashesStored;
+    mapping(string => bool) hashesStoredTemporary;
     
     struct gatewayApiDatas{
         string gatewayUrl;
         string urltoJSonApi;
         string urltoImageApi;
-        string urlToPinApi;
+        string urlToUnPinApi;
         string hashtoApikey;
         string hashtoSecretApikey;
     }
@@ -48,7 +62,7 @@ contract MaticulumNFT is ERC721URIStorage, Ownable{
    * * @return the user address
    */
     function AddNFTToAdress(address _userAddress, string memory _hash) private returns (uint256){
-        hashesStored[_hash] = 1;
+        hashesStored[_hash] = true;
         _tokenIds.increment();
         uint256 newItemId = _tokenIds.current();
         _mint(_userAddress, newItemId);
@@ -68,15 +82,15 @@ contract MaticulumNFT is ERC721URIStorage, Ownable{
     function AddNFTsToAdress(address _userAddress, string[] memory _hashes) public returns (uint256){
         uint256 lastUri = 0;
         
-        // temp
-        
         for(uint i =0;i < _hashes.length;i++){
+            require(!hashesStoredTemporary[_hashes[i]], "Hash already in the list");
             require(bytes(_hashes[i]).length == 46, "Invalid hash length");
-            require(hashesStored[_hashes[i]] != 1, "Hash already minted");
-            // if all different else error 
+            require(!hashesStored[_hashes[i]], "Hash already minted");
+            hashesStoredTemporary[_hashes[i]] = true;
         } 
         
         for(uint i = 0;i < _hashes.length;i++){
+            delete hashesStoredTemporary[_hashes[i]];
             lastUri = AddNFTToAdress(_userAddress, _hashes[i]);
         } 
         
@@ -102,18 +116,18 @@ contract MaticulumNFT is ERC721URIStorage, Ownable{
     }
     
     /**
-   * @notice Create a list of NFTs
+   * @notice Create the gateway datas to interact with IPFS
    * @param _gatewayUrl           url https of the gateway to IPFS
    * @param _urltoJsonApi         url of the API to store a json file     
-   * @param _urlToPinApi          url of the API to delete a hash
+   * @param _urlToUnPinApi          url of the API to delete a hash
    * @param _urltoImageApi        url of the API to store an image
    * @param _hashtoApikey         crypted hash to access Api key to load metadata and image 
    * @param _hashtoSecretApikey   crypted hash to access secret Api key to load metadata and image
    */
     function modifyGatewaysData(string memory _gatewayUrl, 
-                string memory _urltoJsonApi,string memory _urltoImageApi,string memory _urlToPinApi,
+                string memory _urltoJsonApi,string memory _urltoImageApi,string memory _urlToUnPinApi,
                 string memory _hashtoApikey,string memory _hashtoSecretApikey) public onlyOwner{
-        datas = gatewayApiDatas(_gatewayUrl, _urltoJsonApi, _urltoImageApi, _urlToPinApi, _hashtoApikey, _hashtoSecretApikey);
+        datas = gatewayApiDatas(_gatewayUrl, _urltoJsonApi, _urltoImageApi, _urlToUnPinApi, _hashtoApikey, _hashtoSecretApikey);
     }
     
     /**

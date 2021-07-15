@@ -11,11 +11,12 @@ module.exports = async (deployer, network, accounts) => {
    "https://api.pinata.cloud/pinning/pinJSONToIPFS/",
    "https://api.pinata.cloud/pinning/pinFileToIPFS/",
    "https://api.pinata.cloud/pinning/unpin/",
-   'MWE1OWNlMDNhYTA0NmU4MjM2MTVhbnQ',
-   'MjMwZWNlZDljNDk3Mzc1MmFhZDE0MTMwYzI0NTI5ZGQ2YjljNDY1ZmI4ZTQ5OGEyYmZmMjNmZGEyOTljYTVkNGFudA==',
+   "MWE1OWNlMDNhYTA0NmU4MjM2MTVhbnQ",
+   "MjMwZWNlZDljNDk3Mzc1MmFhZDE0MTMwYzI0NTI5ZGQ2YjljNDY1ZmI4ZTQ5OGEyYmZmMjNmZGEyOTljYTVkNGFudA==",
    "DiplomeNFT",
    "MTCF",
-   "QmYFRV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC");
+   "QmYFRV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC"
+   );
    const nft = await NFTContract.deployed();
    
    await deployer.deploy(MaticulumContract, NFTContract.address);

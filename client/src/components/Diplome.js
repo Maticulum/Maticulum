@@ -251,11 +251,9 @@ class Diplome extends Component {
 		
 		let nftDatas = await this.context.contractNFT.methods.getNFTDatas().call();
 		
-		const tokenSymbol = nftDatas[0];		
-		const tokenImage = gateway + nftDatas[1];
+		const tokenSymbol = nftDatas[1];		
+		const tokenImage = gateway + nftDatas[2];
 		
-		alert(tokenSymbol);
-		alert(tokenImage);
 		const tokenDecimals = 0;
 
 		try {
@@ -369,12 +367,6 @@ class Diplome extends Component {
 						<Form.Label column sm="3">{t('diplome.IPFSkey')}</Form.Label>
 						<Col sm="9">
 							<Form.Control type="password" id="mdp" ref={(input) => { this.mdp = input }} />
-						</Col>
-					</Form.Group>
-					<Form.Group as={Row} >
-						<Form.Label column sm="3">Delete PIN</Form.Label>
-						<Col sm="9">
-							<Button onClick={this.deleteAllPins}>Delete</Button>
 						</Col>
 					</Form.Group>					
 					<Form.Group as={Row} >

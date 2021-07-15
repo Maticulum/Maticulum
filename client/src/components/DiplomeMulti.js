@@ -90,11 +90,9 @@ class DiplomeMulti extends Component {
 		
 		let nftDatas = await this.context.contractNFT.methods.getNFTDatas().call();
 		
-		const tokenSymbol = nftDatas[0];		
-		const tokenImage = gateway + nftDatas[1];
 		
-		alert(tokenSymbol);
-		alert(tokenImage);
+		const tokenSymbol = nftDatas[1];		
+		const tokenImage = gateway + nftDatas[2];		
 		const tokenDecimals = 0;
 
 		try {
@@ -254,11 +252,13 @@ class DiplomeMulti extends Component {
 				: null
 			}
 			
-			
+			{ 
+				this.state.isButtonMetamaskVisible ? 
 				<Card.Body>
 					<Button onClick={this.AddInMetamask}>{t('diplome.addMetamask')}</Button>
 				</Card.Body>
-			
+				: null
+			}	
           </Card>
         </div>	
 
