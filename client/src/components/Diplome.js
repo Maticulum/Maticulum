@@ -15,7 +15,8 @@ class Diplome extends Component {
 	loading:false, gateway:null, jsonUrlApi:null, imageUrlAPi:null,
 	paramPinataApiKey:null, paramPinataSecretApiKey:null, hashesImage:[],
 	urlPinAPI:null};
-		
+	
+	// on the load of the page
 	componentDidMount = async () => {
 		const { gateway, jsonUrlApi, imageUrlAPi,paramPinataApiKey,paramPinataSecretApiKey
 		,urlPinAPI} = this.state; 
@@ -36,16 +37,20 @@ class Diplome extends Component {
 		});
 	}		
 		
+	// get the decrypted PinataApiKey with the password filled
 	getPinataApiKey(){ 
 		const { paramPinataApiKey} = this.state;
 		return atob(paramPinataApiKey).split(this.mdp.value)[0];
 	}
 	
+	// get the PinataSecretApi decrypted with the password filled
 	getPinataSecretApiKey(){
 		const { paramPinataSecretApiKey} = this.state;
 		return atob(paramPinataSecretApiKey).split(this.mdp.value)[0];		
 	}
 	
+	// Send the JSON file hash to Pinata API with as image the link 
+	// created with the pinate API image hash response 
 	getJsonData = async (linkDiplome, hashes ) => {
 		const { hashJson, sendNFTVisibility, sizeFile, 
 				loading, gateway, jsonUrlApi, revert} = this.state; 				
@@ -88,6 +93,7 @@ class Diplome extends Component {
 	 
 	};
 	
+	// create the images in the canvas web page
 	createImageDiplome = async(firstname, lastname,school, grade, diplomaName) => {
 		const { files } = this.state; 
 		
@@ -130,14 +136,16 @@ class Diplome extends Component {
 		document.body.appendChild(canvas); 
 		document.getElementById('diplomaImage').appendChild(canvas);
 	}
-		
+	
+	// create the image in the page	with the datas loaded from file or the page
 	onCreateDiplome = async() => {
 		const { files } = this.state; 	
 		this.setState({ showDownload: true });  				
 		await this.createImageDiplome(this.state.firstname, this.state.lastname,this.state.school,
-		"", this.state.grade, this.state.diplomaName);
+		this.state.grade, this.state.diplomaName);
 	}
 	
+	// erase all datas to send a new NFT or list of NFTs
 	clearDiplomas = async() =>  {
 		const { linkVisible,isButtonMetamaskVisible, hashes,hashesImage} = this.state;
 		document.getElementById('diplomaImage').innerHTML = "";	
@@ -152,6 +160,7 @@ class Diplome extends Component {
 		hashes:[],hashesImage:[],isButtonMetamaskVisible:true, files:[]});
 	}
 	
+	// send one image to dedicated Pinata API 
 	onSendOneImage = async(formData, recipeUrl, postHeader, hashes, hashesImage ) => {	
 	    const { gateway } = this.state; 
 		const { t } = this.props; 
@@ -175,6 +184,7 @@ class Diplome extends Component {
 	    });
 	}
 	
+	// Take the files created with images to send then to Pinata
 	createImagePinataAxios = async(e) => {		
 		const { formData, linkDiplome, files, imageUrlAPi, hashes, hashesImage} = this.state; 
 		
@@ -198,6 +208,8 @@ class Diplome extends Component {
 		this.setState({ loading:true});
 	}
 	
+	// Send the json hash stored in Pinata in the smart contract MaticulmNFT
+	// and mint the NFT 
 	SendNFTToSmartContract = async() => {
 		const { hashes, hashesImage, urlPinAPI } = this.state; 
 		const { t } = this.props;
@@ -255,6 +267,7 @@ class Diplome extends Component {
 		await this.clearDiplomas();
 	}
 	
+	// To add the symbolNFT in Metamask with one image
 	AddInMetamask = async() => {
 		const { hashTokenNFT, gateway}= this.state; 
 		const tokenAddress = await this.context.contract.methods.nft().call();

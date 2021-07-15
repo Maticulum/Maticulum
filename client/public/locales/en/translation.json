@@ -51,7 +51,7 @@
 		"errorSendingNFT":"error in sendind NFT contact our developpement team",
 		"linkShow":"Search",
 		"userAdress":"Adresse utilisateur",
-		"searchDiplomas":"Search diplomas by user address"
+		"searchDiplomas":"Rechercher les diplômes de l'adresse saisie"
 		
 	},
    "school": {

@@ -51,7 +51,7 @@
 		"errorSendingNFT":"Erreur dans l'envoi du NFT. Merci de contacter notre équipe de développement.",
 		"linkShow":"Recherche",
 		"userAdress":"User address",
-		"searchDiplomas":"Rechercher les diplômes de l'adresse saisie"
+		"searchDiplomas":"Search diplomas by user address"
 		
 	},
    "school": {

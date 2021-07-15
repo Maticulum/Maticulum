@@ -8,7 +8,7 @@ class ShowDiplomas extends Component {
 	static contextType = Web3Context;
 	
 	state = {imageUrl:null };
-		
+	// to get the hash of the user stored in the blockchain 	
 	getDiplomas = async() => {
 		let address = this.searchDiploma.value;
 		if(address != ""){
@@ -29,6 +29,8 @@ class ShowDiplomas extends Component {
 		}			
 	}
 	
+	// get the json file and the image property with the link to show the image
+	// the image of the diploma in the web page
 	getImage = async(uri) => {
 		const response = await axios ({
 			url: uri,
@@ -39,8 +41,7 @@ class ShowDiplomas extends Component {
 		img.src = response.data.image;
 		document.getElementById('diplomasImage').appendChild(img);
 	}
-		
-		
+				
    	render() {
 		const { t } = this.props;
 		return (

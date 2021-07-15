@@ -17,6 +17,7 @@ class OldDiplome extends Component {
 	paramPinataApiKey:null, paramPinataSecretApiKey:null,hashesImage:[],
 	urlPinAPI:null, cancelTransaction:false};
 	
+	// on the load of the page
 	componentDidMount = async () => {
 		const { gateway, jsonUrlApi, imageUrlAPi,paramPinataApiKey,paramPinataSecretApiKey
 		,urlPinAPI} = this.state; 
@@ -37,12 +38,15 @@ class OldDiplome extends Component {
 		});
 	}		
 	
+	// on loading of file
 	handleFile = async(e) => {
 		const { files, pinataSecretApiKey, pinataApiKey, file} = this.state; 	
 		let filesImages = e.target.files;
 		this.setState({ files : filesImages, linkVisible:true });
 	}
 	
+	// Send the JSON file hash to Pinata API with as image the link 
+	// created with the pinate API image hash response 
 	getJsonData = async (linkDiplome) => {
 		const { hashes, file, sendNFTVisibility, sizeFile, loading, gateway, jsonUrlApi} = this.state; 	
 		const { t } = this.props; 
@@ -84,6 +88,7 @@ class OldDiplome extends Component {
 	 
 	};
 	
+	// To add the symbolNFT in Metamask with one image
 	AddInMetamask = async() => {
 		const { hashTokenNFT, gateway}= this.state; 
 		const tokenAddress = await this.context.contract.methods.nft().call();
@@ -119,6 +124,7 @@ class OldDiplome extends Component {
 		}
     }
 	
+	// send one image to dedicated Pinata API 
 	onSendOneImage = async(formData, postHeader, recipeUrl) =>{	
 		const { hashesImage, gateway } = this.state; 
 		const { t } = this.props; 
@@ -142,6 +148,7 @@ class OldDiplome extends Component {
 		  });
 	}
 	
+	// Take the files created with images to send then to Pinata
 	createImagePinataAxios = async(e) => { 		
 		const { files, imageUrlAPi} = this.state; 		
 		
@@ -165,6 +172,8 @@ class OldDiplome extends Component {
 		this.setState({ loading:true});
 	}
 	
+	// Send the json hash stored in Pinata in the smart contract MaticulmNFT
+	// and mint the NFT 
 	SendNFT = async() => { 
 		const { hashes, hashesImage, urlPinAPI } = this.state;
 		const { t } = this.props;
@@ -221,11 +230,13 @@ class OldDiplome extends Component {
 		this.setState({ isButtonMetamaskVisible:true, hashes:[],hashesImage:[]});		
 	}
 	
+	// get the decrypted PinataApiKey with the password filled
 	getPinataApiKey(){
 		const { paramPinataApiKey} = this.state;
 		return atob(paramPinataApiKey).split(this.mdp.value)[0];
 	}
 	
+	// get the PinataSecretApi decrypted with the password filled
 	getPinataSecretApiKey(){
 		const { paramPinataSecretApiKey} = this.state;
 		return atob(paramPinataSecretApiKey).split(this.mdp.value)[0];		
