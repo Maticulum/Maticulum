@@ -31,7 +31,7 @@ module.exports = async (deployer, network, accounts) => {
 
    await maticulum.registerTrainingContract(TrainingContract.address);
 
-   if (network === 'develop') {
+   if (network === 'develop' || network === 'rinkeby') {
       console.log('---=== Adding test data ===---');
 
       const superAdmin = accounts[0];
