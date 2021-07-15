@@ -72,8 +72,7 @@ class Diplome extends Component {
         .then(async (response) => {
             let ipfsHash = response.data.IpfsHash;	
 			let urlMetadata = gateway + ipfsHash; 
-			hashes.push(ipfsHash);	
-			alert(ipfsHash);
+			hashes.push(ipfsHash);
 			let finished = hashes.length == sizeFile;	
 			if(finished){
 				this.setState({ loading:false});
@@ -167,7 +166,6 @@ class Diplome extends Component {
 	    .then(async (res) => { 
 			let ipfsHash = res.data.IpfsHash;
 		    let urlMetadata = gateway + ipfsHash;
-			alert(ipfsHash);
 		    hashesImage.push(ipfsHash);			
 		    this.setState({ linkDiplome : urlMetadata, linkVisible:true,hashImage:ipfsHash});
 		    await this.getJsonData(urlMetadata, hashes);			
@@ -253,10 +251,6 @@ class Diplome extends Component {
 					});
 			}
 		});
-		/*.on("error",function(error,receipt){
-			hasError = true;
-			alert("onError");
-		});	*/
 		
 		await this.clearDiplomas();
 	}

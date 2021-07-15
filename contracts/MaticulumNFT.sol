@@ -33,6 +33,8 @@ contract MaticulumNFT is ERC721URIStorage, Ownable{
     Counters.Counter private _tokenIds;
     mapping(string => bool) hashesStored;
     mapping(string => bool) hashesStoredTemporary;
+    mapping(address=>uint[]) hashesByUser;
+    uint[] tokenIdUser;
     
     struct gatewayApiDatas{
         string gatewayUrl;
@@ -62,6 +64,7 @@ contract MaticulumNFT is ERC721URIStorage, Ownable{
    * * @return the user address
    */
     function AddNFTToAdress(address _userAddress, string memory _hash) private returns (uint256){
+
         hashesStored[_hash] = true;
         _tokenIds.increment();
         uint256 newItemId = _tokenIds.current();
@@ -69,8 +72,10 @@ contract MaticulumNFT is ERC721URIStorage, Ownable{
         string memory metadata = string(abi.encodePacked(datas.gatewayUrl, _hash)); 
         _setTokenURI(newItemId, metadata);
         
+        hashesByUser[_userAddress].push(newItemId);
+        
         emit NFTMinted(_userAddress, _hash, newItemId);
-        return newItemId;
+        return newItemId;   
     }
     
     /**
@@ -152,5 +157,14 @@ contract MaticulumNFT is ERC721URIStorage, Ownable{
    */
     function getNFTDatas() public view returns(NFTdatas memory){
         return NFTDatas_;
+    }
+    
+    /**
+   * @notice Get all the hashes of one user by address
+   * * @param _userAddress       address of the user
+   * * @return the datas
+   */
+    function getUrisByAddress(address _userAddress) public view returns(uint[] memory){
+        return hashesByUser[_userAddress];
     }
 }

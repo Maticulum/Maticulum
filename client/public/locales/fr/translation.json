@@ -48,7 +48,10 @@
 		"jsonName":"Jeton Maticulum certifié",
 		"loading":"envoi vers IPFS...",
 		"cancelTransaction":"La transaction a bien été annulée.",
-		"errorSendingNFT":"Erreur dans l'envoi du NFT. Merci de contacter notre équipe de développement."
+		"errorSendingNFT":"Erreur dans l'envoi du NFT. Merci de contacter notre équipe de développement.",
+		"linkShow":"Recherche",
+		"userAdress":"User address",
+		"searchDiplomas":"Rechercher les diplômes de l'adresse saisie"
 		
 	},
    "school": {

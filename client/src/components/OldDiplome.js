@@ -218,10 +218,6 @@ class OldDiplome extends Component {
 					});
 			}			
 		});
-		/*.on("error",function(error,receipt){
-			hasError = true;
-			alert("onError");
-		});	*/
 		this.setState({ isButtonMetamaskVisible:true, hashes:[],hashesImage:[]});		
 	}
 	

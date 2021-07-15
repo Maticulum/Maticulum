@@ -47,7 +47,11 @@
 		"description":"This item was securely produced through MaticulumNFT smart contract. The private key of authorized administrators was required for the production and integration on the blockchain.",
 		"jsonName":"Maticulum Certified Item",
 		"loading":"being sent to IPFS...",
-		"cancelTransaction":"Transaction was canceled"
+		"cancelTransaction":"Transaction was canceled",
+		"errorSendingNFT":"error in sendind NFT contact our developpement team",
+		"linkShow":"Search",
+		"userAdress":"Adresse utilisateur",
+		"searchDiplomas":"Search diplomas by user address"
 		
 	},
    "school": {

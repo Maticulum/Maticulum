@@ -23,6 +23,7 @@ import Whitelisted from './components/Whitelisted';
 import ImgTest from "./components/pdf/ImgTest";
 import Diplome from './components/Diplome';
 import OldDiplome from './components/OldDiplome';
+import ShowDiplomas from './components/ShowDiplomas';
 import AdminSetPinataData from './components/AdminSetPinataData';
 
 import "./App.css";
@@ -181,9 +182,8 @@ class App extends Component {
                      <NavLink className="nav-link" to={'/registration'}>{t('nav.registration')}</NavLink>
                      { this.state.isSuperAdmin && <NavLink className="nav-link" to={'/schools'}>{t('nav.schools')}</NavLink> }
                      <NavLink className="nav-link" to={'/oldDiplome'}>{t('diplome.diplomas')}</NavLink>					 
-					 <NavLink className="nav-link" to={'/diplome'}>{t('diplome.diploma')}</NavLink>					 
-					 <NavLink className="nav-link" to={'/adminSetPinataData'}>Set Pinata</NavLink>
-					 
+					 <NavLink className="nav-link" to={'/diplome'}>{t('diplome.diploma')}</NavLink>
+					 <NavLink className="nav-link" to={'/showDiplomas'}>{t('diplome.linkShow')}</NavLink>
                   </Nav>
                </Navbar.Collapse>
                <Navbar.Collapse className="justify-content-end">
@@ -214,6 +214,7 @@ class App extends Component {
                   <Route exact path='/img-test' component={ImgTest} />
                   <Route exact path='/diplome' component={Diplome} /> 
 				  <Route exact path='/oldDiplome' component={OldDiplome} /> 
+				  <Route exact path='/showDiplomas' component={ShowDiplomas} /> 
 				  <Route exact path='/adminSetPinataData' component={AdminSetPinataData} />
                </Switch>
             </div>
