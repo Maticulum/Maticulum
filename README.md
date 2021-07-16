@@ -66,3 +66,5 @@ npm run start:local
 ```
 npm run startRinkeby
 ```
+
+L'application est ensuite accessible par http://localhost:3000
