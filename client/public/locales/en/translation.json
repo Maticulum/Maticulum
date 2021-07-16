@@ -50,9 +50,13 @@
 		"cancelTransaction":"Transaction was canceled",
 		"errorSendingNFT":"error in sendind NFT contact our developpement team",
 		"linkShow":"Search",
-		"userAdress":"Adresse utilisateur",
-		"searchDiplomas":"Rechercher les diplômes de l'adresse saisie"
-		
+		"userAdress":"User address",
+		"searchDiplomas":"Search diplomas by user address",
+		"description2":"Description",
+		"name":"Name",
+		"awardedDiploma":". Diploma awarded by : ",
+		"of":" of ",
+		"diplomaof":"Diploma of "
 	},
    "school": {
       "name": "Name",

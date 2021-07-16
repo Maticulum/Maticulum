@@ -14,7 +14,7 @@ class Diplome extends Component {
 	grade:'',diplomaName:'',files:[], sendNFT:false, hashes:[], sizeFile:0,
 	loading:false, gateway:null, jsonUrlApi:null, imageUrlAPi:null,
 	paramPinataApiKey:null, paramPinataSecretApiKey:null, hashesImage:[],
-	urlPinAPI:null};
+	urlPinAPI:null, descriptions:[],names:[]};
 	
 	// on the load of the page
 	componentDidMount = async () => {
@@ -51,15 +51,15 @@ class Diplome extends Component {
 	
 	// Send the JSON file hash to Pinata API with as image the link 
 	// created with the pinate API image hash response 
-	getJsonData = async (linkDiplome, hashes ) => {
+	getJsonData = async (linkDiplome, hashes, nameJson, descriptionJson ) => {
 		const { hashJson, sendNFTVisibility, sizeFile, 
 				loading, gateway, jsonUrlApi, revert} = this.state; 				
 		const { t } = this.props;  
-		
+						
 		const data ={ 
-			"name": t('diplome.jsonName'),
+			"name": t('diplome.jsonName') + " : " + nameJson,
 			"image": linkDiplome,
-			"description": t('diplome.description')
+			"description": descriptionJson + ". " + t('diplome.description')
 		};
 		
 	  	let pinataApiKey = this.getPinataApiKey();
@@ -95,7 +95,11 @@ class Diplome extends Component {
 	
 	// create the images in the canvas web page
 	createImageDiplome = async(firstname, lastname,school, grade, diplomaName) => {
-		const { files } = this.state; 
+		const { files,names, descriptions  } = this.state; 
+		const { t } = this.props;
+		
+		names.push(t('diplome.diplomaof')  + firstname + " " + lastname); 
+		descriptions.push(grade + t('diplome.of') + diplomaName + t('diplome.awardedDiploma') + school);
 		
 		let userDatas = firstname + lastname + school;
 		const canvas = document.createElement('canvas');		
@@ -111,7 +115,7 @@ class Diplome extends Component {
 		  
 		  context.drawImage(img, 0, 0);
 		  context.font = '20pt Verdana';
-          const { t } = this.props; 
+           
 		  context.fillText(firstname, 125, 175);
 		  context.fillText(lastname, 125, 215);	
 		  context.fillText(school, 10, 35);		
@@ -161,7 +165,8 @@ class Diplome extends Component {
 	}
 	
 	// send one image to dedicated Pinata API 
-	onSendOneImage = async(formData, recipeUrl, postHeader, hashes, hashesImage ) => {	
+	onSendOneImage = async(formData, recipeUrl, postHeader, hashes, hashesImage,
+	nameJson, descriptionJson	) => {	
 	    const { gateway } = this.state; 
 		const { t } = this.props; 
 		let cancelTransaction = false;
@@ -177,7 +182,7 @@ class Diplome extends Component {
 		    let urlMetadata = gateway + ipfsHash;
 		    hashesImage.push(ipfsHash);			
 		    this.setState({ linkDiplome : urlMetadata, linkVisible:true,hashImage:ipfsHash});
-		    await this.getJsonData(urlMetadata, hashes);			
+		    await this.getJsonData(urlMetadata, hashes, nameJson, descriptionJson);			
 	    }) 
 	    .catch((err) => { 
 		   alert(t('diplome.errorSendingNFT') + err); 
@@ -186,7 +191,8 @@ class Diplome extends Component {
 	
 	// Take the files created with images to send then to Pinata
 	createImagePinataAxios = async(e) => {		
-		const { formData, linkDiplome, files, imageUrlAPi, hashes, hashesImage} = this.state; 
+		const { formData, linkDiplome, files, imageUrlAPi, hashes, hashesImage,
+		names, descriptions} = this.state; 
 		
 		let pinataApiKey = this.getPinataApiKey();
 		let pinataSecretApiKey = this.getPinataSecretApiKey();
@@ -201,8 +207,11 @@ class Diplome extends Component {
 		this.setState({ sizeFile : files.length})
 		for(let i = 0;i<files.length;i++){
 			let formData = new FormData();
-			formData.append("file", files[i]);			
-			await this.onSendOneImage(formData, recipeUrl, postHeader, hashes, hashesImage);
+			formData.append("file", files[i]);
+			let nameJson = names[i];
+			let descriptionJson = descriptions[i];
+			await this.onSendOneImage(formData, recipeUrl, postHeader, hashes, hashesImage,
+			nameJson, descriptionJson);
 		}
 		
 		this.setState({ loading:true});
@@ -312,7 +321,7 @@ class Diplome extends Component {
 		  
 		  for(let i =0;i<lines.length;i++){
 			const line = lines[i].split(',');	
-			await this.createImageDiplome(line[0],line[1],line[2],"",line[3],line[4]);	
+			await this.createImageDiplome(line[0],line[1],line[2],line[3],line[4]);	
 		  }
 		};
 		

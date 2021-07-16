@@ -1,3 +1,0 @@
-Martin,Renard,Univesité de Toulouse,Licence,Philopsophie
-Lucille,Drouot,Ecole de Commerce de Lyon II,Master2,Commerce internationale
-Patrick,Vincent,Ecole d'ingénieur,Thèse,Agronomie
