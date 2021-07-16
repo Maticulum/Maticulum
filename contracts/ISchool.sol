@@ -10,4 +10,6 @@ interface ISchool {
 
    function linkTraining(uint256 _schoolId, uint256 trainingId) external;
 
+   function getJuryValidationThreshold(uint256 _schoolId) external view returns (uint8);
+
 }

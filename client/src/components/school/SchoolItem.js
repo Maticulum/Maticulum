@@ -10,7 +10,8 @@ class SchoolItem extends Component {
   
    static contextType = Web3Context;
 
-   state = { isSchoolAdmin: false, create: null, id: null, name: '', town: '', country: '', administrators: ['', ''], validators: [], trainings: [] };
+   state = { isSchoolAdmin: false, create: null, id: null, name: '', town: '', country: '', juryValidation: '1',
+      administrators: ['', ''], validators: [], trainings: [] };
    
 
    async componentDidMount() {
@@ -25,9 +26,22 @@ class SchoolItem extends Component {
          this.setState({ create: true, administrators: [ this.context.account, '']});
       }
       else {
-         const school = await cm.getSchool(id).call();
+         const school = await cm.schools(id).call();
          this.loadTrainings(id);
-         this.setState({ create: false, id, ...school });
+
+         const administrators = [];
+         const administratorsCount = await cm.getSchoolAdministratorsCount(id).call();
+         for (let i = 0; i < administratorsCount; i++) {
+            administrators.push(await cm.getSchoolAdministrator(id, i).call());
+         }
+
+         const validators = [];
+         const validatorsCount = await cm.getSchoolValidatorsCount(id).call();
+         for (let i = 0; i < validatorsCount; i++) {
+            validators.push(await cm.getSchoolValidator(id, i).call());
+         }
+
+         this.setState({ create: false, id, ...school, administrators, validators, administrators });
       }
    }
 
@@ -36,7 +50,7 @@ class SchoolItem extends Component {
       const list = [];
       const cm = this.context.contractSchool.methods;
 
-      const nbTrainings = await cm.getSchoolNbTrainings(schoolId).call();
+      const nbTrainings = await cm.getSchoolTrainingsCount(schoolId).call();
       for (let i = 0; i < nbTrainings; i++) {
          const id = await cm.getSchoolTraining(schoolId, i).call();
          const training = await this.context.contractTraining.methods.trainings(id).call();
@@ -56,12 +70,12 @@ class SchoolItem extends Component {
       const cm = this.context.contractSchool.methods;
 
       if (this.state.create) {
-         await cm.addSchool(this.state.name, this.state.town, this.state.country, 
+         await cm.addSchool(this.state.name, this.state.town, this.state.country, this.state.juryValidation,
             this.state.administrators[0], this.state.administrators[1])
             .send({ from: this.context.account });         
       }
       else {
-         await cm.updateSchool(this.state.id, this.state.name, this.state.town, this.state.country)
+         await cm.updateSchool(this.state.id, this.state.name, this.state.town, this.state.country, this.state.juryValidation,)
             .send({ from: this.context.account });
       }
 
@@ -100,9 +114,7 @@ class SchoolItem extends Component {
                            <Form.Control type="text" value={this.state.country} onChange={(e) => this.setState({country: e.target.value})} />
                         </Col>
                      </Form.Group>
-                     <Form.Group>
-                        <Form.Label>{t('school.administrators')}</Form.Label>
-                     </Form.Group>
+                     <h4>{t('school.administrators')}</h4>
                      { this.state.administrators.map((administrator, index) => (
                         <Form.Group as={Row} key={index}>
                            <Form.Label column sm="2">{t('school.administrator')} {index + 1}</Form.Label>

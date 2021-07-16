@@ -77,5 +77,9 @@
       "validationThreshold": "Number of validations",
       "jury": "Jury",
       "training": "Training"
+   },
+   "error": {
+      "badNetworkTitle": "Bad network",
+      "badNetwork": "Please connect Metamask on the following network: "
    }
 }
