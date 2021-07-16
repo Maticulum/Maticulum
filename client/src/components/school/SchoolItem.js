@@ -10,15 +10,15 @@ class SchoolItem extends Component {
   
    static contextType = Web3Context;
 
-   state = { isAdmin: false, create: null, id: null, name: '', town: '', country: '', administrators: ['', ''], validators: [], trainings: [] };
+   state = { isSchoolAdmin: false, create: null, id: null, name: '', town: '', country: '', administrators: ['', ''], validators: [], trainings: [] };
    
 
    async componentDidMount() {
       const id = this.props.match.params.schoolId;
       const cm = this.context.contractSchool.methods;
 
-      const isAdmin = await cm.isSchoolAdmin(id, this.context.account).call;
-      this.setState({ isAdmin });
+      const isSchoolAdmin = await cm.isSchoolAdmin(id, this.context.account).call;
+      this.setState({ isSchoolAdmin });
 
       const create = id === 'new';
       if (create) {
@@ -55,7 +55,7 @@ class SchoolItem extends Component {
    onSave = async () => {
       const cm = this.context.contractSchool.methods;
 
-      if (this.create) {
+      if (this.state.create) {
          await cm.addSchool(this.state.name, this.state.town, this.state.country, 
             this.state.administrators[0], this.state.administrators[1])
             .send({ from: this.context.account });         
@@ -143,7 +143,7 @@ class SchoolItem extends Component {
                      </ListGroup>
                   }
                   <hr />
-                  { this.state.isAdmin && <Button variant="outline-success" onClick={ this.onAddTraining } >{t('school.addTraining')}</Button> }
+                  { this.state.isSchoolAdmin && <Button variant="outline-success" onClick={ this.onAddTraining } >{t('school.addTraining')}</Button> }
                </Col>
                }
             </Row>

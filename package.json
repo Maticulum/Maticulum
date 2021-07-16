@@ -10,6 +10,7 @@
       "@openzeppelin/contracts": "^4.2.0",
       "@openzeppelin/test-helpers": "^0.5.12",
       "@truffle/hdwallet-provider": "^1.4.1",
+      "chai": "^4.3.4",
       "dotenv": "^10.0.0",
       "solidity-docgen": "^0.5.13",
       "webpack": "4.41.0"
