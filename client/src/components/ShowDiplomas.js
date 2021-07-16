@@ -10,6 +10,7 @@ class ShowDiplomas extends Component {
 	state = {imageUrl:null };
 	// to get the hash of the user stored in the blockchain 	
 	getDiplomas = async() => {
+		document.getElementById('diplomasImage').innerHTML = "";
 		let address = this.searchDiploma.value;
 		if(address != ""){
 			let hashDiplomas = await this.context.contractNFT.methods.getUrisByAddress(address).call();
@@ -21,7 +22,7 @@ class ShowDiplomas extends Component {
 			
 			for(let i =0;i<hashDiplomas.length;i++){				
 				let urlImage = await this.context.contractNFT.methods.getURI(hashDiplomas[i]).call();
-				this.getImage(urlImage);
+				await this.getImage(urlImage);
 			}
 		}
 		else{
@@ -35,11 +36,27 @@ class ShowDiplomas extends Component {
 		const response = await axios ({
 			url: uri,
 			method: "GET"
-		})			
+		})	
 		
+		const { t } = this.props;
 		const img = new Image();
 		img.src = response.data.image;
 		document.getElementById('diplomasImage').appendChild(img);
+		
+		var description = document.createElement('p'); // is a node
+		description.innerHTML = "<b>" +t('diplome.description2') + "</b> : " + response.data.name;
+		
+		var name = document.createElement('p'); // is a node
+		name.innerHTML = "<b>" +t('diplome.name') + "</b> : " + response.data.description;
+		
+		document.getElementById('diplomasImage').appendChild(description);
+		document.getElementById('diplomasImage').appendChild(name);
+	}
+	
+	label(){
+		return(
+			<label>Test</label>
+		);
 	}
 				
    	render() {
