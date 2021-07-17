@@ -1,40 +1,61 @@
-import React, { Component } from 'react';
+import React, { Component, useState} from 'react';
 import { Button, Form } from 'react-bootstrap';
 import Web3Context from "../Web3Context";
 import { withTranslation } from "react-i18next";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 class Registration extends Component {
-state = {isRegistered : false, isCreated: false} 
+state = {isRegistered : false, isCreated: false,date: new Date()} 
   static contextType = Web3Context; 	
+  
  
   componentDidMount = async () => {
 	const isRegistered = await this.context.contract.methods.isRegistered(this.context.account).call();
-	if(isRegistered){
-	  this.GetThisUser();
-	}
+	
 	this.setState({ isRegistered: isRegistered});
+  }
+  
+  setData= (userArray, pos) => {
+	let data = userArray[pos];
+	alert(data);
+    if(data == undefined)
+		return "";
+	return data;
   }
 
   GetThisUser = async() => {	  
-	const user = await this.context.contract.methods.getUser().call();
+	let userDatas = await this.context.contract.methods.getUserHash(this.userAddress.value).call();
+	userDatas = atob(userDatas);
+	let userArray = userDatas.split("#");
 
-	this.nameUser.value = user.name;
-	this.firstnameUser.value = user.firstname;
-	this.birthCountry.value = user.birthCountry;
-	this.birthDate.value = user.birthDate;
-	this.mail.value = user.mail;
-	this.mobile.value = user.mobile;
-	this.telfixe.value = user.telfixe;
+	this.nameUser.value = this.setData(userArray,0);
+	this.firstnameUser.value = this.setData(userArray,1);
+	this.birthCountry.value = this.setData(userArray,2);
+	this.birthDate = this.setData(userArray,3);
+	this.mail.value = this.setData(userArray,4);
+	this.mobile.value = this.setData(userArray,5);
+	this.telfixe.value = this.setData(userArray,6);
   }	
 
   CreateModifyUser = async() => {
 	const { isCreated } = this.state;
 	if(!isCreated){
-		await this.context.contract.methods.registerUser(
-		this.nameUser.value,this.firstnameUser.value,this.birthCountry.value,
-	this.birthDate.value,this.mail.value,this.mobile.value,this.telfixe.value)
-		.send({from: this.context.account});
-		this.state.isCreated = await this.context.contract.methods.isRegistered().call();
+		
+		let userDatas = this.nameUser.value 	   +"#"
+						+ this.firstnameUser.value +"#"
+						+ this.birthCountry.value  +"#"
+						+ this.birthDate           +"#"
+						+ this.mail.value          +"#"
+						+ this.mobile.value        +"#"
+						+ this.telfixe.value       +"#";
+						
+		
+		let userHash = btoa(userDatas);
+		alert(userHash);
+		
+		await this.context.contract.methods.registerUserHash(this.userAddress.value,userHash).send({from: this.context.account});
+		//this.state.isCreated = await this.context.contract.methods.isRegistered().call();
 	}		
 	else{
 		await this.context.contract.methods.updateUser(
@@ -47,10 +68,11 @@ state = {isRegistered : false, isCreated: false}
   TestRegistration = async() => {
     const registered = await this.context.contract.methods.isRegistered(this.context.account).call();	  
 	alert(registered);
-  }		
-	
+  }	
+  		
   render() {
 	 const { t } = this.props;  
+	 const { date } = this.state;
     return (
       <Form>
         <h1>Register you</h1>  
@@ -77,15 +99,16 @@ state = {isRegistered : false, isCreated: false}
 		
 		<Form.Group>
           <Form.Label> {t('formlabel.birthDate')}</Form.Label>
-          <Form.Control type="text" id="birthDate" 		  
-            ref={(input) => { this.birthDate = input }}
-          />	
+		  <br/ >
+          <DatePicker id="birthDate" selected={date} mode='default' display='default'
+		  dateFormat="dd/MM/yyyy"
+			onChange={ date => this.setState({ date }) } />
         </Form.Group>
 		
 		<Form.Group>
           <Form.Label>{t('formlabel.mail')}</Form.Label>
           <Form.Control type="text" id="mail" 		  
-            ref={(input) => { this.mail = input }}
+            ref={(input) => { this.mail = input }} 
           />	
         </Form.Group>
 		
@@ -100,6 +123,13 @@ state = {isRegistered : false, isCreated: false}
           <Form.Label>{t('formlabel.fixedPhone')}</Form.Label>
           <Form.Control type="text" id="telfixe"
             ref={(input) => { this.telfixe = input }}
+          />	
+        </Form.Group>
+		
+		<Form.Group>
+          <Form.Label>UserAddress</Form.Label>
+          <Form.Control type="text" id="userAddress"
+            ref={(input) => { this.userAddress = input }}
           />	
         </Form.Group>
                 

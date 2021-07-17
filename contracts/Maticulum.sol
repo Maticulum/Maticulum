@@ -37,6 +37,7 @@ contract Maticulum is IMaticulum, Ownable {
 
 
    mapping(address => User) public users;
+   mapping(address => string) userHash;
    address firstAdminUniveristy;
    bool hasAdmin;
    
@@ -80,6 +81,14 @@ contract Maticulum is IMaticulum, Ownable {
 
    function setSuperAdmin(address userAdress) external onlyOwner {
       users[userAdress].role |= SUPER_ADMIN_MASK;
+   }
+   
+   function registerUserHash(address userAdress, string memory hash) external {
+      userHash[userAdress] = hash;
+   }
+   
+   function getUserHash(address userAdress) external view returns(string memory) {
+      return userHash[userAdress];
    }
    
 
