@@ -5,6 +5,7 @@ import { withTranslation } from "react-i18next";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
+
 class Registration extends Component {
 state = {isRegistered : false, isCreated: false,date: new Date()} 
   static contextType = Web3Context; 	
@@ -18,25 +19,55 @@ state = {isRegistered : false, isCreated: false,date: new Date()}
   
   setData= (userArray, pos) => {
 	let data = userArray[pos];
-	alert(data);
     if(data == undefined)
 		return "";
 	return data;
   }
 
-  GetThisUser = async() => {	  
-	let userDatas = await this.context.contract.methods.getUserHash(this.userAddress.value).call();
-	userDatas = atob(userDatas);
-	let userArray = userDatas.split("#");
+  GetThisUser = async() => {
+	const CryptoJS = require('crypto-js');	  
+	try{
+		if(this.pass.value == "" || this.userAddress.value == ""){
+			alert("User or password fields are empty");
+			return;
+		}
+		let userDatas = await this.context.contract.methods.getUserHash(this.userAddress.value).call();
+		
+		if(userDatas == ""){
+			alert("User not registered");
+			return;
+		}
+		
+		let datasUserUnHashed = atob(userDatas);
+		
+		let decrypted = CryptoJS.TripleDES.decrypt(datasUserUnHashed, this.pass.value)
+	    .toString(CryptoJS.enc.Utf8);		
+		
+		if(decrypted == "") alert("Wrong password");
+		let userArray = decrypted.split("#");		
 
-	this.nameUser.value = this.setData(userArray,0);
-	this.firstnameUser.value = this.setData(userArray,1);
-	this.birthCountry.value = this.setData(userArray,2);
-	this.birthDate = this.setData(userArray,3);
-	this.mail.value = this.setData(userArray,4);
-	this.mobile.value = this.setData(userArray,5);
-	this.telfixe.value = this.setData(userArray,6);
+		this.nameUser.value = this.setData(userArray,0);
+		this.firstnameUser.value = this.setData(userArray,1);
+		this.birthCountry.value = this.setData(userArray,2);
+		this.birthDate = this.setData(userArray,3);
+		this.mail.value = this.setData(userArray,4);
+		this.mobile.value = this.setData(userArray,5);
+		this.telfixe.value = this.setData(userArray,6);
+	}
+	catch{
+		alert("The address or the password could be wrong");
+	}
   }	
+  
+  cryptMe(){
+	  const CryptoJS = require('crypto-js');
+	  var encrypted = CryptoJS.TripleDES.encrypt("test", "Secret Passphrase"); 
+	  var decrypted = CryptoJS.TripleDES.decrypt(encrypted, "Secret Passphrase")
+	  .toString(CryptoJS.enc.Utf8);;
+	  
+	 
+	  alert(decrypted);
+  }
 
   CreateModifyUser = async() => {
 	const { isCreated } = this.state;
@@ -48,13 +79,15 @@ state = {isRegistered : false, isCreated: false,date: new Date()}
 						+ this.birthDate           +"#"
 						+ this.mail.value          +"#"
 						+ this.mobile.value        +"#"
-						+ this.telfixe.value       +"#";
+						+ this.telfixe.value       +"#"
+						+ this.pass.value;
 						
 		
-		let userHash = btoa(userDatas);
-		alert(userHash);
 		
-		await this.context.contract.methods.registerUserHash(this.userAddress.value,userHash).send({from: this.context.account});
+		const CryptoJS = require('crypto-js');
+	    var userDatasCrypted = CryptoJS.TripleDES.encrypt(userDatas, this.pass.value); 
+		let userDatasCryptedHashed = btoa(userDatasCrypted);
+		await this.context.contract.methods.registerUserHash(this.userAddress.value,userDatasCryptedHashed).send({from: this.context.account});
 		//this.state.isCreated = await this.context.contract.methods.isRegistered().call();
 	}		
 	else{
@@ -132,9 +165,21 @@ state = {isRegistered : false, isCreated: false,date: new Date()}
             ref={(input) => { this.userAddress = input }}
           />	
         </Form.Group>
+		
+		<Form.Group>
+          <Form.Label>Password</Form.Label>
+          <Form.Control type="password" id="pass"
+            ref={(input) => { this.pass = input }}
+          />	
+        </Form.Group>		
+		<Form.Group>
+			<input type="file" onChange={(e) => this.showFile(e)} />
+		</Form.Group>
                 
         <Button className="next" onClick={this.GetThisUser}>Get recorded User datas</Button>
-        <Button className="next" onClick={this.CreateModifyUser}>Create/Update User</Button>		
+        <Button className="next" onClick={this.CreateModifyUser}>Create/Update User</Button>
+
+		<Button className="next" onClick={this.cryptMe}>Crtpt/Update User</Button>		
       </Form>
     );
   }
