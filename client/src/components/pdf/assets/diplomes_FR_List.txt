@@ -1,3 +1,0 @@
-Lucie,Martin,Univesité de Paris IV,Licence,Psychologie
-Albert,Dupin,Université de Marseille,Master1,Littértaure étrangère
-Pierre,Laurent,IUT,Deuxième année,Géographie
