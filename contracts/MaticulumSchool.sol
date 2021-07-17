@@ -10,6 +10,7 @@ import "./ISchool.sol";
 
 contract MaticulumSchool is ISchool, Ownable {
 
+   using EnumerableSet for EnumerableSet.AddressSet;
    using EnumerableSet for EnumerableSet.UintSet;
 
 
@@ -17,30 +18,32 @@ contract MaticulumSchool is ISchool, Ownable {
       string name;
       string town;
       string country;
+      uint8 juryValidationThreshold;
       bool validated;
-      address[] administrators;
-      address[] validators;
    }
 
    IMaticulum private maticulum;
-   address trainingContract;
+   address private trainingContract;
 
 
    School[] public schools;
    uint256 public schoolRegistrationFees = 0.1 ether;
    uint8 public schoolValidationThreshold = 2;
-   mapping(uint256 => EnumerableSet.UintSet) schoolTrainings;
+   mapping(uint256 => EnumerableSet.AddressSet) schoolAdministrators;
+   mapping(uint256 => EnumerableSet.AddressSet) schoolValidators;
+   mapping(uint256 => EnumerableSet.UintSet) schoolTrainings; // TODO move to training ?
 
 
-   event SchoolAdded(uint256 id, string name, string town, string country, address addedBy);
-   event SchoolUpdated(uint256 id, string name, string town, string country, address updatedBy);
-   event SchoolAdminAdded(uint256 id, address admin, address updatedBy);
+   event SchoolAdded(uint256 schoolId, string name, string town, string country, uint8 juryValidationThreshold, address addedBy);
+   event SchoolUpdated(uint256 schoolId, string name, string town, string country, uint8 juryValidationThreshold, address updatedBy);
+   event SchoolAdminAdded(uint256 schoolId, address admin, address updatedBy);
+   event SchoolValidated(uint256 schoolId, address validator, uint256 count);
+
    event SchoolValidationThresholdUpdated(uint8 validationThreshold, address updatedBy);
    event SchoolRegistrationFeesUpdated(uint256 registrationFees, address updatedBy);
-   event SchoolValidated(uint256 id, string name, address validator, uint256 count);
 
 
-    modifier onlySuperAdmin() {
+   modifier onlySuperAdmin() {
       require(maticulum.isSuperAdmin(msg.sender), "!SuperAdmin");
       _;
    }
@@ -74,16 +77,7 @@ contract MaticulumSchool is ISchool, Ownable {
 
 
    function _isSchoolAdmin(uint256 _schoolId, address _user) internal view returns (bool) {
-      School memory school = schools[_schoolId];
-      bool found = false;
-      for (uint256 i = 0; i < school.administrators.length; i++) {
-         if (school.administrators[i] == _user) {
-            found = true;
-            break;
-         }
-      }
-
-      return found;
+      return schoolAdministrators[_schoolId].contains(_user);
    }
 
 
@@ -92,23 +86,22 @@ contract MaticulumSchool is ISchool, Ownable {
    }
 
 
-   function addSchool(string memory _name, string memory _town, string memory _country, address _admin1, address _admin2) 
+   function getJuryValidationThreshold(uint256 _schoolId) external view override returns (uint8) {
+      return schools[_schoolId].juryValidationThreshold;
+   }
+
+
+   function addSchool(string memory _name, string memory _town, string memory _country, uint8 _juryValidationThreshold, address _admin1, address _admin2) 
          external
          onlyRegistered 
          returns (uint256) {
-      School memory school;
-      school.name = _name;
-      school.town = _town;
-      school.country = _country;
-
-      address[] memory administrators = new address[](2);
-      administrators[0] = _admin1;
-      administrators[1] = _admin2;
-      school.administrators = administrators;
-      schools.push(school);
-
+      schools.push(School(_name, _town, _country, _juryValidationThreshold, false));
       uint256 id = schools.length - 1;
-      emit SchoolAdded(id, _name, _town, _country, msg.sender);
+      
+      schoolAdministrators[id].add(_admin1);
+      schoolAdministrators[id].add(_admin2);
+      
+      emit SchoolAdded(id, _name, _town, _country, _juryValidationThreshold, msg.sender);
       emit SchoolAdminAdded(id, _admin1, msg.sender);
       emit SchoolAdminAdded(id, _admin2, msg.sender);
 
@@ -119,22 +112,25 @@ contract MaticulumSchool is ISchool, Ownable {
    function addSchoolAdministrator(uint256 _schoolId, address _user) external {
       require(_isSchoolAdmin(_schoolId, msg.sender), "!SchoolAdmin");
 
-      schools[_schoolId].administrators.push(_user);
+      schoolAdministrators[_schoolId].add(_user);
 
       emit SchoolAdminAdded(_schoolId, _user, msg.sender);
    }
 
 
-   function updateSchool(uint256 _schoolId, string memory _name, string memory _town, string memory _country) external {
+   function updateSchool(uint256 _schoolId, string memory _name, string memory _town, string memory _country, uint8 _juryValidationThreshold) external {
       require(_isSchoolAdmin(_schoolId, msg.sender), "!SchoolAdmin");
 
       School storage school = schools[_schoolId];      
       school.name = _name;
       school.town = _town;
       school.country = _country;
-      delete school.validators;
+      school.juryValidationThreshold = _juryValidationThreshold;
+      school.validated = false;
 
-      emit SchoolUpdated(_schoolId, _name, _town, _country, msg.sender);
+      delete schoolValidators[_schoolId];
+
+      emit SchoolUpdated(_schoolId, _name, _town, _country, _juryValidationThreshold, msg.sender);
    }
 
 
@@ -152,34 +148,40 @@ contract MaticulumSchool is ISchool, Ownable {
    }
 
 
-   function validateSchool(uint256 _id) external onlySuperAdmin {
-      School storage school = schools[_id];
+   function validateSchool(uint256 _schoolId) external onlySuperAdmin {
+      require(!schoolValidators[_schoolId].contains(msg.sender), "Already validated by this user.");
 
-      for (uint256 i = 0; i < school.validators.length; i++) {
-         if (school.validators[i] == msg.sender) {
-               revert("Already validated by this user.");
-         }
+      schoolValidators[_schoolId].add(msg.sender);
+      if (schoolValidators[_schoolId].length() >= schoolValidationThreshold) {
+         schools[_schoolId].validated = true;
       }
       
-      school.validators.push(msg.sender);
-      if (school.validators.length >= schoolValidationThreshold) {
-         school.validated = true;
-      }
-      
-      emit SchoolValidated(_id, school.name, msg.sender, school.validators.length);
+      emit SchoolValidated(_schoolId, msg.sender, schoolValidators[_schoolId].length());
    }
 
 
-   function getNbSchools() external view returns (uint256 length) {
+   function getSchoolsCount() external view returns (uint256 length) {
       return schools.length;
    }
 
 
-   function getSchool(uint256 _id) external view onlyRegistered 
-         returns(string memory name, string memory town, string memory country, address[] memory administrators, address[] memory validators) {
-      School storage school = schools[_id];
+   function getSchoolAdministratorsCount(uint256 _schoolId) external view returns (uint256) {
+      return schoolAdministrators[_schoolId].length();
+   }
 
-      return (school.name, school.town, school.country, school.administrators, school.validators);
+
+   function getSchoolAdministrator(uint256 _schoolId, uint256 index) external view returns (address) {
+      return schoolAdministrators[_schoolId].at(index);
+   }
+
+
+   function getSchoolValidatorsCount(uint256 _schoolId) external view returns (uint256) {
+      return schoolValidators[_schoolId].length();
+   }
+
+
+   function getSchoolValidator(uint256 _schoolId, uint256 index) external view returns (address) {
+      return schoolValidators[_schoolId].at(index);
    }
 
 
@@ -188,7 +190,7 @@ contract MaticulumSchool is ISchool, Ownable {
    * @param _schoolId   id of school
    * @return number of trainings
    */
-   function getSchoolNbTrainings(uint256 _schoolId) external view returns (uint256) {
+   function getSchoolTrainingsCount(uint256 _schoolId) external view returns (uint256) {
       return schoolTrainings[_schoolId].length();
    }
 
@@ -206,6 +208,7 @@ contract MaticulumSchool is ISchool, Ownable {
 
    /**
    * @notice link a training to a school
+   * @dev this function is only accessible to Training smartcontract
    * @param _schoolId   id of school
    * @param _trainingId id of training
    */

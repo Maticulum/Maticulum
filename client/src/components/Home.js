@@ -15,7 +15,7 @@ class Home extends Component {
       const juryTrainings = [];
 
       const cm = this.context.contractTraining.methods;
-      const nbTrainings = await cm.getTrainingsNbForJury(this.context.account).call();
+      const nbTrainings = await cm.getTrainingsCountForJury(this.context.account).call();
       for (let i = 0; i < nbTrainings; i++) {
          const trainingId = await cm.getTrainingForJury(this.context.account, i).call();
          const training = await cm.trainings(trainingId).call();

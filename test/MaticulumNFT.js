@@ -1,9 +1,8 @@
-const { BN, ether } = require('@openzeppelin/test-helpers');
-const { expect } = require('chai');
+
 const Maticulum = artifacts.require('./MaticulumNFT.sol');
 const {expectRevert} = require('@openzeppelin/test-helpers');
 
-contract('Maticulum', accounts => {
+contract('MaticulumNFT', accounts => {
   const owner = accounts[0];
   const user2 = accounts[1];
   const hashDefaut = "tmTRqsdvJGPViJFHoCdQ4jcWhDDqb7D4H1Ynpk15EgKXua"

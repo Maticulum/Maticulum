@@ -43,9 +43,8 @@ contract MaticulumTraining is Ownable {
    event TrainingAdded(uint256 schoolId, uint256 trainingId, string name, string level, uint16 duration, uint16 validationThreshold, address addedBy);
    event TrainingUpdated(uint256 schoolId, uint256 trainingId, string name, string level, uint16 duration, uint16 validationThreshold, address updatedBy);
 
-   event JuryAdded(uint256 schoolId, uint256 trainingId, address jury, address addedBy);
-   event JuryRemoved(uint256 schoolId, uint256 trainingId, address jury, address removedBy);
-   event JuryValidated(uint256 schoolId, uint256 trainingId, address jury, address validator, uint16 count);
+   event JuryAdded(uint256 trainingId, address jury, address addedBy);
+   event JuryRemoved(uint256 trainingId, address jury, address removedBy);
 
 
    constructor(address _maticulum, address _school) {
@@ -119,7 +118,7 @@ contract MaticulumTraining is Ownable {
    * @param _id   id of training
    * @return number of juries
    */
-   function getTrainingNbJuries(uint256 _id) external view returns (uint256) {
+   function getTrainingJuriesCount(uint256 _id) external view returns (uint256) {
       return trainingJuries[_id].length();
    }
 
@@ -140,7 +139,7 @@ contract MaticulumTraining is Ownable {
    * @param _jury jurys address
    * @return jury's training count
    */
-   function getTrainingsNbForJury(address _jury) external view returns (uint256) {
+   function getTrainingsCountForJury(address _jury) external view returns (uint256) {
       return userJuryTrainings[_jury].length();
    }
 
@@ -162,14 +161,15 @@ contract MaticulumTraining is Ownable {
    * @param _jury       added jury
    */
    function addJury(uint256 _trainingId, address _jury) internal {
-      require(maticulum.isRegistered(_jury), "Jury !registered");
       require(school.isSchoolAdmin(trainings[_trainingId].school, msg.sender));
+      require(maticulum.isRegistered(_jury), "Jury !registered");      
 
       maticulum.validateUser(_jury);
       trainingJuries[_trainingId].add(_jury);
       userJuryTrainings[_jury].add(_trainingId);
 
-      emit JuryAdded(trainings[_trainingId].school, _trainingId, _jury, msg.sender);
+
+      emit JuryAdded(_trainingId, _jury, msg.sender);
    }
 
 
@@ -179,13 +179,12 @@ contract MaticulumTraining is Ownable {
    * @param _jury       jury to remove
    */
    function removeJury(uint256 _trainingId, address _jury) internal {
-      Training storage training = trainings[_trainingId];
-      require(school.isSchoolAdmin(training.school, msg.sender));
+      require(school.isSchoolAdmin(trainings[_trainingId].school, msg.sender));
 
       trainingJuries[_trainingId].remove(_jury);
       userJuryTrainings[_jury].remove(_trainingId);
 
-      emit JuryRemoved(training.school, _trainingId, _jury, msg.sender);
+      emit JuryRemoved(_trainingId, _jury, msg.sender);
    }
 
 
@@ -194,7 +193,7 @@ contract MaticulumTraining is Ownable {
    * @param _trainingId    id of training
    * @return trainings number
    */
-   function getUsersNbForTraining(uint256 _trainingId) external view returns (uint256) {
+   function getUsersCountForTraining(uint256 _trainingId) external view returns (uint256) {
       return trainingUsers[_trainingId].length();
    }
 
@@ -246,7 +245,7 @@ contract MaticulumTraining is Ownable {
    * @param _trainingId    id of training
    * @param _user          user address
    * @param _jury          jury address
-   * @return validatedCount  juries already validated
+   * @return validatedCount  juries already validated count
    * @return validatedByJury true if this jury as validated the training/user
    * @return validated       true if all needed juries have validated the training/user
    */

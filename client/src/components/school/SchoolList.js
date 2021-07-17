@@ -22,11 +22,11 @@ class SchoolList extends Component {
 
    getSchools = async () => {
       const cm = this.context.contractSchool.methods;
-      const size = await cm.getNbSchools().call();
+      const size = await cm.getSchoolsCount().call();
 
       let schools = [];
       for (let i = 0; i < size; i++) {
-         const school = await cm.getSchool(i).call();
+         const school = await cm.schools(i).call();
          schools.push({
             id: i,
             ...school

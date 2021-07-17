@@ -23,7 +23,7 @@ class Training extends Component {
       const isAdmin = await cmSchool.isSchoolAdmin(schoolId, this.context.account).call;
       this.setState({ isAdmin });
 
-      const school = await cmSchool.getSchool(schoolId).call();
+      const school = await cmSchool.schools(schoolId).call();
       this.setState({ schoolId, schoolName: school.name });
 
       const create = trainingId === 'new';
@@ -34,7 +34,7 @@ class Training extends Component {
          const training = await cmTraining.trainings(trainingId).call();
          this.setState({ create: false, id: trainingId, ...training });
          
-         const nbJuries = await cmTraining.getTrainingNbJuries(trainingId).call();
+         const nbJuries = await cmTraining.getTrainingJuriesCount(trainingId).call();
          const juries = [];
          for (let i = 0; i < nbJuries; i++) {
             const jury = await cmTraining.getTrainingJury(trainingId, i).call();

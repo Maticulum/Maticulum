@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { BrowserRouter as Router, NavLink, Switch, Route } from 'react-router-dom';
-import { Button, Nav, Navbar, NavDropdown } from 'react-bootstrap';
+import { Alert, Button, Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { withTranslation } from "react-i18next";
 
 import getWeb3 from "./getWeb3";
@@ -57,11 +57,9 @@ class App extends Component {
             deployedNetwork && deployedNetwork.address,
          );
 		 
-		   const NFTAddress = await instance.methods.nft().call();
-		   const instanceNFT = new web3.eth.Contract(MaticulumNFT.abi, NFTAddress);
-
-         const instanceSchool = new web3.eth.Contract(MaticulumSchool.abi, MaticulumSchool.networks[networkId].address);
-         const instanceTraining = new web3.eth.Contract(MaticulumTraining.abi, MaticulumTraining.networks[networkId].address);
+		   const instanceNFT = new web3.eth.Contract(MaticulumNFT.abi, deployedNetwork && MaticulumNFT.networks[networkId].address);
+         const instanceSchool = new web3.eth.Contract(MaticulumSchool.abi, deployedNetwork && MaticulumSchool.networks[networkId].address);
+         const instanceTraining = new web3.eth.Contract(MaticulumTraining.abi, deployedNetwork && MaticulumTraining.networks[networkId].address);
 
          window.ethereum.on('accountsChanged', accounts => {
             console.log('Accounts changed ', accounts);
@@ -76,7 +74,7 @@ class App extends Component {
          window.ethereum.on('chainChanged', networkId => {
             console.log('Chain changed ', networkId);
             this.setState({ networkId: parseInt(networkId) });
-            this.init();
+            window.location.reload();
          });
 
          // Set web3, accounts, and contract to the state, and then proceed with an
@@ -150,12 +148,21 @@ class App extends Component {
    }
 
  
-   render() {  
+   render() {
+      const { t } = this.props;
+
       if (!this.state.web3) {
          return <div>Loading Web3, accounts, and contract...</div>;
       }
 
-      const { t } = this.props;
+      if (this.state.networkId !== config.NETWORK_ID) {
+         return <Container>
+            <Alert variant="danger">
+               <Alert.Heading>{t('error.badNetworkTitle')}</Alert.Heading>
+               {t('error.badNetwork')} {config.NETWORK_NAME}
+            </Alert>
+         </Container>;
+      }
 
       const { accounts, networkId } = this.state;
       const polygon = networkId === config.NETWORK_ID;
