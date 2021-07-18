@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom';
 import { Button, Col,Container, Form, InputGroup, Row } from 'react-bootstrap';
 import { withTranslation } from "react-i18next";
 
-import Web3Context from '../Web3Context';
+import Web3Context from '../../Web3Context';
 
 
 class Training extends Component {

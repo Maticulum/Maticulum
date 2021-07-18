@@ -29,15 +29,18 @@ contract MaticulumSchool is ISchool, Ownable {
    School[] public schools;
    uint256 public schoolRegistrationFees = 0.1 ether;
    uint8 public schoolValidationThreshold = 2;
+   
    mapping(uint256 => EnumerableSet.AddressSet) schoolAdministrators;
+   mapping(address => EnumerableSet.UintSet) administratorSchools;
+
    mapping(uint256 => EnumerableSet.AddressSet) schoolValidators;
-   mapping(uint256 => EnumerableSet.UintSet) schoolTrainings; // TODO move to training ?
+   mapping(uint256 => EnumerableSet.UintSet) schoolTrainings;
 
 
    event SchoolAdded(uint256 schoolId, string name, string town, string country, uint8 juryValidationThreshold, address addedBy);
    event SchoolUpdated(uint256 schoolId, string name, string town, string country, uint8 juryValidationThreshold, address updatedBy);
    event SchoolAdminAdded(uint256 schoolId, address admin, address updatedBy);
-   event SchoolValidated(uint256 schoolId, address validator, uint256 count);
+   event SchoolValidated(uint256 schoolId, uint256 count, address validatedBy);
 
    event SchoolValidationThresholdUpdated(uint8 validationThreshold, address updatedBy);
    event SchoolRegistrationFeesUpdated(uint256 registrationFees, address updatedBy);
@@ -99,7 +102,10 @@ contract MaticulumSchool is ISchool, Ownable {
       uint256 id = schools.length - 1;
       
       schoolAdministrators[id].add(_admin1);
+      administratorSchools[_admin1].add(id);
+
       schoolAdministrators[id].add(_admin2);
+      administratorSchools[_admin2].add(id);
       
       emit SchoolAdded(id, _name, _town, _country, _juryValidationThreshold, msg.sender);
       emit SchoolAdminAdded(id, _admin1, msg.sender);
@@ -113,6 +119,7 @@ contract MaticulumSchool is ISchool, Ownable {
       require(_isSchoolAdmin(_schoolId, msg.sender), "!SchoolAdmin");
 
       schoolAdministrators[_schoolId].add(_user);
+      administratorSchools[_user].add(_schoolId);
 
       emit SchoolAdminAdded(_schoolId, _user, msg.sender);
    }
@@ -152,11 +159,12 @@ contract MaticulumSchool is ISchool, Ownable {
       require(!schoolValidators[_schoolId].contains(msg.sender), "Already validated by this user.");
 
       schoolValidators[_schoolId].add(msg.sender);
-      if (schoolValidators[_schoolId].length() >= schoolValidationThreshold) {
+      uint256 count = schoolValidators[_schoolId].length();
+      if (count >= schoolValidationThreshold) {
          schools[_schoolId].validated = true;
       }
       
-      emit SchoolValidated(_schoolId, msg.sender, schoolValidators[_schoolId].length());
+      emit SchoolValidated(_schoolId, count, msg.sender);
    }
 
 
@@ -175,6 +183,16 @@ contract MaticulumSchool is ISchool, Ownable {
    }
 
 
+   function getAdministratorSchoolsCount(address _admin) external view returns (uint256) {
+      return administratorSchools[_admin].length();
+   }
+
+
+   function getAdministratorSchools(address _admin, uint256 _index) external view returns (uint256) {
+      return administratorSchools[_admin].at(_index);
+   }
+
+ 
    function getSchoolValidatorsCount(uint256 _schoolId) external view returns (uint256) {
       return schoolValidators[_schoolId].length();
    }

@@ -3,10 +3,10 @@ import { Button, Container, Form, Table } from 'react-bootstrap';
 import { withRouter } from 'react-router-dom';
 import { withTranslation } from 'react-i18next';
 
-import Web3Context from '../Web3Context';
+import Web3Context from '../../Web3Context';
 
 
-class TrainingValidation extends Component {
+class RegsitrationValidation extends Component {
 
    static contextType = Web3Context;
 
@@ -23,25 +23,24 @@ class TrainingValidation extends Component {
       const cm = this.context.contractTraining.methods;
 
       const trainingId = this.props.match.params.trainingId;
-      const isJury = cm.isTrainingJury(trainingId, this.context.account);
-      if (!isJury) {
+      const training = await cm.trainings(trainingId).call();
+
+      const isSchoolAdmin= await  this.context.contractSchool.methods.isSchoolAdmin(training.school, this.context.account);
+      if (!isSchoolAdmin) {
          this.props.history.push('/');
          return;
       }
       
-      const training = await cm.trainings(trainingId).call();
       const school = await this.context.contractSchool.methods.schools(training.school).call();
-
-      const nbUsers = await cm.getUsersNbForTraining(trainingId).call()
+      const nbUsers = await cm.getUserWaitingTrainingValidationCount(trainingId).call()
       for (let i = 0; i < nbUsers; i++) {
-         const userId = await cm.getUserForTraining(trainingId, i).call();
+         const userId = await cm.getUserWaitingTrainingValidation(trainingId, i).call();
          const user = await this.context.contract.methods.users(userId).call();
-         const validation = await cm.getTrainingValidation(trainingId, userId, this.context.account).call();
 
-         users.push({ id: userId, ...user, ...validation });
+         users.push({ id: userId, ...user });
       }
 
-      this.setState({ users, training, school });
+      this.setState({ users, training, school, checkedUsers: [] });
    }
 
 
@@ -68,7 +67,7 @@ class TrainingValidation extends Component {
       if (this.state.checkedUsers) {
          const trainingId = this.props.match.params.trainingId;
 
-         await this.context.contractTraining.methods.validateTrainingMultipleUsers(trainingId, this.state.checkedUsers).send({ from: this.context.account });
+         await this.context.contractTraining.methods.validateUserTrainingRequestMultiple(trainingId, this.state.checkedUsers).send({ from: this.context.account });
          this.init();
       }
    }
@@ -90,7 +89,7 @@ class TrainingValidation extends Component {
                      <tr>
                         <th>{t('table.address')}</th>
                         <th>{t('table.name')}</th>
-                        <th colSpan="2">{t('table.validated')}</th>
+                        <th>{t('table.validated')}</th>
                      </tr>
                   </thead>
                   <tbody>
@@ -99,10 +98,9 @@ class TrainingValidation extends Component {
                         <td>{ user.id }</td>
                         <td>{ user.name }&nbsp;{ user.firstname }</td>
                         <td>
-                           <Form.Check id={user.id} checked={ user.currentValidation || user.validatedByJury } disabled={user.validated || user.validatedByJury}
+                           <Form.Check id={user.id} checked={ user.currentValidation }
                               onChange={ (e) => this.onCheck(user.id, index, e.target.checked) } />
                         </td>
-                        <td>{ user.validatedCount }&nbsp;/&nbsp;{ this.state.training.validationThreshold }</td>
                      </tr>
                   ))}
                   </tbody>
@@ -114,4 +112,4 @@ class TrainingValidation extends Component {
    }
 }
 
-export default withTranslation()(withRouter(TrainingValidation));
+export default withTranslation()(withRouter(RegsitrationValidation));
