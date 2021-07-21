@@ -75,6 +75,17 @@ contract MaticulumTraining is Ownable {
 
 
    /**
+   * @notice Check if a user is a jury of a training
+   * @param _user    address of the user
+   * @return true if the user is a jury (even if not validated yet)
+   */
+   function isJury(address _user) external view returns (bool) {
+      return juryTrainings[_user].length() > 0
+         || juryWaitingTrainingValidation[_user].length() > 0;
+   }
+
+
+   /**
    * @notice Get the number of trainings
    * @return trainings count
    */
@@ -82,6 +93,14 @@ contract MaticulumTraining is Ownable {
       return trainings.length;
    }
 
+
+   /**
+   * @notice Get the number of diplomas ready
+   * @return diplomas ready count
+   */
+   function getDiplomasReadyCount() external view returns (uint256) {
+      return diplomasReady.length;
+   }
 
    /**
    * @notice Get the status of a registration request
@@ -181,6 +200,27 @@ contract MaticulumTraining is Ownable {
    */
    function getTrainingUserWaitingValidation(address _user, uint256 _index) external view returns (uint256) {
       return userWaitingTrainingValidation[_user].at(_index);
+   }
+
+
+   /**
+   * @notice Get the number of trainings for a user
+   * @param _user    address of user
+   * @return Count of trainings
+   */
+   function getUserTrainingsCount(address _user) external view returns (uint256) {
+      return userTrainings[_user].length();
+   }
+
+
+   /**
+   * @notice Get the training for a user for the given index
+   * @param _user    address of user
+   * @param _index   training index
+   * @return Training at this index
+   */
+   function getUserTraining(address _user, uint256 _index) external view returns (uint256) {
+      return userTrainings[_user].at(_index);
    }
 
 
