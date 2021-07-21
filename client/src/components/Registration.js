@@ -4,10 +4,10 @@ import Web3Context from "../Web3Context";
 import { withTranslation } from "react-i18next";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
+import DataFromBase from './DataFromBase';
 
 class Registration extends Component {
-state = {isRegistered : false, isCreated: false,date: new Date()} 
+state = {isRegistered : false, isCreated: false,date: null} 
   static contextType = Web3Context; 	
   
  
@@ -58,19 +58,11 @@ state = {isRegistered : false, isCreated: false,date: new Date()}
 		alert("The address or the password could be wrong");
 	}
   }	
-  
-  cryptMe(){
-	  const CryptoJS = require('crypto-js');
-	  var encrypted = CryptoJS.TripleDES.encrypt("test", "Secret Passphrase"); 
-	  var decrypted = CryptoJS.TripleDES.decrypt(encrypted, "Secret Passphrase")
-	  .toString(CryptoJS.enc.Utf8);;
-	  
-	 
-	  alert(decrypted);
-  }
 
   CreateModifyUser = async() => {
-	const { isCreated } = this.state;
+	const { isCreated } = this.state;	
+	// to simulate registration in database
+	DataFromBase.setDataPass(this.pass.value);
 	if(!isCreated){
 		
 		let userDatas = this.nameUser.value 	   +"#"
@@ -96,16 +88,12 @@ state = {isRegistered : false, isCreated: false,date: new Date()}
 		this.birthDate.value,this.mail.value,this.mobile.value,this.telfixe.value)
 		.send({from: this.context.account});
 	}	  
-  }	
-
-  TestRegistration = async() => {
-    const registered = await this.context.contract.methods.isRegistered(this.context.account).call();	  
-	alert(registered);
-  }	
+  }		
   		
   render() {
 	 const { t } = this.props;  
 	 const { date } = this.state;
+	 
     return (
       <Form>
         <h1>Register you</h1>  
@@ -178,8 +166,7 @@ state = {isRegistered : false, isCreated: false,date: new Date()}
                 
         <Button className="next" onClick={this.GetThisUser}>Get recorded User datas</Button>
         <Button className="next" onClick={this.CreateModifyUser}>Create/Update User</Button>
-
-		<Button className="next" onClick={this.cryptMe}>Crtpt/Update User</Button>		
+	
       </Form>
     );
   }

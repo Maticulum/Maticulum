@@ -1,10 +1,17 @@
 import React, { Component } from "react";
-import { Button, Card, Form, Container, Row, Col } from 'react-bootstrap';
+import { SectionList,Button, Card, Form, Container, Row, Col } from 'react-bootstrap';
 import Web3Context from "../Web3Context";
 import { withTranslation } from "react-i18next";
 import background from './pdf/assets/background.jpg';
 import axios from "axios";
+import DataFromBase from './DataFromBase';
+import ListGroup from 'react-bootstrap/ListGroup';
 
+// TODO : permettre de charger un prédiplôme avec le user donné enregistré par un admin
+// et une école donnée écran préalable à la création de diplôme 
+// ou plutôt dans la page liste de user, liste d'école/formation du user
+// préchargement des données
+// admin formation peut saisir adresse avec mdp et récupérer nom prénom + ecole niveau 
 class Diplome extends Component {
 	static contextType = Web3Context;
 	
@@ -14,8 +21,9 @@ class Diplome extends Component {
 	grade:'',diplomaName:'',files:[], sendNFT:false, hashes:[], sizeFile:0,
 	loading:false, gateway:null, jsonUrlApi:null, imageUrlAPi:null,
 	paramPinataApiKey:null, paramPinataSecretApiKey:null, hashesImage:[],
-	urlPinAPI:null, descriptions:[],names:[]};
-	
+	urlPinAPI:null, descriptions:[],names:[],
+	trainingUsers:[]};
+		
 	// on the load of the page
 	componentDidMount = async () => {
 		const { gateway, jsonUrlApi, imageUrlAPi,paramPinataApiKey,paramPinataSecretApiKey
@@ -30,6 +38,10 @@ class Diplome extends Component {
 		let paramPinataApi = gatewaysData[4];
 		let paramPinataSecretApi = gatewaysData[5];
 		let hashToken = gatewaysData[5];
+		
+		//this.state.trainingUsers.push({name:'Training1',id: '1'});
+		//this.state.trainingUsers.push({name:'Training2',id: '2'});
+		//this.state.trainingUsers.push({name:'Training3',id: '3'});
 		
 		this.setState({ gateway : gatewayURL, 
 		jsonUrlApi: jsonAPI, imageUrlAPi: imageAPI,urlPinAPI:pinAPI,
@@ -217,6 +229,13 @@ class Diplome extends Component {
 		this.setState({ loading:true});
 	}
 	
+	setData= (userArray, pos) => {
+		let data = userArray[pos];
+		if(data == undefined)
+			return "";
+		return data;
+	  }
+	
 	// Send the json hash stored in Pinata in the smart contract MaticulmNFT
 	// and mint the NFT 
 	SendNFTToSmartContract = async() => {
@@ -328,14 +347,99 @@ class Diplome extends Component {
 		reader.onerror = (e) => alert(e.target.error.name);
 		reader.readAsText(e.target.files[0])		
     }	
+	
+	searchUser = async (e) => {
+		const { trainingUsers } = this.state;;
+		let pass = DataFromBase.getDataPass();
+		if(pass == ""){
+			pass = this.tbxPass.value;
+			DataFromBase.setDataPass(pass);
+		}
+		
+		const CryptoJS = require('crypto-js');
+		let userDatas = await this.context.contract.methods.getUserHash(this.tbxUserAdress.value).call();
+		
+		let datasUserUnHashed = atob(userDatas);
+		
+		let decrypted = CryptoJS.TripleDES.decrypt(datasUserUnHashed, pass)
+	    .toString(CryptoJS.enc.Utf8);	
+		
+		if(decrypted == "") alert("Wrong password");
+		let userArray = decrypted.split("#");
+		
+		this.tbxFirstname.value = this.setData(userArray,1);
+		this.tbxLastname.value = this.setData(userArray,0);
+		
+		let trainingUsersTemp = [];	
+		let trainingsAll = [];
+		
+		let userTrainings = await this.context.contractTraining.methods.getUserTrainingsCount(this.tbxUserAdress.value).call();
+		
+		for(let i = 0;i<userTrainings.length;i++){			
+			let trainingId = await this.context.contractTraining.methods.getUserTraining(this.tbxUserAdress.value,i).call();			
+			let training = await this.context.contractTraining.methods.trainings(trainingId).call();
+			trainingsAll.push(training);
+			trainingUsersTemp.push({name:training[1],id: trainingId});
+		}
+		
+		let currentTraining = trainingsAll[0];
+		
+		this.setState({ trainingUsers:trainingUsersTemp});
+		let schools = await this.context.contractSchool.methods.schools(currentTraining[0]).call();
+		this.tbxSchool.value = schools[0]
+		this.tbxGrade.value = currentTraining[2];
+		this.tbxDiplomaName.value = currentTraining[1];
+		
+		this.setState({trainingUsers:trainingUsersTemp, 
+			diplomaName: this.tbxDiplomaName.value,
+			firstname: this.tbxFirstname.value, lastname: this.tbxLastname.value, 
+			school : this.tbxSchool.value, grade:this.tbxGrade.value
+		});
+	}
+	
+	GetValuePair(event) {
+		
+	}
 		
 	render() {
 		const { t } = this.props; 
+		let optionTemplate = this.state.trainingUsers.map(v => (
+		  <option value={v.id}>{v.name}</option>
+		));
 		
 		return(
 		<div style={{display: 'flex', justifyContent: 'center'}}>
 			<Container>
 				<Form>
+					<Form.Group as={Row} >
+						<Form.Label column sm="3">Adresse Utilisateur</Form.Label>
+						<Col sm="3">
+						  <Form.Control type="text" 
+						  id="tbxUserAdress" ref={(input) => { this.tbxUserAdress = input }}
+						  />
+						</Col>
+						Password
+						<Col sm="3">
+						  <Form.Control type="password" 
+						  id="tbxPass" ref={(input) => { this.tbxPass = input }}
+						  />
+						</Col>
+						<Col sm="1">
+						  <Button onClick={this.searchUser}>Search user</Button>
+						</Col>
+					</Form.Group>
+					<Form.Group as={Row} >
+						<Form.Label column sm="3">Formation(s)</Form.Label>
+						<Col sm="9">
+						  <label>
+							<select 
+								value={this.state.value} 
+								onChange={this.GetValuePair.bind(this)}>
+								{optionTemplate}
+							</select>
+						  </label>
+						</Col>
+					</Form.Group>
 					<Form.Group as={Row} >
 						<Form.Label column sm="3"></Form.Label>
 						<Form.Label column sm="9">{t('diplome.diplomaBuid')}</Form.Label>
@@ -428,7 +532,7 @@ class Diplome extends Component {
 					<Form.Group as={Row} >
 						<Form.Label column sm="3">{t('diplome.publishFromFile')}</Form.Label>
 						<Col sm="9">
-							<input type="file" onChange={(e) => this.showFile(e)} />
+							<input type="file" onChange={(e) => this.showFile(e)} accept="text/csv" />
 						</Col>
 					</Form.Group>
 					<Form.Group as={Row} >
