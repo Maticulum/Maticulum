@@ -10,7 +10,7 @@ class TrainingChoice extends Component {
 
    static contextType = Web3Context;
 
-   state = { schools: [], trainings: [], selectedSchool: null }
+   state = { schools: [], trainings: [], selectedSchool: null, userSelected:null }
 
 
    async componentDidMount() {
@@ -60,9 +60,17 @@ class TrainingChoice extends Component {
 
 
    onRegister = async (trainingId) => {
-      await this.context.contractTraining.methods.registerForTraining(trainingId).send({from: this.context.account});
+	   
+      const { userSelected } = this.state;
+	  // alert(userSelected);
+	  await this.context.contractTraining.methods
+	  .validateUserTrainingRequestDirect(trainingId, userSelected).send({from: this.context.account});
       
       this.onSchoolChange(this.state.selectedSchool);
+   }
+   
+   OnChangeUser = async (e, trainingId) => {
+	  this.state.userSelected = e.target.value;
    }
 
 
@@ -93,6 +101,7 @@ class TrainingChoice extends Component {
                   <tr>
                      <th>Name</th>
                      <th>Hours</th>
+					 <th>User Address</th>
                      <th>Register</th>
                   </tr>
                </thead>
@@ -101,10 +110,17 @@ class TrainingChoice extends Component {
                      <tr key={training.id}>
                         <td>{ training.name }</td>
                         <td>{ training.duration }</td>
+						<td>
+							<Form.Control type="text" 
+							id="tbxUserAddress" 
+							ref={(input) => { this.tbxUserAddress = input }}
+							onChange={this.OnChangeUser} 
+							/>
+						</td>
                         <td>
                            { training.registered ? 
                               'Registered' : 
-                              <Button variant="outline-primary" onClick={ () => this.onRegister(training.id) }>Register</Button>
+                              <Button variant="outline-primary" onClick={ () => this.onRegister(training.id, this.tbxUserAddress.value) }>Register</Button>
                            }
                            { training.registered && !training.validated && ' (Validation pending)' }
                            

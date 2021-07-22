@@ -349,7 +349,7 @@ class Diplome extends Component {
     }	
 	
 	searchUser = async (e) => {
-		const { trainingUsers } = this.state;;
+		const { trainingUsers } = this.state;
 		let pass = DataFromBase.getDataPass();
 		if(pass == ""){
 			pass = this.tbxPass.value;
@@ -358,8 +358,8 @@ class Diplome extends Component {
 		
 		const CryptoJS = require('crypto-js');
 		let userDatas = await this.context.contract.methods.getUserHash(this.tbxUserAdress.value).call();
-		
-		let datasUserUnHashed = atob(userDatas);
+		let user = userDatas[0];
+		let datasUserUnHashed = atob(user);
 		
 		let decrypted = CryptoJS.TripleDES.decrypt(datasUserUnHashed, pass)
 	    .toString(CryptoJS.enc.Utf8);	
@@ -375,7 +375,7 @@ class Diplome extends Component {
 		
 		let userTrainings = await this.context.contractTraining.methods.getUserTrainingsCount(this.tbxUserAdress.value).call();
 		
-		for(let i = 0;i<userTrainings.length;i++){			
+		for(let i = 0;i<userTrainings;i++){			
 			let trainingId = await this.context.contractTraining.methods.getUserTraining(this.tbxUserAdress.value,i).call();			
 			let training = await this.context.contractTraining.methods.trainings(trainingId).call();
 			trainingsAll.push(training);
@@ -397,9 +397,16 @@ class Diplome extends Component {
 		});
 	}
 	
-	GetValuePair(event) {
+	GetValuePair = async (event) => {
+		var index = event.nativeEvent.target.selectedIndex;
+		this.tbxDiplomaName.value = event.nativeEvent.target[index].text;
+		let currentTraining = await this.context.contractTraining.methods.trainings(index).call();
+		this.tbxGrade.value = currentTraining[2];
 		
+		this.setState({ diplomaName: this.tbxDiplomaName.value, grade:this.tbxGrade.value});
 	}
+	
+
 		
 	render() {
 		const { t } = this.props; 

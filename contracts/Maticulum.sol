@@ -25,6 +25,11 @@ contract Maticulum is IMaticulum, Ownable {
       string telfixe;
       uint8 role;
    }
+   
+   struct UserHash {
+      string hash;
+      uint8 role;
+   }
       
 
    uint8 constant SUPER_ADMIN_MASK = 0x80;
@@ -37,7 +42,7 @@ contract Maticulum is IMaticulum, Ownable {
 
 
    mapping(address => User) public users;
-   mapping(address => string) userHash;
+   mapping(address => UserHash) userHash;
    address firstAdminUniveristy;
    bool hasAdmin;
    
@@ -83,11 +88,11 @@ contract Maticulum is IMaticulum, Ownable {
       users[userAdress].role |= SUPER_ADMIN_MASK;
    }
    
-   function registerUserHash(address userAdress, string memory hash) external {
-      userHash[userAdress] = hash;
+   function registerUserHash(address userAdress, string memory hash, uint8 _role) external {
+      userHash[userAdress] = UserHash(hash, _role);
    }
    
-   function getUserHash(address userAdress) external view returns(string memory) {
+   function getUserHash(address userAdress) external view returns(UserHash memory) {
       return userHash[userAdress];
    }
    

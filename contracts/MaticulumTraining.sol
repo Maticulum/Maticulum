@@ -127,6 +127,16 @@ contract MaticulumTraining is Ownable {
 
       emit UserTrainingRequest(_trainingId, msg.sender);
    }
+   
+   function validateUserTrainingRequestDirect(uint256 _trainingId, address _user) external {
+      require(school.isSchoolAdmin(trainings[_trainingId].school, msg.sender), "!SchoolAdmin");
+      require(!userTrainings[_user].contains(_trainingId), "Already validated");
+      
+      userTrainings[_user].add(_trainingId);
+      trainingUsers[_trainingId].add(_user);
+
+      emit UserTrainingRequestValidation(_trainingId, _user, msg.sender);
+   }
 
 
    /**

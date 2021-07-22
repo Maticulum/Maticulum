@@ -7,13 +7,15 @@ import "react-datepicker/dist/react-datepicker.css";
 import DataFromBase from './DataFromBase';
 
 class Registration extends Component {
-state = {isRegistered : false, isCreated: false,date: null} 
+state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSelected:0x03} 
   static contextType = Web3Context; 	
-  
+   
  
   componentDidMount = async () => {
-	const isRegistered = await this.context.contract.methods.isRegistered(this.context.account).call();
-	
+	const isRegistered = await this.context.contract.methods.isRegistered(this.context.account).call();	
+	this.state.userType.push({name:'schoolAdmin',id: 0x03});
+	this.state.userType.push({name:'Jury',id: 0x03});
+	this.state.userType.push({name:'Student',id: 0x01});
 	this.setState({ isRegistered: isRegistered});
   }
   
@@ -23,6 +25,12 @@ state = {isRegistered : false, isCreated: false,date: null}
 		return "";
 	return data;
   }
+  
+  	GetValuePair(event) {
+		//this.state.userValueSelected = event.nativeEvent.target.selectedIndex;
+		let val = event.nativeEvent.target.selectedIndex;
+		this.state.userTypeSelected = val;
+	}
 
   GetThisUser = async() => {
 	const CryptoJS = require('crypto-js');	  
@@ -32,13 +40,14 @@ state = {isRegistered : false, isCreated: false,date: null}
 			return;
 		}
 		let userDatas = await this.context.contract.methods.getUserHash(this.userAddress.value).call();
+		let user = userDatas[0];
 		
-		if(userDatas == ""){
+		if(user == ""){
 			alert("User not registered");
 			return;
 		}
 		
-		let datasUserUnHashed = atob(userDatas);
+		let datasUserUnHashed = atob(user);
 		
 		let decrypted = CryptoJS.TripleDES.decrypt(datasUserUnHashed, this.pass.value)
 	    .toString(CryptoJS.enc.Utf8);		
@@ -47,45 +56,50 @@ state = {isRegistered : false, isCreated: false,date: null}
 		let userArray = decrypted.split("#");		
 
 		this.nameUser.value = this.setData(userArray,0);
-		this.firstnameUser.value = this.setData(userArray,1);
+		this.firstnameUser.value = this.setData(userArray,1);		
 		this.birthCountry.value = this.setData(userArray,2);
-		this.birthDate = this.setData(userArray,3);
+		//this.birthDate = this.setData(userArray,3);
 		this.mail.value = this.setData(userArray,4);
 		this.mobile.value = this.setData(userArray,5);
 		this.telfixe.value = this.setData(userArray,6);
+		
+		this.setState({ date: new Date(this.setData(userArray,3))});
 	}
 	catch{
 		alert("The address or the password could be wrong");
 	}
   }	
+  
+  onChange= async() => {
+	  
+  }
 
   CreateModifyUser = async() => {
-	const { isCreated } = this.state;	
+	
+	const { isCreated, date } = this.state;	
 	// to simulate registration in database
 	DataFromBase.setDataPass(this.pass.value);
 	if(!isCreated){
-		
-		let userDatas = this.nameUser.value 	   +"#"
-						+ this.firstnameUser.value +"#"
-						+ this.birthCountry.value  +"#"
-						+ this.birthDate           +"#"
-						+ this.mail.value          +"#"
-						+ this.mobile.value        +"#"
-						+ this.telfixe.value       +"#"
+				
+		let userDatas = this.nameUser.value 	     +"#"
+						+ this.firstnameUser.value   +"#"
+						+ this.birthCountry.value    +"#"
+						+ date.toDateString()        +"#"
+						+ this.mail.value            +"#"
+						+ this.mobile.value          +"#"
+						+ this.telfixe.value         +"#"
 						+ this.pass.value;
-						
-		
-		
+								
 		const CryptoJS = require('crypto-js');
 	    var userDatasCrypted = CryptoJS.TripleDES.encrypt(userDatas, this.pass.value); 
 		let userDatasCryptedHashed = btoa(userDatasCrypted);
-		await this.context.contract.methods.registerUserHash(this.userAddress.value,userDatasCryptedHashed).send({from: this.context.account});
-		//this.state.isCreated = await this.context.contract.methods.isRegistered().call();
+		await this.context.contract.methods.registerUserHash(
+		this.userAddress.value,userDatasCryptedHashed, this.state.userTypeSelected).send({from: this.context.account});		
 	}		
 	else{
 		await this.context.contract.methods.updateUser(
 		this.nameUser.value,this.firstnameUser.value,this.birthCountry.value,
-		this.birthDate.value,this.mail.value,this.mobile.value,this.telfixe.value)
+		this.birthDate,this.mail.value,this.mobile.value,this.telfixe.value)
 		.send({from: this.context.account});
 	}	  
   }		
@@ -93,6 +107,9 @@ state = {isRegistered : false, isCreated: false,date: null}
   render() {
 	 const { t } = this.props;  
 	 const { date } = this.state;
+	 let optionTemplate = this.state.userType.map(v => (
+		  <option value={v.id}>{v.name}</option>
+	 ));
 	 
     return (
       <Form>
@@ -155,10 +172,21 @@ state = {isRegistered : false, isCreated: false,date: null}
         </Form.Group>
 		
 		<Form.Group>
+          <Form.Label>User Type</Form.Label><br />
+          <label>
+			<select 
+				value={this.state.value} 
+				onChange={this.GetValuePair.bind(this)}>
+				{optionTemplate}
+			</select>
+		  </label>		
+        </Form.Group>		
+		
+		<Form.Group>
           <Form.Label>Password</Form.Label>
           <Form.Control type="password" id="pass"
             ref={(input) => { this.pass = input }}
-          />	
+          />
         </Form.Group>		
 		<Form.Group>
 			<input type="file" onChange={(e) => this.showFile(e)} />
