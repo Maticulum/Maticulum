@@ -3,7 +3,11 @@
         "home": "Home",
         "whitelisted": "Whitelisted",
         "registration": "Registration",
-        "schools": "Schools"
+        "schools": "Schools",
+		"training":"Trainings",
+		"createDiploma":"Create diploma",
+		"oldDiplomas":"Old diplomas",
+		"searchDiplomas":"Search diplomas"
     },
     "button": {
         "add": "Add",
@@ -27,6 +31,16 @@
 		"firstname": "First name",
 		"mobilePhone":"Mobile phone number",
 		"fixedPhone":"Telephone number"
+	},
+	"registration":{
+		"register":"User register",
+		"userNoreg":"User not registered",
+		"userEmpty":"User or password fields are empty",
+		"wrongPass":"Wrong password",
+		"addressError":"The address or the password could be wrong",
+		"userType":"User Type",
+		"getUser":"Get recorded User datas",
+		"createUser":"Create/Update User"
 	},
 	"diplome":{
 		"createNFT":"Create NFT",
@@ -56,7 +70,11 @@
 		"name":"Name",
 		"awardedDiploma":". Diploma awarded by : ",
 		"of":" of ",
-		"diplomaof":"Diploma of "
+		"diplomaof":"Diploma of ",
+		"studentAdress": "Student Address",
+		"searchUser":"Search",
+		"password":"Password"
+		
 	},
    "school": {
       "name": "Name",

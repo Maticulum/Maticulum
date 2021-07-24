@@ -189,10 +189,10 @@ class App extends Component {
                      { this.state.isSuperAdmin && <NavLink className="nav-link" visibility="hidden" to={'/whitelisted'}>{t('nav.whitelisted')}</NavLink> }
                      <NavLink className="nav-link" to={'/registration'}>{t('nav.registration')}</NavLink>
                      { this.state.isSuperAdmin && <NavLink className="nav-link" to={'/schools'}>{t('nav.schools')}</NavLink> }
-                     <NavLink className="nav-link" to={'/trainings/choice'}>Choix training</NavLink>
-					 <NavLink className="nav-link" to={'/oldDiplome'}>{t('diplome.diplomas')}</NavLink>					 
-					 <NavLink className="nav-link" to={'/diplome'}>{t('diplome.diploma')}</NavLink>
-					 <NavLink className="nav-link" to={'/showDiplomas'}>{t('diplome.linkShow')}</NavLink>
+                     <NavLink className="nav-link" to={'/trainings/choice'}>{t('nav.training')}</NavLink>
+					 <NavLink className="nav-link" to={'/oldDiplome'}>{t('nav.oldDiplomas')}</NavLink>					 
+					 <NavLink className="nav-link" to={'/diplome'}>{t('nav.createDiploma')}</NavLink>
+					 <NavLink className="nav-link" to={'/showDiplomas'}>{t('nav.searchDiplomas')}</NavLink>
                   </Nav>
                </Navbar.Collapse>
                <Navbar.Collapse className="justify-content-end">

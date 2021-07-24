@@ -37,11 +37,7 @@ class Diplome extends Component {
 		let pinAPI = gatewaysData[3];
 		let paramPinataApi = gatewaysData[4];
 		let paramPinataSecretApi = gatewaysData[5];
-		let hashToken = gatewaysData[5];
-		
-		//this.state.trainingUsers.push({name:'Training1',id: '1'});
-		//this.state.trainingUsers.push({name:'Training2',id: '2'});
-		//this.state.trainingUsers.push({name:'Training3',id: '3'});
+		let hashToken = gatewaysData[5];		
 		
 		this.setState({ gateway : gatewayURL, 
 		jsonUrlApi: jsonAPI, imageUrlAPi: imageAPI,urlPinAPI:pinAPI,
@@ -419,24 +415,24 @@ class Diplome extends Component {
 			<Container>
 				<Form>
 					<Form.Group as={Row} >
-						<Form.Label column sm="3">Adresse Utilisateur</Form.Label>
+						<Form.Label column sm="3">{t('diplome.studentAdress')}</Form.Label>
 						<Col sm="3">
 						  <Form.Control type="text" 
 						  id="tbxUserAdress" ref={(input) => { this.tbxUserAdress = input }}
 						  />
 						</Col>
-						Password
+						{t('diplome.password')}
 						<Col sm="3">
 						  <Form.Control type="password" 
 						  id="tbxPass" ref={(input) => { this.tbxPass = input }}
 						  />
 						</Col>
 						<Col sm="1">
-						  <Button onClick={this.searchUser}>Search user</Button>
+						  <Button onClick={this.searchUser}>{t('diplome.searchUser')}</Button>
 						</Col>
 					</Form.Group>
 					<Form.Group as={Row} >
-						<Form.Label column sm="3">Formation(s)</Form.Label>
+						<Form.Label column sm="3">{t('training.training')}(s)</Form.Label>
 						<Col sm="9">
 						  <label>
 							<select 

@@ -3,7 +3,11 @@
         "home": "Accueil",
         "whitelisted": "Liste blanche",
         "registration": "Enregistrement",
-        "schools": "Écoles"
+        "schools": "Écoles",
+		"training":"Formations",
+		"createDiploma":"Créer diplômes",
+		"oldDiplomas":"Anciens diplômes",
+		"searchDiplomas":"Chercher diplômes"
     },
     "button": {
         "add": "Ajouter",
@@ -27,6 +31,16 @@
 		"firstname": "Prénom",
 		"mobilePhone":"Numéro de téléphone mobile",
 		"fixedPhone":"Numéro de téléphone fixe"
+	},
+	"registration":{
+		"register":"Enregistrement d'un utilisateur",
+		"userNoreg":"Utilisateur non enregistré",
+		"userEmpty":"Les champs utilisateur ou mot de passe sont vides",
+		"wrongPass":"Error de mot de passe",
+		"addressError":"L'adresse de l'utilisateur ou le mot de passe semblent erronées",
+		"userType":"Type d'utilisateur",
+		"getUser":"Afficher les données de l'utilisateur",
+		"createUser":"Créer ou mettre à jour un utilisateur"
 	},
 	"diplome":{
 		"createNFT":"Créer NFT",
@@ -56,7 +70,10 @@
 		"name":"Nom",
 		"awardedDiploma":". Diplôme décerné par : ",
 		"of":" de ",
-		"diplomaof":"Diplome de "		
+		"diplomaof":"Diplome de ",
+		"studentAdress": "Adresse de l'étudiant",
+		"searchUser":"Rechercher",
+		"password":"Mot de passe"		
 	},
    "school": {
       "name": "Nom",

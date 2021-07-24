@@ -26,24 +26,23 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 	return data;
   }
   
-  	GetValuePair(event) {
-		//this.state.userValueSelected = event.nativeEvent.target.selectedIndex;
-		let val = event.nativeEvent.target.selectedIndex;
+  	GetValuePair(event) {let val = event.nativeEvent.target.selectedIndex;
 		this.state.userTypeSelected = val;
 	}
 
   GetThisUser = async() => {
-	const CryptoJS = require('crypto-js');	  
+	const CryptoJS = require('crypto-js');
+	const { t } = this.props;	
 	try{
 		if(this.pass.value == "" || this.userAddress.value == ""){
-			alert("User or password fields are empty");
+			alert(t('registration.userEmpty'));
 			return;
 		}
 		let userDatas = await this.context.contract.methods.getUserHash(this.userAddress.value).call();
 		let user = userDatas[0];
 		
 		if(user == ""){
-			alert("User not registered");
+			alert(t('registration.userNoreg'));
 			return;
 		}
 		
@@ -52,13 +51,12 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 		let decrypted = CryptoJS.TripleDES.decrypt(datasUserUnHashed, this.pass.value)
 	    .toString(CryptoJS.enc.Utf8);		
 		
-		if(decrypted == "") alert("Wrong password");
+		if(decrypted == "") alert(t('registration.wrongPass'));
 		let userArray = decrypted.split("#");		
 
 		this.nameUser.value = this.setData(userArray,0);
 		this.firstnameUser.value = this.setData(userArray,1);		
 		this.birthCountry.value = this.setData(userArray,2);
-		//this.birthDate = this.setData(userArray,3);
 		this.mail.value = this.setData(userArray,4);
 		this.mobile.value = this.setData(userArray,5);
 		this.telfixe.value = this.setData(userArray,6);
@@ -66,7 +64,7 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 		this.setState({ date: new Date(this.setData(userArray,3))});
 	}
 	catch{
-		alert("The address or the password could be wrong");
+		alert(t('registration.addressError'));
 	}
   }	
   
@@ -113,7 +111,7 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 	 
     return (
       <Form>
-        <h1>Register you</h1>  
+        <h1>{t('registration.register')}</h1>  
         <Form.Group>
           <Form.Label>{t('formlabel.name')}</Form.Label>
           <Form.Control type="text" id="nameUser"
@@ -172,7 +170,7 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
         </Form.Group>
 		
 		<Form.Group>
-          <Form.Label>User Type</Form.Label><br />
+          <Form.Label>{t('registration.userType')}</Form.Label><br />
           <label>
 			<select 
 				value={this.state.value} 
@@ -183,7 +181,7 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
         </Form.Group>		
 		
 		<Form.Group>
-          <Form.Label>Password</Form.Label>
+          <Form.Label>{t('diplome.password')}</Form.Label>
           <Form.Control type="password" id="pass"
             ref={(input) => { this.pass = input }}
           />
@@ -192,8 +190,8 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 			<input type="file" onChange={(e) => this.showFile(e)} />
 		</Form.Group>
                 
-        <Button className="next" onClick={this.GetThisUser}>Get recorded User datas</Button>
-        <Button className="next" onClick={this.CreateModifyUser}>Create/Update User</Button>
+        <Button className="next" onClick={this.GetThisUser}>{t('diplome.getUser')}</Button>
+        <Button className="next" onClick={this.CreateModifyUser}>{t('diplome.createUser')}</Button>
 	
       </Form>
     );
