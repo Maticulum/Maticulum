@@ -15,9 +15,9 @@ contract MaticulumNFT is ERC721URIStorage, Ownable{
    * @param _urltoImageApi        url of the API to store an image
    * @param _hashtoApikey         crypted hash to access Api key to load metadata and image 
    * @param _hashtoSecretApikey   crypted hash to access secret Api key to load metadata and image
-   * * @param _hashImageToken   crypted hash to access secret Api key to load metadata and image
-   * * @param _name   crypted hash to access secret Api key to load metadata and image
-   * * @param _symbol   crypted hash to access secret Api key to load metadata and image
+   * @param _hashImageToken   crypted hash to access secret Api key to load metadata and image
+   * @param _name   crypted hash to access secret Api key to load metadata and image
+   * @param _symbol   crypted hash to access secret Api key to load metadata and image
    */
     constructor(string memory _gatewayUrl, string memory _urltoJsonApi, string memory _urltoImageApi, string memory _urlToUnPinApi,
                 string memory _hashtoApikey,string memory _hashtoSecretApikey,
@@ -35,6 +35,7 @@ contract MaticulumNFT is ERC721URIStorage, Ownable{
     mapping(string => bool) hashesStoredTemporary;
     mapping(address=>uint[]) hashesByUser;
     uint[] tokenIdUser;
+    uint256 maxHashCount = 200;
     
     struct gatewayApiDatas{
         string gatewayUrl;
@@ -64,7 +65,7 @@ contract MaticulumNFT is ERC721URIStorage, Ownable{
    * * @return the user address
    */
     function AddNFTToAdress(address _userAddress, string memory _hash) private returns (uint256){
-
+        
         hashesStored[_hash] = true;
         _tokenIds.increment();
         uint256 newItemId = _tokenIds.current();
@@ -85,6 +86,8 @@ contract MaticulumNFT is ERC721URIStorage, Ownable{
    * * @return the user address
    */
     function AddNFTsToAdress(address _userAddress, string[] memory _hashes) public returns (uint256){
+        require(_hashes.length <= maxHashCount, "Gaz limit security");
+       
         uint256 lastUri = 0;
         
         for(uint i =0;i < _hashes.length;i++){
@@ -148,6 +151,7 @@ contract MaticulumNFT is ERC721URIStorage, Ownable{
    * @param _hashImageToken       hash of the image
    */
     function modifyHashToImageToken(string memory _hashImageToken) public onlyOwner{
+        require(bytes(_hashImageToken).length == 46, "Invalid hash length");
         NFTDatas_.hashImageToken = _hashImageToken;
     }
     

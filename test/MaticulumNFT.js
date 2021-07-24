@@ -146,6 +146,11 @@ contract('MaticulumNFT', accounts => {
 	assert.equal(nftDatas[2], hasItemToken, "not awaited field");
   });
   
+  it("error NFTs hash image token length", async () => {	
+    const hasItemToken = "AAAAAV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC11"
+	await expectRevert(this.Maticulum.modifyHashToImageToken(hasItemToken,{ from: owner }), "Invalid hash length");
+  });
+  
   it("Mint a list of NFTs and get list of uris", async () => {
 	const hashOne = "7mYFRV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC";
 	const hashTwo = "QmYFRV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC";
@@ -171,6 +176,16 @@ contract('MaticulumNFT', accounts => {
 	assert.equal(urisUser2.length, 2, "The length of the uri stored by user should be 2");
 	assert.equal(await this.Maticulum.getURI(urisUser2[0],{ from: owner }),gatewayUrl + hashFour, "Not awaited hash");
 	assert.equal(await this.Maticulum.getURI(urisUser2[1],{ from: owner }),gatewayUrl + hashFive, "Not awaited hash");
+  });
+  
+  it("Mint a list of 201 NFTs and get error Gaz limit security", async () => {
+	const hashes200 = [];
+	
+	for(let i = 100; i < 302; i++){
+		hashes200.push(i + "FRV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC");
+	}
+	
+	await expectRevert(this.Maticulum.AddNFTsToAdress(owner, hashes200, { from: owner }), "Gaz limit security");	
   });
   
 });
