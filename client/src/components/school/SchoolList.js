@@ -3,7 +3,6 @@ import { Link, withRouter } from 'react-router-dom';
 import { Button, Container, Row, Table } from 'react-bootstrap';
 import { withTranslation } from "react-i18next";
 
-
 import Web3Context from '../../Web3Context';
 
 

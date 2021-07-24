@@ -36,23 +36,36 @@ contract MaticulumTraining is Ownable {
    IMaticulum private maticulum;
    ISchool private school;
 
+   /// List of trainings
    Training[] public trainings;
+
+   /// List of (training, user) validated by juries and ready to emit diploma
    DiplomaReady[] public diplomasReady;
 
+   /// List of (training, jury) waiting a validation from School Admin
    mapping(uint256 => EnumerableSet.AddressSet) trainingJuriesWaitingValidation;
    mapping(address => EnumerableSet.UintSet) juryWaitingTrainingValidation;
-   mapping(uint256 => mapping(address => EnumerableSet.AddressSet)) juryValidation;
 
+   /// List of (training, jury) validated by School Admin
    mapping(uint256 => EnumerableSet.AddressSet) trainingJuries;
    mapping(address => EnumerableSet.UintSet) juryTrainings;
 
+   /// List of (training, student) waiting validation after registration to a training
    mapping(uint256 => EnumerableSet.AddressSet) trainingUsersWaitingValidation;
    mapping(address => EnumerableSet.UintSet) userWaitingTrainingValidation;
 
+   /// List of validated (training, student)
    mapping(uint256 => EnumerableSet.AddressSet) trainingUsers;
    mapping(address => EnumerableSet.UintSet) userTrainings;
    
-   mapping(uint256 => mapping(address => DiplomaValidation)) diplomaUserValidation;   
+   /// List of validators for a (training, jury)
+   mapping(uint256 => mapping(address => EnumerableSet.AddressSet)) juryValidations;
+
+   /// List of jury validation for (training, student)
+   mapping(uint256 => mapping(address => DiplomaValidation)) diplomaUserValidations;
+
+   /// List of student date registration for a training
+   mapping(uint256 => mapping(address => uint256)) public trainingStudentRegistrationDates;
 
 
    event TrainingAdded(uint256 schoolId, uint256 trainingId, string name, string level, uint16 duration, uint16 validationThreshold, address addedBy);
@@ -125,9 +138,12 @@ contract MaticulumTraining is Ownable {
       trainingUsersWaitingValidation[_trainingId].add(msg.sender);
       userWaitingTrainingValidation[msg.sender].add(_trainingId);
 
+      trainingStudentRegistrationDates[_trainingId][msg.sender] = block.timestamp; // TODO here or at validation step ?
+
       emit UserTrainingRequest(_trainingId, msg.sender);
    }
    
+
    function validateUserTrainingRequestDirect(uint256 _trainingId, address _user) external {
       require(school.isSchoolAdmin(trainings[_trainingId].school, msg.sender), "!SchoolAdmin");
       require(!userTrainings[_user].contains(_trainingId), "Already validated");
@@ -160,7 +176,7 @@ contract MaticulumTraining is Ownable {
 
 
    /**
-   * @notice Valide multiple users request to register for a training
+   * @notice Validate multiple users request to register for a training
    * @param _trainingId id of the training
    * @param _users      array of users addresses
    */
@@ -241,7 +257,7 @@ contract MaticulumTraining is Ownable {
    * @param _level      training level
    * @param _duration   training duration, in hours
    * @param _validationThreshold  number of validation by a jury to validate a user diploma
-   * @param _juries     juryies for the training
+   * @param _juries     juries for the training
    * @return the id of the saved training
    */
    function addTraining(uint256 _schoolId, string memory _name, string memory _level, uint16 _duration, uint16 _validationThreshold, address[] memory _juries) 
@@ -317,7 +333,7 @@ contract MaticulumTraining is Ownable {
 
 
    /**
-   * @notice Get the number of trainings a jury participate in.
+   * @notice Get the number of trainings a jury participates in.
    * @param _jury jurys address
    * @return jury's training count
    */
@@ -352,6 +368,39 @@ contract MaticulumTraining is Ownable {
       juryWaitingTrainingValidation[_jury].add(_trainingId);
 
       emit JuryAdded(_trainingId, _jury, msg.sender);
+
+      validateJury(_trainingId, _jury);
+   }
+
+
+   /**
+   * @notice Get the count of juries waiting a validation for a given training
+   * @param _trainingId id of the training
+   * @return 
+   */
+   function getTrainingJuriesWaitingValidationCount(uint256 _trainingId) external view returns (uint256) {
+      return trainingJuriesWaitingValidation[_trainingId].length();
+   }
+
+
+   /**
+   * @notice Get the jury waiting a validation for a given training and index
+   * @param _trainingId id of the training
+   * @param _index      element index
+   * @return jury
+   */
+   function getTrainingJuryWaitingValidation(uint256 _trainingId, uint256 _index) external view returns (address) {
+      return trainingJuriesWaitingValidation[_trainingId].at(_index);
+   }
+
+
+   function getTrainingsWaitingValidationCountForJury(address _jury) external view returns (uint256) {
+      return juryWaitingTrainingValidation[_jury].length();
+   }
+
+
+   function getTrainingWaitingValidationForJury(address _jury, uint256 index) external view returns (uint256) {
+      return juryWaitingTrainingValidation[_jury].at(index);
    }
 
 
@@ -360,15 +409,14 @@ contract MaticulumTraining is Ownable {
    * @param _trainingId id of training
    * @param _jury       address of jury
    */
-   function validateJury(uint256 _trainingId, address _jury) external {
-      require(school.isSchoolAdmin(trainings[_trainingId].school, msg.sender));
+   function validateJury(uint256 _trainingId, address _jury) internal {
       require(trainingJuriesWaitingValidation[_trainingId].contains(_jury), "Not waiting");
       require(!trainingJuries[_trainingId].contains(_jury), "Already jury");
-      require(juryValidation[_trainingId][_jury].contains(msg.sender), "Already validated by this admin");
+      require(!juryValidations[_trainingId][_jury].contains(msg.sender), "Already validated by this admin");
       
-      juryValidation[_trainingId][_jury].add(msg.sender);
+      juryValidations[_trainingId][_jury].add(msg.sender);
 
-      uint256 count = juryValidation[_trainingId][_jury].length();
+      uint256 count = juryValidations[_trainingId][_jury].length();
       if (count >= trainings[_trainingId].validationThreshold) {
          maticulum.validateUser(_jury);
          trainingJuries[_trainingId].add(_jury);
@@ -378,7 +426,47 @@ contract MaticulumTraining is Ownable {
          juryWaitingTrainingValidation[_jury].remove(_trainingId);
       }
 
-      emit JuryValidated(_trainingId, _jury, count,msg.sender);
+      emit JuryValidated(_trainingId, _jury, count, msg.sender);
+   }
+
+
+   /**
+   * @notice Validate multiple juries
+   * @param _trainingId    id of training
+   * @param _juries        juries to validate
+   */
+   function validateJuryMultiple(uint256 _trainingId, address[] memory _juries) external {
+      require(school.isSchoolAdmin(trainings[_trainingId].school, msg.sender));
+
+      for (uint256 i = 0; i < _juries.length; i++) {
+         validateJury(_trainingId, _juries[i]);
+      }
+   }
+
+
+   /**
+   * @notice Get the status of a jury validation
+   * @param _trainingId    id of training
+   * @param _jury          jury address
+   * @return validated     true if the jury is validated
+   * @return count         nb of school admins who have validated this jury
+   */
+   function getJuryValidationStatus(uint256 _trainingId, address _jury) external view returns (bool validated, uint256 count) {
+      count = juryValidations[_trainingId][_jury].length();
+      validated = count >= trainings[_trainingId].validationThreshold;
+   }
+
+
+   /**
+   * @notice Get the address who validates this jury, for the given training and index
+   * @dev count can be retrieve with getJuryValidationStatus
+   * @param _trainingId    id of training
+   * @param _jury          jury address
+   * @param _index         index of validator
+   * @return the address
+   */
+   function getJuryValidator(uint256 _trainingId, address _jury, uint256 _index) external view returns (address) {
+      return juryValidations[_trainingId][_jury].at(_index);
    }
 
 
@@ -425,8 +513,9 @@ contract MaticulumTraining is Ownable {
    */
    function validateDiploma(uint256 _trainingId, address _user) public {
       require(isTrainingJury(_trainingId, msg.sender), "!jury");
+      require(trainingStudentRegistrationDates[_trainingId][_user] + (trainings[_trainingId].duration * 3600 ) >= block.timestamp, "StillOngoingTraining");
 
-      DiplomaValidation storage validation = diplomaUserValidation[_trainingId][_user];
+      DiplomaValidation storage validation = diplomaUserValidations[_trainingId][_user];
       validation.juries.add(msg.sender);
 
       uint256 count = validation.juries.length();
@@ -464,7 +553,7 @@ contract MaticulumTraining is Ownable {
    */
    function getDiplomaValidation(uint256 _trainingId, address _user, address _jury) 
          external view returns (uint256 validatedCount, bool validatedByJury, bool validated) {
-      DiplomaValidation storage validation = diplomaUserValidation[_trainingId][_user];
+      DiplomaValidation storage validation = diplomaUserValidations[_trainingId][_user];
 
       return (validation.juries.length(), validation.juries.contains(_jury), validation.validated);
    }

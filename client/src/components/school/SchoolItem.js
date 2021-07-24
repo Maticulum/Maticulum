@@ -41,7 +41,7 @@ class SchoolItem extends Component {
             validators.push(await cm.getSchoolValidator(id, i).call());
          }
 
-         this.setState({ create: false, id, ...school, administrators, validators, administrators });
+         this.setState({ create: false, id, ...school, administrators, validators });
       }
    }
 
@@ -83,12 +83,20 @@ class SchoolItem extends Component {
    }
 
 
+   onAdministratorUpdate = (value, index) => {
+      const admins = [...this.state.administrators];
+      admins[index] = value;
+      this.setState({ administrators: admins });
+   }
+
+
    render() {
       if (this.state.create === null) {
          return <div>Loading...</div>;
       }
 
       const { t } = this.props;
+      const readOnly = !this.context.isSuperAdmin;
 
       return (
          <Container fluid={!this.state.create} >
@@ -99,19 +107,22 @@ class SchoolItem extends Component {
                      <Form.Group as={Row} >
                         <Form.Label column sm="2">{t('school.name')}</Form.Label>
                         <Col>
-                           <Form.Control type="text" value={this.state.name} onChange={(e) => this.setState({name: e.target.value})} />
+                           <Form.Control type="text" readOnly={readOnly} plaintext={readOnly}
+                              value={this.state.name} onChange={(e) => this.setState({name: e.target.value})} />
                         </Col>
                      </Form.Group>
                      <Form.Group as={Row} >
                         <Form.Label column sm="2">{t('school.town')}</Form.Label>
                         <Col>
-                           <Form.Control type="text" value={this.state.town} onChange={(e) => this.setState({town: e.target.value})} />
+                           <Form.Control type="text" readOnly={readOnly} plaintext={readOnly}
+                              value={this.state.town} onChange={(e) => this.setState({town: e.target.value})} />
                         </Col>
                      </Form.Group>
                      <Form.Group as={Row} >
                         <Form.Label column sm="2">{t('school.country')}</Form.Label>
                         <Col>
-                           <Form.Control type="text" value={this.state.country} onChange={(e) => this.setState({country: e.target.value})} />
+                           <Form.Control type="text" readOnly={readOnly} plaintext={readOnly}
+                              value={this.state.country} onChange={(e) => this.setState({country: e.target.value})} />
                         </Col>
                      </Form.Group>
                      <h4>{t('school.administrators')}</h4>
@@ -119,11 +130,8 @@ class SchoolItem extends Component {
                         <Form.Group as={Row} key={index}>
                            <Form.Label column sm="2">{t('school.administrator')} {index + 1}</Form.Label>
                            <Col>
-                              <Form.Control type="text" value={this.state.administrators[index]} onChange={(e) => {
-                                    const admins = [...this.state.administrators];
-                                    admins[index] = e.target.value;
-                                    this.setState({ administrators: admins });
-                                 }} />
+                              <Form.Control type="text" readOnly={readOnly} plaintext={readOnly}
+                                 value={this.state.administrators[index]} onChange={(e) => this.onAdministratorUpdate(e.target.value, index) } />
                            </Col>
                         </Form.Group>
                      ))}
@@ -139,7 +147,9 @@ class SchoolItem extends Component {
                            }
                         </Form.Group>
                      }
-                     <Button onClick={ this.onSave }>{t('button.save')}</Button>
+                     { !readOnly && 
+                        <Button onClick={ this.onSave }>{t('button.save')}</Button>
+                     }
                   </Form>
                </Col>
 

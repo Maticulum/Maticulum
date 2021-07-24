@@ -68,7 +68,7 @@ class TrainingValidation extends Component {
       if (this.state.checkedUsers) {
          const trainingId = this.props.match.params.trainingId;
 
-         await this.context.contractTraining.methods.validateTrainingMultipleUsers(trainingId, this.state.checkedUsers).send({ from: this.context.account });
+         await this.context.contractTraining.methods.validateDiplomaMultipleUsers(trainingId, this.state.checkedUsers).send({ from: this.context.account });
          this.init();
       }
    }

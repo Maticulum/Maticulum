@@ -40,6 +40,12 @@ class Training extends Component {
             const jury = await cmTraining.getTrainingJury(trainingId, i).call();
             juries.push(jury);
          }
+
+         const nbJuryWaiting = await cmTraining.getTrainingJuriesWaitingValidationCount(trainingId).call();
+         for (let i = 0; i < nbJuryWaiting; i++) {
+            const jury = await cmTraining.getTrainingJuryWaitingValidation(trainingId, i).call();
+            juries.push(jury);
+         }
          this.setState({ juries, previousJuries: juries });
       }
    }

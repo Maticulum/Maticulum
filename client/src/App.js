@@ -21,6 +21,7 @@ import Training from './components/training/Training';
 import TrainingChoice from './components/training/TrainingChoice';
 import RegistrationValidation from './components/training/RegistrationValidation';
 import TrainingValidation from './components/training/TrainingValidation';
+import JuryValidation from './components/training/JuryValidation';
 import Whitelisted from './components/Whitelisted';
 import Diplome from './components/Diplome';
 import OldDiplome from './components/OldDiplome';
@@ -54,33 +55,22 @@ class App extends Component {
          // Get the contract instance.
          const networkId = await web3.eth.net.getId();
          const deployedNetwork = Maticulum.networks[networkId];
-         const instance = new web3.eth.Contract(
-            Maticulum.abi,
-            deployedNetwork && deployedNetwork.address,
-         );
-		 
-		   const instanceNFT = new web3.eth.Contract(MaticulumNFT.abi, deployedNetwork && MaticulumNFT.networks[networkId].address);
+         const instance = new web3.eth.Contract(Maticulum.abi, deployedNetwork && deployedNetwork.address,);
+		 const instanceNFT = new web3.eth.Contract(MaticulumNFT.abi, deployedNetwork && MaticulumNFT.networks[networkId].address);
          const instanceSchool = new web3.eth.Contract(MaticulumSchool.abi, deployedNetwork && MaticulumSchool.networks[networkId].address);
          const instanceTraining = new web3.eth.Contract(MaticulumTraining.abi, deployedNetwork && MaticulumTraining.networks[networkId].address);
 
          window.ethereum.on('accountsChanged', accounts => {
             console.log('Accounts changed ', accounts);
-            this.setState({ accounts });
-            
-            this.init();
-            if (!this.state.isRegistered) {
-               window.location.assign('/registration');
-            }
+            window.location.href='/';
          });
 
          window.ethereum.on('chainChanged', networkId => {
             console.log('Chain changed ', networkId);
-            this.setState({ networkId: parseInt(networkId) });
-            window.location.reload();
+            window.location.href='/';
          });
 
-         // Set web3, accounts, and contract to the state, and then proceed with an
-         // example of interacting with the contract's methods.
+         // Set web3, accounts, and contract to the state, and then proceed with init
          this.setState({ web3, networkId, accounts, contract: instance, contractNFT: instanceNFT,
             contractSchool: instanceSchool, contractTraining: instanceTraining}, this.init);
       } catch (error) {
@@ -144,11 +134,6 @@ class App extends Component {
       await window.ethereum.enable();
    }
 
-
-   changeLanguage = (lng) => {
-      i18n.changeLanguage(lng);
-   }
-
  
    render() {
       const { t } = this.props;
@@ -203,8 +188,8 @@ class App extends Component {
                      { connected ? this.getEllipsis(accounts[0]) : 'Connection' }
                   </Button>
                   <NavDropdown title={i18n.language.toUpperCase()} id="language">
-                     <NavDropdown.Item onClick={() => this.changeLanguage('en')}>EN</NavDropdown.Item>
-                     <NavDropdown.Item onClick={() => this.changeLanguage('fr')}>FR</NavDropdown.Item>
+                     <NavDropdown.Item onClick={() => i18n.changeLanguage('en')}>EN</NavDropdown.Item>
+                     <NavDropdown.Item onClick={() => i18n.changeLanguage('fr')}>FR</NavDropdown.Item>
                   </NavDropdown>
                </Navbar.Collapse>
             </Navbar>
@@ -219,6 +204,7 @@ class App extends Component {
                   <Route path='/schools/:schoolId/trainings/:trainingId' component={ Training } />
                   <Route path='/schools/:schoolId' component={ SchoolItem } />
                   <Route exact path='/trainings/choice' component={ TrainingChoice } />
+                  <Route path='/trainings/:trainingId/jury' component={ JuryValidation } />
                   <Route path='/trainings/:trainingId/registration' component={ RegistrationValidation } />
                   <Route path='/trainings/:trainingId/validation' component={ TrainingValidation } />
 
