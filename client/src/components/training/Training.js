@@ -73,6 +73,11 @@ class Training extends Component {
 
    onSave = async () => {
       if (this.state.create) {
+		  alert(this.state.schoolId);
+		  alert(this.state.name);
+		  alert(this.state.level);
+		  alert(this.state.duration);
+		  alert(this.state.validationThreshold);
          await this.context.contractTraining.methods.addTraining(this.state.schoolId, this.state.name, this.state.level, this.state.duration, this.state.validationThreshold,
             this.state.juries)
             .send({ from: this.context.account });

@@ -46,20 +46,18 @@ module.exports = async (deployer, network, accounts) => {
       const student3 = '0x82Ee53789484F959689449F5FFa243D34cfEaa05';
       const student4 = '0xc50405e65d9826242f3e338b6eFC81d463b4d26A';
 
-      await maticulum.registerUser('ONE', 'Maticulum', 'France', '10/07/2021', 'a@a.com', '123', '123');
       await maticulum.setSuperAdmin(superAdmin);
-      await maticulum.addUser(superAdmin2, 'Maticulum', 'TWO', 0x83);
       await maticulum.setSuperAdmin(superAdmin2);
 
       console.log('=> addUser');
-      await maticulum.addUser(schoolAdmin, 'School', 'ADMIN 1', 0x03);
-      await maticulum.addUser(schoolAdmin2, 'School', 'ADMIN 2', 0x03);
-      await maticulum.addUser(jury, 'Jury', 'ONE', 0x03);
-      await maticulum.addUser(jury2, 'Jury', 'TWO', 0x03);
-      await maticulum.addUser(student1, 'Student', 'ONE', 0x03);
-      await maticulum.addUser(student2, 'Student', 'TWO', 0x03);
-      await maticulum.addUser(student3, 'Student', 'THREE', 0x01);
-      await maticulum.addUser(student4, 'Student', 'FOUR', 0x01);
+      await maticulum.addUser(schoolAdmin, 0x03);
+      await maticulum.addUser(schoolAdmin2, 0x03);
+      await maticulum.addUser(jury, 0x03);
+      await maticulum.addUser(jury2, 0x03);
+      await maticulum.addUser(student1, 0x03);
+      await maticulum.addUser(student2, 0x03);
+      await maticulum.addUser(student3, 0x01);
+      await maticulum.addUser(student4, 0x01);
 
       console.log('=> updateSchoolValidationThreshold');
       await school.updateSchoolValidationThreshold(1);

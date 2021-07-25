@@ -38,6 +38,7 @@
 		"userEmpty":"User or password fields are empty",
 		"wrongPass":"Wrong password",
 		"addressError":"The address or the password could be wrong",
+		"userAddress":"User address",
 		"userType":"User Type",
 		"getUser":"Get recorded User datas",
 		"createUser":"Create/Update User"

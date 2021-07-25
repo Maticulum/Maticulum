@@ -127,7 +127,7 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
         </Form.Group>
 		
 		<Form.Group>
-          <Form.Label>Birth country</Form.Label>
+          <Form.Label>{t('formlabel.birthCountry')}</Form.Label>
           <Form.Control type="text" id="birthCountry" 		  
             ref={(input) => { this.birthCountry = input }}
           />	
@@ -163,7 +163,7 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
         </Form.Group>
 		
 		<Form.Group>
-          <Form.Label>UserAddress</Form.Label>
+          <Form.Label>{t('registration.userAddress')}</Form.Label>
           <Form.Control type="text" id="userAddress"
             ref={(input) => { this.userAddress = input }}
           />	
@@ -190,8 +190,8 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 			<input type="file" onChange={(e) => this.showFile(e)} />
 		</Form.Group>
                 
-        <Button className="next" onClick={this.GetThisUser}>{t('diplome.getUser')}</Button>
-        <Button className="next" onClick={this.CreateModifyUser}>{t('diplome.createUser')}</Button>
+        <Button className="next" onClick={this.GetThisUser}>{t('registration.getUser')}</Button>
+        <Button className="next" onClick={this.CreateModifyUser}>{t('registration.createUser')}</Button>
 	
       </Form>
     );

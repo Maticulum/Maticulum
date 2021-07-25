@@ -38,6 +38,7 @@
 		"userEmpty":"Les champs utilisateur ou mot de passe sont vides",
 		"wrongPass":"Error de mot de passe",
 		"addressError":"L'adresse de l'utilisateur ou le mot de passe semblent erronées",
+		"userAddress":"Adresse de l'utilisateur",
 		"userType":"Type d'utilisateur",
 		"getUser":"Afficher les données de l'utilisateur",
 		"createUser":"Créer ou mettre à jour un utilisateur"

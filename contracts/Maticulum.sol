@@ -41,8 +41,7 @@ contract Maticulum is IMaticulum, Ownable {
    address payable feesReceiver;
 
 
-   mapping(address => User) public users;
-   mapping(address => UserHash) userHash;
+   mapping(address => UserHash) public users;
    address firstAdminUniveristy;
    bool hasAdmin;
    
@@ -94,54 +93,21 @@ contract Maticulum is IMaticulum, Ownable {
    }
    
    function registerUserHash(address userAdress, string memory hash, uint8 _role) external {
-      userHash[userAdress] = UserHash(hash, _role);
+      users[userAdress] = UserHash(hash, _role);
    }
    
    function getUserHash(address userAdress) external view returns(UserHash memory) {
-      return userHash[userAdress];
+      return users[userAdress];
    }
    
 
-   function registerUser(string memory name, string memory firstname, string memory birthCountry, string memory birthDate,
-         string memory mail, string memory telfixe, string memory mobile) external {
-      users[msg.sender].role = REGISTERED_MASK;
-      updateUser(name, firstname,mail, telfixe, mobile, birthCountry, birthDate);
-   }
-   
-
-   function updateUser(string memory name, string memory firstname, string memory birthCountry, string memory birthDate,
-         string memory mail, string memory telfixe, string memory mobile) 
-         public
-         onlyRegistered {
-      users[msg.sender].name = name;
-      users[msg.sender].firstname = firstname;
-      users[msg.sender].birthCountry = birthCountry;
-      users[msg.sender].birthDate = birthDate;
-      users[msg.sender].mail = mail;
-      users[msg.sender].telfixe = telfixe;
-      users[msg.sender].mobile = mobile;
-   }
-   
-
-   function getUser() external view returns(User memory) {
+   function getUser() external view returns(UserHash memory) {
       return users[msg.sender];
-   }
-   
-
-   function getlastUriId() public view returns(uint256){
-        return nft.getlastUriId();
-   }
-
-
-   function createDiplomeNFTs(address ownerAddressNFT, string[] memory hashes) external returns(uint256){
-        return nft.AddNFTsToAdress(ownerAddressNFT, hashes);
    }
 	
 
 	/// @dev For test purposes, should be removed
-   function addUser(address _user, string memory _firstname, string memory _lastname, uint8 _role) external onlyOwner {
-      users[_user].firstname = _firstname;
-      users[_user].name = _lastname;      
+   function addUser(address _user, uint8 _role) external onlyOwner {     
       users[_user].role = _role;
    }
 
