@@ -151,6 +151,9 @@ contract MaticulumTraining is Ownable {
       userTrainings[_user].add(_trainingId);
       trainingUsers[_trainingId].add(_user);
 
+      trainingStudentRegistrationDates[_trainingId][_user] = block.timestamp;
+
+
       emit UserTrainingRequestValidation(_trainingId, _user, msg.sender);
    }
 
@@ -513,7 +516,7 @@ contract MaticulumTraining is Ownable {
    */
    function validateDiploma(uint256 _trainingId, address _user) public {
       require(isTrainingJury(_trainingId, msg.sender), "!jury");
-      require(trainingStudentRegistrationDates[_trainingId][_user] + (trainings[_trainingId].duration * 3600 ) >= block.timestamp, "StillOngoingTraining");
+      require(block.timestamp >= trainingStudentRegistrationDates[_trainingId][_user] + (trainings[_trainingId].duration * 3600 ), "StillOngoingTraining");
 
       DiplomaValidation storage validation = diplomaUserValidations[_trainingId][_user];
       validation.juries.add(msg.sender);
@@ -571,9 +574,11 @@ contract MaticulumTraining is Ownable {
 
 
    /// @dev For test purposes, should be removed
-   function addUserTraining(address _user, uint256 _trainingId) external {
+   function addUserTraining(address _user, uint256 _trainingId) external onlyOwner {
       userTrainings[_user].add(_trainingId);
       trainingUsers[_trainingId].add(_user);
+
+      trainingStudentRegistrationDates[_trainingId][_user] = block.timestamp;
    }
 
 }

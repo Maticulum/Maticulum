@@ -10,4 +10,6 @@ interface IMaticulum {
 
    function validateUser(address _user) external;
 
+   function getFeesReceiver() external view returns (address payable);
+
 }

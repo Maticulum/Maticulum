@@ -38,7 +38,7 @@ contract Maticulum is IMaticulum, Ownable {
 
    MaticulumNFT public nft;
    address trainingContract;
-   address feesReceiver;
+   address payable feesReceiver;
 
 
    mapping(address => User) public users;
@@ -58,7 +58,7 @@ contract Maticulum is IMaticulum, Ownable {
 
    constructor(address _nft) {
       nft = MaticulumNFT(_nft);
-      feesReceiver = msg.sender;
+      feesReceiver = payable(msg.sender);
    }
 
 
@@ -74,6 +74,11 @@ contract Maticulum is IMaticulum, Ownable {
 
    function isRegistered(address _user) external view override returns(bool) {
       return users[_user].role != 0;
+   }
+
+
+   function getFeesReceiver() external view override returns (address payable) {
+      return feesReceiver;
    }
 
 

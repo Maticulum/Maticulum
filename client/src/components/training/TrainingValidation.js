@@ -3,6 +3,7 @@ import { Button, Container, Form, Table } from 'react-bootstrap';
 import { withRouter } from 'react-router-dom';
 import { withTranslation } from 'react-i18next';
 
+import moment from 'moment';
 import Web3Context from '../../Web3Context';
 
 
@@ -36,9 +37,14 @@ class TrainingValidation extends Component {
       for (let i = 0; i < nbUsers; i++) {
          const userId = await cm.getUserForTraining(trainingId, i).call();
          const user = await this.context.contract.methods.users(userId).call();
+         const regDate = await cm.trainingStudentRegistrationDates(trainingId, userId).call();
          const validation = await cm.getDiplomaValidation(trainingId, userId, this.context.account).call();
 
-         users.push({ id: userId, ...user, ...validation });
+         const m = moment(regDate * 1000);
+         m.add(training.duration, 'h'); 
+
+         users.push({ id: userId, ...user, ...validation, 
+            lock: m.format('YYYY-MM-DD'), locked: m.diff(moment()) > 0 });
       }
 
       this.setState({ users, training, school });
@@ -90,7 +96,8 @@ class TrainingValidation extends Component {
                      <tr>
                         <th>{t('table.address')}</th>
                         <th>{t('table.name')}</th>
-                        <th colSpan="2">{t('table.validated')}</th>
+                        <th>Validation after</th>
+                        <th colSpan="2">Diploma validation</th>
                      </tr>
                   </thead>
                   <tbody>
@@ -98,8 +105,11 @@ class TrainingValidation extends Component {
                      <tr key={user.id}>
                         <td>{ user.id }</td>
                         <td>{ user.name }&nbsp;{ user.firstname }</td>
+                        <td>{ user.lock }</td>
                         <td>
-                           <Form.Check id={user.id} checked={ user.currentValidation || user.validatedByJury } disabled={user.validated || user.validatedByJury}
+                           <Form.Check id={user.id} 
+                              checked={ user.currentValidation || user.validatedByJury } 
+                              disabled={ user.validated || user.validatedByJury || user.locked }
                               onChange={ (e) => this.onCheck(user.id, index, e.target.checked) } />
                         </td>
                         <td>{ user.validatedCount }&nbsp;/&nbsp;{ this.state.training.validationThreshold }</td>

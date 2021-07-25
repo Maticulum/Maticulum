@@ -35,7 +35,6 @@ class StudentHome extends Component {
          trainings.push({ id: trainingId, school: school.name, name: training.name, waiting: true });
       }
 
-      console.log("Trainings", trainings);
       this.setState({ trainings });
    }
 

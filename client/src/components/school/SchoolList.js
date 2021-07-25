@@ -26,10 +26,14 @@ class SchoolList extends Component {
       let schools = [];
       for (let i = 0; i < size; i++) {
          const school = await cm.schools(i).call();
-         schools.push({
-            id: i,
-            ...school
-         });
+         
+         const validators = [];
+         const validatorCount = await cm.getSchoolValidatorsCount(i).call();
+         for (let j = 0; j < validatorCount; j++) {
+            validators.push(await cm.getSchoolValidator(i, j).call());
+         }
+
+         schools.push({ id: i, ...school, validators });
       }
 
       return schools;
@@ -65,28 +69,22 @@ class SchoolList extends Component {
                <Table>
                   <thead>
                   <tr>
-                     <th>#</th>
                      <th>{t('table.name')}</th>
                      <th>{t('table.validated')}</th>
-                     <th>{t('table.action')}</th>
+                     <th></th>
                   </tr>
                   </thead>
                   <tbody>
                   { this.state.schools.map(school => (
                      <tr key={school.id}>
-                        <td>{ school.id }</td>
-                        <td>{ school.name }</td>
+                        <td><a href={`/schools/${school.id}`}>{ school.name }</a></td>
                         <td>
-                        { school.validated ?
-                           <i className="bi bi-check2-all" style={{color:'green'}}></i> :
-                           ((school.validators ? school.validators.length : 0) + ' / 3')
-                        }
+                           { (school.validators ? school.validators.length : 0) + ' / ' + this.state.validationThreshold }
                         </td>
-                        <td valign="top">
-                        <Link to={`/schools/${school.id}`}><i className="bi bi-pencil-square"></i>{t('button.edit')}</Link>
-                        { this.context.isSuperAdmin && !school.validated && !school.validators.includes(this.context.account) &&
-                           (<a href="" onClick={() => this.onValidate(school.id)} className="next"><i className="bi bi-check-square"></i>{t('button.validate')}</a>)
-                        }
+                        <td>
+                           { this.context.isSuperAdmin && !school.validated && !school.validators.includes(this.context.account) &&
+                              (<a href="" onClick={() => this.onValidate(school.id)} className="next"><i className="bi bi-check-square"></i>{t('button.validate')}</a>)
+                           }
                         </td>
                      </tr>
                   ))}

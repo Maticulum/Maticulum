@@ -13,7 +13,8 @@ class SuperAdminHome extends Component {
    state = { init: false }
 
    async componentDidMount() {
-      
+      // Validate School
+      // Validate School Admin
    }
 
 

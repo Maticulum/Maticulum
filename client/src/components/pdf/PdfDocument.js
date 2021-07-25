@@ -39,8 +39,6 @@ class PDFDocument extends Component {
 
     constructor(props) {
       super(props);
-
-      console.log("data=", props.data);
     }
 
 

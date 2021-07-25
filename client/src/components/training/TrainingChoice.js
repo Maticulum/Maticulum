@@ -60,17 +60,17 @@ class TrainingChoice extends Component {
 
 
    onRegister = async (trainingId) => {
-	   
-      const { userSelected } = this.state;
-	  // alert(userSelected);
-	  await this.context.contractTraining.methods
-	  .validateUserTrainingRequestDirect(trainingId, userSelected).send({from: this.context.account});
+	   await this.context.contractTraining.methods
+	      .validateUserTrainingRequestDirect(trainingId, this.state.trainings[trainingId].user).send({from: this.context.account});
       
       this.onSchoolChange(this.state.selectedSchool);
    }
+
    
-   OnChangeUser = async (e, trainingId) => {
-	  this.state.userSelected = e.target.value;
+   onChangeUser = (value, index) => {
+      const trainings = [...this.state.trainings];
+      trainings[index].user = value;
+      this.setState({ trainings });
    }
 
 
@@ -101,29 +101,23 @@ class TrainingChoice extends Component {
                   <tr>
                      <th>Name</th>
                      <th>Hours</th>
-					 <th>User Address</th>
+					      <th>User Address</th>
                      <th>Register</th>
                   </tr>
                </thead>
                <tbody>
-                  { this.state.trainings.map(training => 
+                  { this.state.trainings.map((training, index) => 
                      <tr key={training.id}>
                         <td>{ training.name }</td>
                         <td>{ training.duration }</td>
-						<td>
-							<Form.Control type="text" 
-							id="tbxUserAddress" 
-							ref={(input) => { this.tbxUserAddress = input }}
-							onChange={this.OnChangeUser} 
-							/>
-						</td>
                         <td>
-                           { training.registered ? 
-                              'Registered' : 
-                              <Button variant="outline-primary" onClick={ () => this.onRegister(training.id, this.tbxUserAddress.value) }>Register</Button>
-                           }
-                           { training.registered && !training.validated && ' (Validation pending)' }
-                           
+                           <Form.Control type="text" 
+                              value={ this.state.trainings[index].user }
+                              onChange={ e => this.onChangeUser(e.target.value, index) }
+                           />
+                        </td>
+                        <td>
+                           <Button variant="outline-primary" onClick={ () => this.onRegister(training.id) }>Register</Button>
                         </td>
                      </tr>
                   )}

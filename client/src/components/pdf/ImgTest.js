@@ -13,7 +13,6 @@ class ImgTest extends Component {
     this.setState({ showDownload: true });    
     
     const canvas = document.createElement('canvas');
-    console.log(canvas.toDataURL('image/png'));
     const context = canvas.getContext('2d');
 
     const img = new Image();
@@ -27,8 +26,6 @@ class ImgTest extends Component {
       context.fillText(this.state.title, 350, 120);
       context.fillText(this.state.firstname, 125, 175);
       context.fillText(this.state.lastname, 125, 215);
-
-      console.log(canvas.toDataURL('image/png'));
     };
 
     img.src = document.getElementById('bg').src;

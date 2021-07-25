@@ -95,9 +95,14 @@ contract MaticulumSchool is ISchool, Ownable {
 
 
    function addSchool(string memory _name, string memory _town, string memory _country, uint8 _juryValidationThreshold, address _admin1, address _admin2) 
-         external
+         external payable
          onlyRegistered 
          returns (uint256) {
+      require(msg.value == schoolRegistrationFees, "MissingFees");
+      if (!maticulum.getFeesReceiver().send(msg.value)) {
+         revert("Error sending fess");
+      }
+
       schools.push(School(_name, _town, _country, _juryValidationThreshold, false));
       uint256 id = schools.length - 1;
       

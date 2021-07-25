@@ -65,7 +65,7 @@ module.exports = async (deployer, network, accounts) => {
       await school.updateSchoolValidationThreshold(1);
 
       console.log('=> addSchool');
-      await school.addSchool('Alyra', 'Paris', 'France', 2, superAdmin, schoolAdmin);
+      await school.addSchool('Alyra', 'Paris', 'France', 2, superAdmin, schoolAdmin, { value: "100000000000000000" });
       await school.validateSchool(0);
 
       console.log('=> addTraining');

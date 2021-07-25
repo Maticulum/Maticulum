@@ -59,7 +59,6 @@ class JuryValidation extends Component {
       }
 
       this.setState({ juries, training, school });
-      console.log("JURYVAL", this.state);
    }
 
 

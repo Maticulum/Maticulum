@@ -11,21 +11,25 @@ class SchoolItem extends Component {
    static contextType = Web3Context;
 
    state = { isSchoolAdmin: false, create: null, id: null, name: '', town: '', country: '', juryValidation: '1',
-      administrators: ['', ''], validators: [], trainings: [] };
+      administrators: ['', ''], validators: [], trainings: [], fees: null };
    
 
    async componentDidMount() {
       const id = this.props.match.params.schoolId;
       const cm = this.context.contractSchool.methods;
 
-      const isSchoolAdmin = await cm.isSchoolAdmin(id, this.context.account).call;
-      this.setState({ isSchoolAdmin });
+      let isSchoolAdmin = false;
+      const fees = await cm.schoolRegistrationFees().call();
+      this.setState({ isSchoolAdmin, fees });
 
       const create = id === 'new';
       if (create) {
          this.setState({ create: true, administrators: [ this.context.account, '']});
       }
       else {
+         isSchoolAdmin = await cm.isSchoolAdmin(id, this.context.account).call();
+         this.setState({ isSchoolAdmin });
+
          const school = await cm.schools(id).call();
          this.loadTrainings(id);
 
@@ -72,7 +76,7 @@ class SchoolItem extends Component {
       if (this.state.create) {
          await cm.addSchool(this.state.name, this.state.town, this.state.country, this.state.juryValidation,
             this.state.administrators[0], this.state.administrators[1])
-            .send({ from: this.context.account });         
+            .send({ from: this.context.account, value: this.state.fees });
       }
       else {
          await cm.updateSchool(this.state.id, this.state.name, this.state.town, this.state.country, this.state.juryValidation,)
@@ -96,7 +100,8 @@ class SchoolItem extends Component {
       }
 
       const { t } = this.props;
-      const readOnly = !this.context.isSuperAdmin;
+      const readOnly = !this.context.isSuperAdmin && !this.state.create;
+      const fees = this.context.web3.utils.fromWei(this.context.web3.utils.toBN(this.state.fees));
 
       return (
          <Container fluid={!this.state.create} >
@@ -135,7 +140,23 @@ class SchoolItem extends Component {
                            </Col>
                         </Form.Group>
                      ))}
-                     { !this.state.create && 
+
+                     { this.state.create && <>
+                        <h4>Paiement</h4>
+                        <Form.Group as={Row}>
+                           <Form.Label column sm="2">Fees</Form.Label>
+                           <Form.Label>{ fees } TMATIC</Form.Label>
+                        </Form.Group>
+                        <Form.Group as={Row}>
+                           <Form.Label column sm="2">CGV</Form.Label>
+                           <Col>
+                              <Form.Control as="textearea" readOnly >Texte des conditions générales...</Form.Control>
+                           </Col>
+                        </Form.Group>
+                        </>
+                     }
+
+                     { !this.state.create &&
                         <Form.Group>
                            <Form.Label>{t('school.validators')}</Form.Label>
                            { this.state.validators &&
@@ -148,7 +169,7 @@ class SchoolItem extends Component {
                         </Form.Group>
                      }
                      { !readOnly && 
-                        <Button onClick={ this.onSave }>{t('button.save')}</Button>
+                        <Button onClick={ this.onSave }>{t('school.create')}</Button>
                      }
                   </Form>
                </Col>

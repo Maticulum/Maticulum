@@ -17,6 +17,15 @@ class SchoolAdminHome extends Component {
       const cmTraining = this.context.contractTraining.methods;
       const schools = [];
 
+      // Get diploma ready list
+      const diplomasReady = [];
+      const diplomasReadyCount = cmTraining.getDiplomasReadyCount().call();
+      for (let i = 0; i < diplomasReadyCount; i++) {
+         const { trainingId, user } = cmTraining.diplomasReady(i).call();
+         diplomasReady.push({ trainingId, user });
+      }
+      const diplomasReadyByTraining = diplomasReady.reduce((map, obj) => map[obj.trainingId] = obj.user, {});
+
       const schoolsCount = await cm.getAdministratorSchoolsCount(this.context.account).call();
       // For each school the user is school admin
       for (let i = 0; i < schoolsCount; i++) {
@@ -64,6 +73,7 @@ class SchoolAdminHome extends Component {
                            <tr>
                               <th>Training</th>
                               <th>Juries waiting validation</th>
+                              <th>Diplomas ready</th>
                            </tr>
                         </thead>
                         <tbody>
@@ -75,6 +85,9 @@ class SchoolAdminHome extends Component {
                                        <a href={`/trainings/${training.id}/jury`}> {training.juriesWaitingValidation} </a> :
                                        training.juriesWaitingValidation
                                     }
+                                 </td>
+                                 <td>
+
                                  </td>
                               </tr> 
                            )}

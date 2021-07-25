@@ -56,7 +56,7 @@ class App extends Component {
          const networkId = await web3.eth.net.getId();
          const deployedNetwork = Maticulum.networks[networkId];
          const instance = new web3.eth.Contract(Maticulum.abi, deployedNetwork && deployedNetwork.address,);
-		 const instanceNFT = new web3.eth.Contract(MaticulumNFT.abi, deployedNetwork && MaticulumNFT.networks[networkId].address);
+		   const instanceNFT = new web3.eth.Contract(MaticulumNFT.abi, deployedNetwork && MaticulumNFT.networks[networkId].address);
          const instanceSchool = new web3.eth.Contract(MaticulumSchool.abi, deployedNetwork && MaticulumSchool.networks[networkId].address);
          const instanceTraining = new web3.eth.Contract(MaticulumTraining.abi, deployedNetwork && MaticulumTraining.networks[networkId].address);
 
@@ -88,14 +88,12 @@ class App extends Component {
       }
 
       const user = await contract.methods.users(accounts[0]).call();
-      console.log("user", user);
       if (user) {
          const isRegistered = (user.role & roles.REGISTERED) ===roles.REGISTERED;
          const isValidated = (user.role & roles.VALIDATED) === roles.VALIDATED;
          const isSuperAdmin = (user.role & roles.SUPER_ADMIN) === roles.SUPER_ADMIN;
 
          this.setState({ isRegistered, isValidated, isSuperAdmin });
-         console.log("state", this.state);
       }
    };
 
@@ -160,7 +158,7 @@ class App extends Component {
             web3: this.state.web3,
             contract: this.state.contract,
             account: this.state.accounts[0],
-			contractNFT: this.state.contractNFT,
+			   contractNFT: this.state.contractNFT,
             contractSchool: this.state.contractSchool,
             contractTraining: this.state.contractTraining,
             isSuperAdmin: this.state.isSuperAdmin
@@ -172,12 +170,12 @@ class App extends Component {
                   <Nav className='mr-auto'>
                      <NavLink className="nav-link" exact to={'/'}>{t('nav.home')}</NavLink>
                      { this.state.isSuperAdmin && <NavLink className="nav-link" visibility="hidden" to={'/whitelisted'}>{t('nav.whitelisted')}</NavLink> }
-                     <NavLink className="nav-link" to={'/registration'}>{t('nav.registration')}</NavLink>
+                     { !this.state.isRegistered && <NavLink className="nav-link" to={'/registration'}>{t('nav.registration')}</NavLink> }
                      { this.state.isSuperAdmin && <NavLink className="nav-link" to={'/schools'}>{t('nav.schools')}</NavLink> }
                      <NavLink className="nav-link" to={'/trainings/choice'}>{t('nav.training')}</NavLink>
-					 <NavLink className="nav-link" to={'/oldDiplome'}>{t('nav.oldDiplomas')}</NavLink>					 
-					 <NavLink className="nav-link" to={'/diplome'}>{t('nav.createDiploma')}</NavLink>
-					 <NavLink className="nav-link" to={'/showDiplomas'}>{t('nav.searchDiplomas')}</NavLink>
+                     <NavLink className="nav-link" to={'/oldDiplome'}>{t('nav.oldDiplomas')}</NavLink>					 
+                     <NavLink className="nav-link" to={'/diplome'}>{t('nav.createDiploma')}</NavLink>
+                     <NavLink className="nav-link" to={'/showDiplomas'}>{t('nav.searchDiplomas')}</NavLink>
                   </Nav>
                </Navbar.Collapse>
                <Navbar.Collapse className="justify-content-end">
