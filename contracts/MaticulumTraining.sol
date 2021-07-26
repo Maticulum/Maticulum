@@ -439,7 +439,7 @@ contract MaticulumTraining is Ownable {
    * @param _juries        juries to validate
    */
    function validateJuryMultiple(uint256 _trainingId, address[] memory _juries) external {
-      require(school.isSchoolAdmin(trainings[_trainingId].school, msg.sender));
+      require(school.isSchoolAdmin(trainings[_trainingId].school, msg.sender), "!SchoolAdmin");
 
       for (uint256 i = 0; i < _juries.length; i++) {
          validateJury(_trainingId, _juries[i]);
