@@ -580,5 +580,9 @@ contract MaticulumTraining is Ownable {
 
       trainingStudentRegistrationDates[_trainingId][_user] = block.timestamp;
    }
+   
+   function diplomaValidated(address _userAddress, uint256 _trainingId) public view returns(bool) {
+       return diplomaUserValidations[_trainingId][_userAddress].validated;
+   }
 
 }

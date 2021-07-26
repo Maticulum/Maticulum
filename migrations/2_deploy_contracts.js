@@ -2,26 +2,12 @@ var NFTContract = artifacts.require("./MaticulumNFT.sol");
 var MaticulumContract = artifacts.require("./Maticulum.sol");
 var SchoolContract = artifacts.require("./MaticulumSchool.sol");
 var TrainingContract = artifacts.require("./MaticulumTraining.sol");
-
+var DiplomasValidationContract = artifacts.require("./DiplomasValidation.sol");
 
 module.exports = async (deployer, network, accounts) => {
 
-   await deployer.deploy(NFTContract, 
-   "https://gateway.pinata.cloud/ipfs/",
-   "https://api.pinata.cloud/pinning/pinJSONToIPFS/",
-   "https://api.pinata.cloud/pinning/pinFileToIPFS/",
-   "https://api.pinata.cloud/pinning/unpin/",
-   "MWE1OWNlMDNhYTA0NmU4MjM2MTVhbnQ",
-   "MjMwZWNlZDljNDk3Mzc1MmFhZDE0MTMwYzI0NTI5ZGQ2YjljNDY1ZmI4ZTQ5OGEyYmZmMjNmZGEyOTljYTVkNGFudA==",
-   "DiplomeNFT",
-   "MTCF",
-   "QmYFRV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC"
-   );
-   const nft = await NFTContract.deployed();
-   
-   await deployer.deploy(MaticulumContract, NFTContract.address);
+   await deployer.deploy(MaticulumContract);
    const maticulum = await MaticulumContract.deployed();
-   await nft.transferOwnership(MaticulumContract.address);
 
    await deployer.deploy(SchoolContract, MaticulumContract.address);
    const school = await SchoolContract.deployed();
@@ -31,6 +17,20 @@ module.exports = async (deployer, network, accounts) => {
 
    await maticulum.registerTrainingContract(TrainingContract.address);
    await school.registerTrainingContract(TrainingContract.address);
+   
+   await deployer.deploy(DiplomasValidationContract, SchoolContract.address,TrainingContract.address);
+   
+   await deployer.deploy(NFTContract, 
+   "https://gateway.pinata.cloud/ipfs/",
+   "https://api.pinata.cloud/pinning/pinJSONToIPFS/",
+   "https://api.pinata.cloud/pinning/pinFileToIPFS/",
+   "https://api.pinata.cloud/pinning/unpin/",
+   "MWE1OWNlMDNhYTA0NmU4MjM2MTVhbnQ",
+   "MjMwZWNlZDljNDk3Mzc1MmFhZDE0MTMwYzI0NTI5ZGQ2YjljNDY1ZmI4ZTQ5OGEyYmZmMjNmZGEyOTljYTVkNGFudA==",
+   "DiplomeNFT",
+   "MTCF",
+   "QmYFRV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC",
+   DiplomasValidationContract.address);
 
    if (network === 'develop' || network === 'rinkeby') {
       console.log('---=== Adding test data ===---');

@@ -36,7 +36,6 @@ contract Maticulum is IMaticulum, Ownable {
    uint8 constant VALIDATED_MASK = 0x02;
    uint8 constant REGISTERED_MASK = 0x01;
 
-   MaticulumNFT public nft;
    address trainingContract;
    address payable feesReceiver;
 
@@ -55,8 +54,7 @@ contract Maticulum is IMaticulum, Ownable {
    }
 
 
-   constructor(address _nft) {
-      nft = MaticulumNFT(_nft);
+   constructor() {
       feesReceiver = payable(msg.sender);
    }
 

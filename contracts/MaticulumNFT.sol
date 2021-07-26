@@ -4,10 +4,10 @@ pragma solidity 0.8.4;
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "./IDiplomasValidation.sol";
 
-contract MaticulumNFT is ERC721URIStorage, Ownable{
-    
-     /**
+contract MaticulumNFT is ERC721URIStorage, Ownable {
+      /**
    * @notice Create the datas for the gateway and for the NFT
    * @param _gatewayUrl           url https of the gateway to IPFS
    * @param _urltoJsonApi         url of the API to store a json file     
@@ -23,10 +23,13 @@ contract MaticulumNFT is ERC721URIStorage, Ownable{
                 string memory _hashtoApikey,string memory _hashtoSecretApikey,
                 string memory _name,
                 string memory _symbol,
-                string memory _hashImageToken) ERC721(_name, _symbol) {
+                string memory _hashImageToken,
+                address _validationAddress) ERC721(_name, _symbol) {
         
         datas = gatewayApiDatas(_gatewayUrl, _urltoJsonApi, _urltoImageApi, _urlToUnPinApi, _hashtoApikey, _hashtoSecretApikey);
         NFTDatas_ = NFTdatas(_name, _symbol, _hashImageToken);
+        validation = IDiplomasValidation(_validationAddress);
+        testModeValidationDiploma = false;
     }
     
     using Counters for Counters.Counter;
@@ -34,6 +37,7 @@ contract MaticulumNFT is ERC721URIStorage, Ownable{
     mapping(string => bool) hashesStored;
     mapping(string => bool) hashesStoredTemporary;
     mapping(address=>uint[]) hashesByUser;
+    mapping(string=>bool) hashesDiplomasValidated;
     uint[] tokenIdUser;
     uint256 maxHashCount = 200;
     
@@ -54,10 +58,25 @@ contract MaticulumNFT is ERC721URIStorage, Ownable{
     
     gatewayApiDatas datas;
     NFTdatas NFTDatas_;
+    IDiplomasValidation validation;
+    bool testModeValidationDiploma;
     
     event NFTMinted(address recipient, string hash, uint256 newItemId);
     event GatewayChanged(string gatewayUrl);
-  
+    
+    function setTestMode(bool _test) external onlyOwner {
+        testModeValidationDiploma = _test;
+    }
+    
+    function validateDiplomas(string[] memory _hashes, uint256 _schoolId, uint256 _trainingId, address[] memory _userAddresses) external {
+        
+        require(validation.areDiplomasValidated(_schoolId, _trainingId, _userAddresses), "!diplomasValidated");
+        
+        for(uint i = 0;i < _hashes.length;i++){
+            hashesDiplomasValidated[_hashes[i]] = true;
+        } 
+    }
+    
     /**
    * @notice create a NFT
    * @param _userAddress  adress oth future owner of the NFT
@@ -81,16 +100,17 @@ contract MaticulumNFT is ERC721URIStorage, Ownable{
     
     /**
    * @notice Create a list of NFTs
-   * @param _userAddress  adress of the future owner of the NFT
-   * @param _hashes       list of hashes to retrieve the JSON Metadata on IPFS
-   * * @return the user address
+   * @param _userAddress      Ownser of the future mited NFT
+   * @param _hashes           list of hashes to retrieve the JSON Metadata on IPFS
+   * @return the user address
    */
-    function AddNFTsToAdress(address _userAddress, string[] memory _hashes) public returns (uint256){
+    function AddNFTsToAdress(address _userAddress,string[] memory _hashes) public returns (uint256){
         require(_hashes.length <= maxHashCount, "Gaz limit security");
-       
+        
         uint256 lastUri = 0;
         
         for(uint i =0;i < _hashes.length;i++){
+            if(!testModeValidationDiploma) require( hashesDiplomasValidated[_hashes[i]], "!diplomasValidated");
             require(!hashesStoredTemporary[_hashes[i]], "Hash already in the list");
             require(bytes(_hashes[i]).length == 46, "Invalid hash length");
             require(!hashesStored[_hashes[i]], "Hash already minted");
