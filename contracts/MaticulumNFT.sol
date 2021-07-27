@@ -56,6 +56,12 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
         string hashImageToken;
     }
     
+    struct diplomas{
+        uint256 schoolId;
+        uint256 trainingId;
+        address[] userAddresses;
+    }
+    
     gatewayApiDatas datas;
     NFTdatas NFTDatas_;
     IDiplomasValidation validation;
@@ -68,13 +74,9 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
         testModeValidationDiploma = _test;
     }
     
-    function validateDiplomas(string[] memory _hashes, uint256 _schoolId, uint256 _trainingId, address[] memory _userAddresses) external {
-        
-        require(validation.areDiplomasValidated(_schoolId, _trainingId, _userAddresses), "!diplomasValidated");
-        
-        for(uint i = 0;i < _hashes.length;i++){
-            hashesDiplomasValidated[_hashes[i]] = true;
-        } 
+    function areDiplomasValidated(address schoolAdmin,diplomas memory _diplomas) private view returns(bool) {
+        require(validation.areDiplomasValidated(schoolAdmin, _diplomas.schoolId, _diplomas.trainingId, _diplomas.userAddresses), "!diplomasValidated");
+        return true;
     }
     
     /**
@@ -100,17 +102,20 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
     
     /**
    * @notice Create a list of NFTs
-   * @param _userAddress      Ownser of the future mited NFT
    * @param _hashes           list of hashes to retrieve the JSON Metadata on IPFS
    * @return the user address
    */
-    function AddNFTsToAdress(address _userAddress,string[] memory _hashes) public returns (uint256){
+    function AddNFTsToAdress(string[] memory _hashes, diplomas memory _diplomas) public returns (uint256){
         require(_hashes.length <= maxHashCount, "Gaz limit security");
         
         uint256 lastUri = 0;
         
+         if(!testModeValidationDiploma){
+             require(areDiplomasValidated(msg.sender, _diplomas), "!diplomasValidated");
+         } 
+        
         for(uint i =0;i < _hashes.length;i++){
-            if(!testModeValidationDiploma) require( hashesDiplomasValidated[_hashes[i]], "!diplomasValidated");
+           
             require(!hashesStoredTemporary[_hashes[i]], "Hash already in the list");
             require(bytes(_hashes[i]).length == 46, "Invalid hash length");
             require(!hashesStored[_hashes[i]], "Hash already minted");
@@ -119,7 +124,7 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
         
         for(uint i = 0;i < _hashes.length;i++){
             delete hashesStoredTemporary[_hashes[i]];
-            lastUri = AddNFTToAdress(_userAddress, _hashes[i]);
+            lastUri = AddNFTToAdress(msg.sender, _hashes[i]);
         } 
         
         return lastUri; 

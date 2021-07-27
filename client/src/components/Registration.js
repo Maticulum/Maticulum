@@ -73,7 +73,10 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
   }
 
   CreateModifyUser = async() => {
-	
+	if(this.userAddress.value == "") {
+		alert("user adress must be filled");
+		return;
+	}
 	const { isCreated, date } = this.state;	
 	// to simulate registration in database
 	DataFromBase.setDataPass(this.pass.value);
@@ -91,6 +94,7 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 		const CryptoJS = require('crypto-js');
 	    var userDatasCrypted = CryptoJS.TripleDES.encrypt(userDatas, this.pass.value); 
 		let userDatasCryptedHashed = btoa(userDatasCrypted);
+				
 		await this.context.contract.methods.registerUserHash(
 		this.userAddress.value,userDatasCryptedHashed, this.state.userTypeSelected).send({from: this.context.account});		
 	}		

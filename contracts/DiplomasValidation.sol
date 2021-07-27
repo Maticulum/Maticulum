@@ -20,10 +20,10 @@ contract DiplomasValidation is IDiplomasValidation, Ownable {
    * @param _trainingId       id of the student's training
    * @param _userAddresses    list of student adresses who will have a diploma
     */
-    function areDiplomasValidated(uint256 _schoolId, uint256 _trainingId, address[] memory _userAddresses) public view override returns (bool) {
+    function areDiplomasValidated(address schoolAdmin, uint256 _schoolId, uint256 _trainingId, address[] memory _userAddresses) public view override returns (bool) {
         
         
-        require(school.isSchoolAdmin(_schoolId, msg.sender), "!SchoolAdmin");
+        require(school.isSchoolAdmin(_schoolId, schoolAdmin), "!SchoolAdmin");
         
         for(uint i =0;i < _userAddresses.length;i++){
             require(training.diplomaValidated(_userAddresses[i], _trainingId), "!DiplomaValidated");

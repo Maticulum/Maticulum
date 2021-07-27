@@ -22,7 +22,7 @@ class Diplome extends Component {
 	loading:false, gateway:null, jsonUrlApi:null, imageUrlAPi:null,
 	paramPinataApiKey:null, paramPinataSecretApiKey:null, hashesImage:[],
 	urlPinAPI:null, descriptions:[],names:[],
-	trainingUsers:[]};
+	trainingUsers:[], schoolId:null,trainingId:null};
 		
 	// on the load of the page
 	componentDidMount = async () => {
@@ -101,6 +101,10 @@ class Diplome extends Component {
 	 
 	};
 	
+	checkDiplomaValidationState= async() =>{
+		
+	}
+	
 	// create the images in the canvas web page
 	createImageDiplome = async(firstname, lastname,school, grade, diplomaName) => {
 		const { files,names, descriptions  } = this.state; 
@@ -140,7 +144,7 @@ class Diplome extends Component {
 			const file=  new File([blob], hashString + '.png');
 			files.push(file);
 		  });
-		  this.setState({ linkVisible:true});	  		  
+		  this.setState({ linkVisible:true});		  
 		};
 		
 		img.src = document.getElementById('bg').src;
@@ -235,15 +239,22 @@ class Diplome extends Component {
 	// Send the json hash stored in Pinata in the smart contract MaticulmNFT
 	// and mint the NFT 
 	SendNFTToSmartContract = async() => {
-		const { hashes, hashesImage, urlPinAPI } = this.state; 
+		const { hashes, hashesImage, urlPinAPI, schoolId, trainingId } = this.state; 
 		const { t } = this.props;
+				
 						
 		let pinataApiKey = this.getPinataApiKey();
 		let pinataSecretApiKey = this.getPinataSecretApiKey();
 		
 		let annulationNotYetShown = true;
+		let diplomas = { schoolId:schoolId,trainingId:trainingId,
+		userAddresses: [this.tbxUserAdress.value]};
 		
-		this.context.contractNFT.methods.AddNFTsToAdress(this.context.account,hashes)
+		alert(schoolId);
+		alert(trainingId);
+		alert(this.tbxUserAdress.value);
+		
+		this.context.contractNFT.methods.AddNFTsToAdress(hashes, diplomas)
 		.send({from:this.context.account}) 
 		.then(async (response) => {
 			
@@ -371,6 +382,8 @@ class Diplome extends Component {
 		
 		let userTrainings = await this.context.contractTraining.methods.getUserTrainingsCount(this.tbxUserAdress.value).call();
 		
+		let trainingIdToStore = null;
+		
 		for(let i = 0;i<userTrainings;i++){			
 			let trainingId = await this.context.contractTraining.methods.getUserTraining(this.tbxUserAdress.value,i).call();			
 			let training = await this.context.contractTraining.methods.trainings(trainingId).call();
@@ -378,9 +391,7 @@ class Diplome extends Component {
 			trainingUsersTemp.push({name:training[1],id: trainingId});
 		}
 		
-		let currentTraining = trainingsAll[0];
-		
-		this.setState({ trainingUsers:trainingUsersTemp});
+		let currentTraining = trainingsAll[0];		
 		let schools = await this.context.contractSchool.methods.schools(currentTraining[0]).call();
 		this.tbxSchool.value = schools[0]
 		this.tbxGrade.value = currentTraining[2];
@@ -389,21 +400,21 @@ class Diplome extends Component {
 		this.setState({trainingUsers:trainingUsersTemp, 
 			diplomaName: this.tbxDiplomaName.value,
 			firstname: this.tbxFirstname.value, lastname: this.tbxLastname.value, 
-			school : this.tbxSchool.value, grade:this.tbxGrade.value
+			school : this.tbxSchool.value, grade:this.tbxGrade.value,
+			schoolId:currentTraining[0], trainingId : trainingUsersTemp[0].id
 		});
 	}
 	
 	GetValuePair = async (event) => {
 		var index = event.nativeEvent.target.selectedIndex;
 		this.tbxDiplomaName.value = event.nativeEvent.target[index].text;
-		let currentTraining = await this.context.contractTraining.methods.trainings(index).call();
+		let currentTraining = await this.context.contractTraining.methods.trainings(event.nativeEvent.target[index].value).call();
 		this.tbxGrade.value = currentTraining[2];
-		
-		this.setState({ diplomaName: this.tbxDiplomaName.value, grade:this.tbxGrade.value});
+		alert(currentTraining[0]);
+		this.setState({ diplomaName: this.tbxDiplomaName.value, grade:this.tbxGrade.value,
+		trainingId: index, schoolId :currentTraining[0]});
 	}
 	
-
-		
 	render() {
 		const { t } = this.props; 
 		let optionTemplate = this.state.trainingUsers.map(v => (
