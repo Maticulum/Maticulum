@@ -95,7 +95,6 @@ class TrainingValidation extends Component {
                   <thead>
                      <tr>
                         <th>{t('table.address')}</th>
-                        <th>{t('table.name')}</th>
                         <th>Validation after</th>
                         <th colSpan="2">Diploma validation</th>
                      </tr>
@@ -104,7 +103,6 @@ class TrainingValidation extends Component {
                   { this.state.users.map((user, index) => (
                      <tr key={user.id}>
                         <td>{ user.id }</td>
-                        <td>{ user.name }&nbsp;{ user.firstname }</td>
                         <td>{ user.lock }</td>
                         <td>
                            <Form.Check id={user.id} 

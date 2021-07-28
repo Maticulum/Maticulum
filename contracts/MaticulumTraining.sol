@@ -266,7 +266,6 @@ contract MaticulumTraining is Ownable {
    function addTraining(uint256 _schoolId, string memory _name, string memory _level, uint16 _duration, uint16 _validationThreshold, address[] memory _juries) 
          external returns (uint256) {
       require(school.isSchoolAdmin(_schoolId, msg.sender), "!SchoolAdmin");
-      require(school.isValidated(_schoolId), "!SchoolValidated");
 
       trainings.push(Training(_schoolId, _name, _level, _duration, _validationThreshold));      
 

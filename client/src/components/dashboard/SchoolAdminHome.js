@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Badge, Container, Table } from 'react-bootstrap';
+import { Table } from 'react-bootstrap';
 import { withRouter } from 'react-router-dom';
 import { withTranslation } from 'react-i18next';
 
@@ -19,12 +19,11 @@ class SchoolAdminHome extends Component {
 
       // Get diploma ready list
       const diplomasReady = [];
-      const diplomasReadyCount = cmTraining.getDiplomasReadyCount().call();
+      const diplomasReadyCount = await cmTraining.getDiplomasReadyCount().call();
       for (let i = 0; i < diplomasReadyCount; i++) {
-         const { trainingId, user } = cmTraining.diplomasReady(i).call();
+         const { trainingId, user } = await cmTraining.diplomasReady(i).call();
          diplomasReady.push({ trainingId, user });
       }
-      const diplomasReadyByTraining = diplomasReady.reduce((map, obj) => map[obj.trainingId] = obj.user, {});
 
       const schoolsCount = await cm.getAdministratorSchoolsCount(this.context.account).call();
       // For each school the user is school admin
@@ -40,8 +39,8 @@ class SchoolAdminHome extends Component {
             const training = await cmTraining.trainings(trainingId).call();
 
             const juriesCount = await cmTraining.getTrainingJuriesWaitingValidationCount(trainingId).call();
-            
-            trainings.push({ id: trainingId, ...training, juriesWaitingValidation: juriesCount });
+            const ready = diplomasReady.filter(e => e.trainingId === trainingId).length;
+            trainings.push({ id: trainingId, ...training, juriesWaitingValidation: juriesCount, ready });
          }
 
          schools.push({ id: schoolId, ...school, trainings });
@@ -55,18 +54,12 @@ class SchoolAdminHome extends Component {
       const { t } = this.props;  
 
       return (
-         <Container>
+         <>
             { this.state.adminSchools && 
                this.state.adminSchools.map((school, index) =>
                   <div key={index}>
                      <h3>
                         <a href={`/schools/${school.id}`}>{ school.name }</a>
-                        &nbsp;
-                        <Badge style={{fontSize: '50%' }}
-                           bg={ 'secondary ' + (school.validated ? 'success' : 'warning')}
-                           className={ 'bg-secondary ' +  (school.validated ? 'bg-success' : 'bg-warning')} >
-                           {school.validated ? 'Validated' : 'Waiting validation'}
-                        </Badge>
                      </h3>
                      <Table>
                         <thead>
@@ -87,7 +80,7 @@ class SchoolAdminHome extends Component {
                                     }
                                  </td>
                                  <td>
-
+                                    { training.ready }
                                  </td>
                               </tr> 
                            )}
@@ -96,7 +89,7 @@ class SchoolAdminHome extends Component {
                   </div>
                )
             }
-         </Container>
+         </>
       );
    }
 }

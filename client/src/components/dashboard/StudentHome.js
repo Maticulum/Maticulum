@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Badge, Button, Container, Table } from 'react-bootstrap';
+import { Button, Container, Table } from 'react-bootstrap';
 import { withRouter } from 'react-router-dom';
 import { withTranslation } from 'react-i18next';
 
@@ -63,8 +63,6 @@ class StudentHome extends Component {
                   )}
                </tbody>
             </Table>
-
-            <Button onClick={e => this.props.history.push('/trainings/choice') }>Register to a new training</Button>
          </Container>
       );
    }

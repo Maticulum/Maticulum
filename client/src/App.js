@@ -17,6 +17,7 @@ import Home from './components/Home';
 import Registration from './components/Registration';
 import SchoolList from './components/school/SchoolList';
 import SchoolItem from './components/school/SchoolItem';
+import AdminValidation from './components/school/AdminValidation';
 import Training from './components/training/Training';
 import TrainingChoice from './components/training/TrainingChoice';
 import RegistrationValidation from './components/training/RegistrationValidation';
@@ -89,11 +90,13 @@ class App extends Component {
 
       const user = await contract.methods.users(accounts[0]).call();
       if (user) {
-         const isRegistered = (user.role & roles.REGISTERED) ===roles.REGISTERED;
+         const isRegistered = (user.role & roles.REGISTERED) === roles.REGISTERED;
          const isValidated = (user.role & roles.VALIDATED) === roles.VALIDATED;
          const isSuperAdmin = (user.role & roles.SUPER_ADMIN) === roles.SUPER_ADMIN;
 
-         this.setState({ isRegistered, isValidated, isSuperAdmin });
+         const isSchoolAdmin = await this.state.contractSchool.methods.getAdministratorSchoolsCount(accounts[0]).call() > 0;
+
+         this.setState({ isRegistered, isValidated, isSuperAdmin, isSchoolAdmin });
       }
    };
 
@@ -169,12 +172,13 @@ class App extends Component {
                <Navbar.Collapse>
                   <Nav className='mr-auto'>
                      <NavLink className="nav-link" exact to={'/'}>{t('nav.home')}</NavLink>
-                     { this.state.isSuperAdmin && <NavLink className="nav-link" visibility="hidden" to={'/whitelisted'}>{t('nav.whitelisted')}</NavLink> }
                      { !this.state.isRegistered && <NavLink className="nav-link" to={'/registration'}>{t('nav.registration')}</NavLink> }
+                     { this.state.isValidated && <NavLink className="nav-link" to={'/schools/new'}>{t('nav.createSchool')}</NavLink> }
+                     { this.state.isSuperAdmin && <NavLink className="nav-link" visibility="hidden" to={'/whitelisted'}>{t('nav.whitelisted')}</NavLink> }
                      { this.state.isSuperAdmin && <NavLink className="nav-link" to={'/schools'}>{t('nav.schools')}</NavLink> }
-                     <NavLink className="nav-link" to={'/trainings/choice'}>{t('nav.training')}</NavLink>
-                     <NavLink className="nav-link" to={'/oldDiplome'}>{t('nav.oldDiplomas')}</NavLink>					 
-                     <NavLink className="nav-link" to={'/diplome'}>{t('nav.createDiploma')}</NavLink>
+                     { this.state.isSchoolAdmin && <NavLink className="nav-link" to={'/trainings/choice'}>{t('nav.training')}</NavLink> }
+                     { this.state.isSchoolAdmin && <NavLink className="nav-link" to={'/oldDiplome'}>{t('nav.oldDiplomas')}</NavLink> }
+                     { this.state.isSchoolAdmin && <NavLink className="nav-link" to={'/diplome'}>{t('nav.createDiploma')}</NavLink> }
                      <NavLink className="nav-link" to={'/showDiplomas'}>{t('nav.searchDiplomas')}</NavLink>
                   </Nav>
                </Navbar.Collapse>
@@ -200,7 +204,9 @@ class App extends Component {
                   
                   <Route exact path='/schools' component={ SchoolList} />
                   <Route path='/schools/:schoolId/trainings/:trainingId' component={ Training } />
+                  <Route path='/schools/:schoolId/validation' component={ AdminValidation } />
                   <Route path='/schools/:schoolId' component={ SchoolItem } />
+
                   <Route exact path='/trainings/choice' component={ TrainingChoice } />
                   <Route path='/trainings/:trainingId/jury' component={ JuryValidation } />
                   <Route path='/trainings/:trainingId/registration' component={ RegistrationValidation } />

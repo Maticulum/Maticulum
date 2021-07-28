@@ -11,7 +11,7 @@ class SchoolItem extends Component {
    static contextType = Web3Context;
 
    state = { isSchoolAdmin: false, create: null, id: null, name: '', town: '', country: '', juryValidation: '1',
-      administrators: ['', ''], validators: [], trainings: [], fees: null };
+      administrators: ['', ''], trainings: [], fees: null };
    
 
    async componentDidMount() {
@@ -36,16 +36,16 @@ class SchoolItem extends Component {
          const administrators = [];
          const administratorsCount = await cm.getSchoolAdministratorsCount(id).call();
          for (let i = 0; i < administratorsCount; i++) {
-            administrators.push(await cm.getSchoolAdministrator(id, i).call());
+            const administrator = await cm.getSchoolAdministrator(id, i).call();
+            administrators.push(administrator);
+         }
+         const administratorsWaitingCount = await cm.getSchoolAdministratorsWaitingValidationCount(id).call();
+         for (let i = 0; i < administratorsWaitingCount; i++) {
+            const administrator = await cm.getSchoolAdministratorWaitingValidation(id, i).call();
+            administrators.push(administrator);
          }
 
-         const validators = [];
-         const validatorsCount = await cm.getSchoolValidatorsCount(id).call();
-         for (let i = 0; i < validatorsCount; i++) {
-            validators.push(await cm.getSchoolValidator(id, i).call());
-         }
-
-         this.setState({ create: false, id, ...school, administrators, validators });
+         this.setState({ create: false, id, ...school, administrators });
       }
    }
 
@@ -74,6 +74,7 @@ class SchoolItem extends Component {
       const cm = this.context.contractSchool.methods;
 
       if (this.state.create) {
+         console.log(this.state);
          await cm.addSchool(this.state.name, this.state.town, this.state.country, this.state.juryValidation,
             this.state.administrators[0], this.state.administrators[1])
             .send({ from: this.context.account, value: this.state.fees });
@@ -130,7 +131,10 @@ class SchoolItem extends Component {
                               value={this.state.country} onChange={(e) => this.setState({country: e.target.value})} />
                         </Col>
                      </Form.Group>
-                     <h4>{t('school.administrators')}</h4>
+                     <Row>
+                        <h4>{t('school.administrators')}</h4>
+                        { this.state.isAdmin && <Button variant="outline-success" onClick={ this.onAddJury }>{t('button.add')}</Button> }
+                     </Row>
                      { this.state.administrators.map((administrator, index) => (
                         <Form.Group as={Row} key={index}>
                            <Form.Label column sm="2">{t('school.administrator')} {index + 1}</Form.Label>
@@ -142,7 +146,9 @@ class SchoolItem extends Component {
                      ))}
 
                      { this.state.create && <>
-                        <h4>Paiement</h4>
+                        <Row>
+                           <h4>Paiement</h4>
+                        </Row>
                         <Form.Group as={Row}>
                            <Form.Label column sm="2">Fees</Form.Label>
                            <Form.Label>{ fees } TMATIC</Form.Label>
@@ -150,24 +156,12 @@ class SchoolItem extends Component {
                         <Form.Group as={Row}>
                            <Form.Label column sm="2">CGV</Form.Label>
                            <Col>
-                              <Form.Control as="textearea" readOnly >Texte des conditions générales...</Form.Control>
+                              <Form.Control as="textarea" rows={3} readOnly value="Texte des conditions générales..." />
                            </Col>
                         </Form.Group>
                         </>
                      }
 
-                     { !this.state.create &&
-                        <Form.Group>
-                           <Form.Label>{t('school.validators')}</Form.Label>
-                           { this.state.validators &&
-                              <ListGroup>
-                                    { this.state.validators.map((validator, index) => (
-                                       <ListGroup.Item key={index}>{validator}</ListGroup.Item>
-                                    ))}
-                              </ListGroup>
-                           }
-                        </Form.Group>
-                     }
                      { !readOnly && 
                         <Button onClick={ this.onSave }>{t('school.create')}</Button>
                      }

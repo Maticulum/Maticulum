@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link, withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import { Button, Container, Row, Table } from 'react-bootstrap';
 import { withTranslation } from "react-i18next";
 
@@ -26,14 +26,8 @@ class SchoolList extends Component {
       let schools = [];
       for (let i = 0; i < size; i++) {
          const school = await cm.schools(i).call();
-         
-         const validators = [];
-         const validatorCount = await cm.getSchoolValidatorsCount(i).call();
-         for (let j = 0; j < validatorCount; j++) {
-            validators.push(await cm.getSchoolValidator(i, j).call());
-         }
 
-         schools.push({ id: i, ...school, validators });
+         schools.push({ id: i, ...school });
       }
 
       return schools;
@@ -70,22 +64,12 @@ class SchoolList extends Component {
                   <thead>
                   <tr>
                      <th>{t('table.name')}</th>
-                     <th>{t('table.validated')}</th>
-                     <th></th>
                   </tr>
                   </thead>
                   <tbody>
                   { this.state.schools.map(school => (
                      <tr key={school.id}>
                         <td><a href={`/schools/${school.id}`}>{ school.name }</a></td>
-                        <td>
-                           { (school.validators ? school.validators.length : 0) + ' / ' + this.state.validationThreshold }
-                        </td>
-                        <td>
-                           { this.context.isSuperAdmin && !school.validated && !school.validators.includes(this.context.account) &&
-                              (<a href="" onClick={() => this.onValidate(school.id)} className="next"><i className="bi bi-check-square"></i>{t('button.validate')}</a>)
-                           }
-                        </td>
                      </tr>
                   ))}
                   </tbody>

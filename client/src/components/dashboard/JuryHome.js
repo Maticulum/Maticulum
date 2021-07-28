@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Badge, Container, Table } from 'react-bootstrap';
+import { Badge, Table } from 'react-bootstrap';
 import { withRouter } from 'react-router-dom';
 import { withTranslation } from 'react-i18next';
 
@@ -44,10 +44,10 @@ class JuryHome extends Component {
 
 
    render() {
-      const { t } = this.props;  
+      //const { t } = this.props;  
 
       return (
-         <Container>
+         <>
             { this.state.trainings && 
                <>
                <h3>Jury pour les formations</h3>
@@ -56,7 +56,7 @@ class JuryHome extends Component {
                      <tr>
                         <th>School</th>
                         <th>Training</th>
-                        <th>Students waiting registration validation</th>
+                        { /* <th>Students waiting registration validation</th> */ }
                         <th>Diplomas waiting validation</th>
                      </tr>
                   </thead>
@@ -65,15 +65,16 @@ class JuryHome extends Component {
                         <tr key={sindex}>
                            <td>{ training.school }</td>
                            <td>
-                              { training.name }
+                              { training.name } &nbsp;
                               { training.waiting && <Badge bg="secondary warning" className="bg-secondary bg-warning">Waiting validation</Badge> }
                            </td>
-                           <td>
+{ /*                           <td>
                               { training.count > 0 ?
                                  <a href={`/trainings/${training.id}/registration`}>{ training.count }</a> :
                                  training.count
                               }
                            </td>
+                           */ }
                            <td>
                               <a href={`/trainings/${training.id}/validation`}>Validate</a>
                            </td>
@@ -83,7 +84,7 @@ class JuryHome extends Component {
                </Table>
                </>
             }
-         </Container>
+         </>
       );
    }
 }

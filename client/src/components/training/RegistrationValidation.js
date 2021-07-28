@@ -88,7 +88,6 @@ class RegsitrationValidation extends Component {
                   <thead>
                      <tr>
                         <th>{t('table.address')}</th>
-                        <th>{t('table.name')}</th>
                         <th>{t('table.validated')}</th>
                      </tr>
                   </thead>
@@ -96,7 +95,6 @@ class RegsitrationValidation extends Component {
                   { this.state.users.map((user, index) => (
                      <tr key={user.id}>
                         <td>{ user.id }</td>
-                        <td>{ user.name }&nbsp;{ user.firstname }</td>
                         <td>
                            <Form.Check id={user.id} checked={ user.currentValidation }
                               onChange={ (e) => this.onCheck(user.id, index, e.target.checked) } />

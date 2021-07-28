@@ -46,10 +46,9 @@ module.exports = async (deployer, network, accounts) => {
       const student3 = '0x82Ee53789484F959689449F5FFa243D34cfEaa05';
       const student4 = '0xc50405e65d9826242f3e338b6eFC81d463b4d26A';
 
-      await maticulum.setSuperAdmin(superAdmin);
-      await maticulum.setSuperAdmin(superAdmin2);
-
       console.log('=> addUser');
+      await maticulum.addUser(superAdmin, 0x03);
+      await maticulum.addUser(superAdmin2, 0x03);
       await maticulum.addUser(schoolAdmin, 0x03);
       await maticulum.addUser(schoolAdmin2, 0x03);
       await maticulum.addUser(jury, 0x03);
@@ -59,12 +58,15 @@ module.exports = async (deployer, network, accounts) => {
       await maticulum.addUser(student3, 0x01);
       await maticulum.addUser(student4, 0x01);
 
+      await maticulum.setSuperAdmin(superAdmin);
+      await maticulum.setSuperAdmin(superAdmin2);
+
       console.log('=> updateSchoolValidationThreshold');
       await school.updateSchoolValidationThreshold(1);
 
       console.log('=> addSchool');
       await school.addSchool('Alyra', 'Paris', 'France', 2, superAdmin, schoolAdmin, { value: "100000000000000000" });
-      await school.validateSchool(0);
+      await school.validateAdministratorMultiple(0, [superAdmin]);
 
       console.log('=> addTraining');
       await training.addTraining(0, 'Chef de projet', 'Aucun', 350, 1, [ jury, jury2 ]);

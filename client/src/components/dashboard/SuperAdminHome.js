@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Badge, Button, Container, Table } from 'react-bootstrap';
+import { Table } from 'react-bootstrap';
 import { withRouter } from 'react-router-dom';
 import { withTranslation } from 'react-i18next';
 
@@ -13,22 +13,59 @@ class SuperAdminHome extends Component {
    state = { init: false }
 
    async componentDidMount() {
-      // Validate School
-      // Validate School Admin
+      const admins = [];
+      const cm = this.context.contractSchool.methods;
+
+      const schoolsCount = await cm.getSchoolsCount().call();
+      for (let schoolId = 0; schoolId < schoolsCount; schoolId++) {
+         const adminsCount = await cm.getSchoolAdministratorsWaitingValidationCount(schoolId).call();
+         if (adminsCount !== 0) {
+            const school = await cm.schools(schoolId).call();
+
+            admins.push({ id: schoolId, name: school.name, count: adminsCount });
+         }
+      }
+      
+      this.setState({ admins });
    }
 
 
    render() {
-      if (this.state.init === false) {
+      if (this.state.admins === false) {
          return <div>Loading...</div>;
       }
 
       const { t } = this.props;  
 
       return (
-         <Container>
-            SuperAdmin
-         </Container>
+         <>
+            { this.state.admins && 
+               <>
+               <h3>School admins</h3>
+               <Table>
+                  <thead>
+                     <tr>
+                        <th>School</th>
+                        <th>Admins waiting validation</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     { this.state.admins.map((admin, sindex) => 
+                        <tr key={sindex}>
+                           <td>{ admin.name }</td>
+                           <td>
+                              { admin.count > 0 ?
+                                 <a href={`/schools/${admin.id}/validation`}>{ admin.count }</a> :
+                                 admin.count
+                              }
+                           </td>
+                        </tr> 
+                     )}
+                  </tbody>
+               </Table>
+               </>
+            }
+         </>
       );
    }
 }

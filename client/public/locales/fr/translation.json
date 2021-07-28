@@ -7,7 +7,8 @@
 		"training":"Formations",
 		"createDiploma":"Créer diplômes",
 		"oldDiplomas":"Anciens diplômes",
-		"searchDiplomas":"Chercher diplômes"
+		"searchDiplomas":"Chercher diplômes",
+      "createSchool": "Ajouter école"
     },
     "button": {
         "add": "Ajouter",
@@ -85,7 +86,8 @@
       "validators": "Validateurs",
       "details": "Détails",
       "trainings": "Formations",
-      "addTraining": "Ajouter formation"
+      "addTraining": "Ajouter formation",
+      "create": "Ajouter"
    },
    "training": {
       "name": "Nom",
@@ -94,7 +96,9 @@
       "hours": "heures",
       "validationThreshold": "Nombre de validations",
       "jury": "Jury",
-      "training": "Formation"
+      "training": "Formation",
+      "address": "Adresse étudiant",
+      "register": "Enregistrer"
    },
    "error": {
       "badNetworkTitle": "Erreur réseau",

@@ -6,8 +6,6 @@ interface ISchool {
 
    function isSchoolAdmin(uint256 _schoolId, address _user) external view returns (bool);
    
-   function isValidated(uint256 _schoolId) external view returns (bool);
-
    function linkTraining(uint256 _schoolId, uint256 trainingId) external;
 
    function getJuryValidationThreshold(uint256 _schoolId) external view returns (uint8);

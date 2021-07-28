@@ -17,24 +17,13 @@ class Home extends Component {
    state = { isSuperAdmin: false, isSchoolAdmin: false, isJury: false, isStudent: false }
 
    async componentDidMount() {
-      if (this.context.isSuperAdmin) {
-         this.setState({ isSuperAdmin: true });
-         return;
-      }
-
+      const user = await this.context.contract.methods.users(this.context.account).call();
+      const isSuperAdmin = (user.role & 0x80) === 0x80;
       const isSchoolAdmin = await this.context.contractSchool.methods.getAdministratorSchoolsCount(this.context.account).call() > 0;
-      if (isSchoolAdmin) {
-         this.setState({ isSchoolAdmin: true });
-         return;
-      }
-
       const isJury = await this.context.contractTraining.methods.isJury(this.context.account).call();
-      if (isJury) {
-         this.setState({ isJury: true });
-         return;
-      }
+      const isStudent = !(isSuperAdmin || isSchoolAdmin || isJury);
 
-      this.setState({ isStudent: true });
+      this.setState({ isSuperAdmin, isSchoolAdmin, isJury, isStudent });
    }
 
 

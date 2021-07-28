@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Accordion, Button, Container, Form, Table } from 'react-bootstrap';
+import { Button, Container, Form, Table } from 'react-bootstrap';
 import { withRouter } from 'react-router-dom';
 import { withTranslation } from 'react-i18next';
 
@@ -106,7 +106,6 @@ class JuryValidation extends Component {
                   <thead>
                      <tr>
                         <th>{t('table.address')}</th>
-                        <th>{t('table.name')}</th>
                         <th colSpan="2">{t('table.validated')}</th>
                      </tr>
                   </thead>
@@ -114,7 +113,6 @@ class JuryValidation extends Component {
                   { this.state.juries.map((jury, index) => (
                      <tr key={jury.id}>
                         <td>{ jury.id }</td>
-                        <td>{ jury.name }&nbsp;{ jury.firstname }</td>
                         <td>
                            <Form.Check id={jury.id} 
                               checked={ jury.currentValidation || jury.validatedByAdmin || jury.validated } 

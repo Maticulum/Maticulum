@@ -99,10 +99,10 @@ class TrainingChoice extends Component {
             <Table>
                <thead>
                   <tr>
-                     <th>Name</th>
-                     <th>Hours</th>
-					      <th>User Address</th>
-                     <th>Register</th>
+                     <th>{ t('training.name') }</th>
+                     <th>{ t('training.hours') }</th>
+					      <th>{ t('training.address') }</th>
+                     <th>{ t('training.register') }</th>
                   </tr>
                </thead>
                <tbody>
@@ -112,12 +112,12 @@ class TrainingChoice extends Component {
                         <td>{ training.duration }</td>
                         <td>
                            <Form.Control type="text" 
-                              value={ this.state.trainings[index].user }
+                              value={ this.state.trainings[index].user || '' }
                               onChange={ e => this.onChangeUser(e.target.value, index) }
                            />
                         </td>
                         <td>
-                           <Button variant="outline-primary" onClick={ () => this.onRegister(training.id) }>Register</Button>
+                           <Button variant="outline-primary" onClick={ () => this.onRegister(training.id) }>{ t('training.register') }</Button>
                         </td>
                      </tr>
                   )}
