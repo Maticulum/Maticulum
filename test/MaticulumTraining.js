@@ -36,7 +36,7 @@ contract('MaticulumTraining', accounts => {
 
       await this.school.updateSchoolValidationThreshold(1, { from: superAdmin1 });
       await this.school.addSchool('Alyra', 'Paris', 'France', 2, schoolAdmin1, schoolAdmin2, { value: "100000000000000000", from: superAdmin1 });
-      await this.school.validateSchool(0, { from: superAdmin1 });
+      await this.school.validateAdministratorMultiple(0, [schoolAdmin1, schoolAdmin2], { from: superAdmin1 });
 	});	
 
   

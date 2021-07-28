@@ -134,6 +134,31 @@ contract MaticulumSchool is ISchool, Ownable {
    }
 
 
+   /**
+   * @notice Update a school
+   * @param _name    School name
+   * @param _town     School town
+   * @param _country School country
+   * @param _juryValidationThreshold   number of juries to validate a training
+   */
+   function updateSchool(uint256 _schoolId, string memory _name, string memory _town, string memory _country, uint8 _juryValidationThreshold) external {
+      require(_isSchoolAdmin(_schoolId, msg.sender), "!SchoolAdmin");
+
+      School storage school = schools[_schoolId];      
+      school.name = _name;
+      school.town = _town;
+      school.country = _country;
+      school.juryValidationThreshold = _juryValidationThreshold;
+
+      emit SchoolUpdated(_schoolId, _name, _town, _country, _juryValidationThreshold, msg.sender);
+   }
+
+
+   /**
+   * @notice Add a school admin for a specified school
+   * @param _schoolId   id of school
+   * @param _user       user address
+   */
    function addSchoolAdministrator(uint256 _schoolId, address _user) public onlyRegistered {
       schoolAdministratorsWaitingValidation[_schoolId].add(_user);
       administratorSchoolsWaitingValidation[_user].add(_schoolId);
@@ -142,6 +167,11 @@ contract MaticulumSchool is ISchool, Ownable {
    }
 
 
+   /**
+   * @notice Validate an administrator (By a Maticulum admin). Require schoolValidationThreshold validations.
+   * @param _schoolId   id of school
+   * @param _user       user address
+   */
    function validateAdministrator(uint256 _schoolId, address _user) internal {
       require(!schoolAdministrators[_schoolId].contains(_user), "Already admin");
       require(!adminValidations[_schoolId][_user].contains(msg.sender), "Already validated by this superadmin");
@@ -161,6 +191,11 @@ contract MaticulumSchool is ISchool, Ownable {
    }
 
 
+  /**
+   * @notice Validate multiple administrators
+   * @param _schoolId   id of school
+   * @param _users      users addresses
+   */
    function validateAdministratorMultiple(uint256 _schoolId, address[] memory _users) external {
       require(maticulum.isSuperAdmin(msg.sender), "!SuperAdmin");
 
@@ -170,19 +205,10 @@ contract MaticulumSchool is ISchool, Ownable {
    }
 
 
-   function updateSchool(uint256 _schoolId, string memory _name, string memory _town, string memory _country, uint8 _juryValidationThreshold) external {
-      require(_isSchoolAdmin(_schoolId, msg.sender), "!SchoolAdmin");
-
-      School storage school = schools[_schoolId];      
-      school.name = _name;
-      school.town = _town;
-      school.country = _country;
-      school.juryValidationThreshold = _juryValidationThreshold;
-
-      emit SchoolUpdated(_schoolId, _name, _town, _country, _juryValidationThreshold, msg.sender);
-   }
-
-
+   /**
+   * @notice Update the number of Maticulum admins needed to validate a school admin
+   * @param _validationThreshold    validation admin number
+   */
    function updateSchoolValidationThreshold(uint8 _validationThreshold) external onlySuperAdmin {
       schoolValidationThreshold = _validationThreshold;
 
@@ -190,6 +216,10 @@ contract MaticulumSchool is ISchool, Ownable {
    }
 
 
+   /**
+   * @notice Update the school registration fees
+   * @param _registrationFees    fees (in wei)
+   */
    function updateSchoolRegistrationFees(uint256 _registrationFees) external onlySuperAdmin {
       schoolRegistrationFees = _registrationFees;
 
@@ -197,36 +227,73 @@ contract MaticulumSchool is ISchool, Ownable {
    }
 
 
-   function getSchoolsCount() external view returns (uint256 length) {
+   /**
+   * @notice Get the number of schools
+   * @return school count
+   */
+   function getSchoolsCount() external view returns (uint256) {
       return schools.length;
    }
 
 
+   /**
+   * @notice Get the number of administrators for a school
+   * @param _schoolId   id of school
+   * @return count
+   */
    function getSchoolAdministratorsCount(uint256 _schoolId) external view returns (uint256) {
       return schoolAdministrators[_schoolId].length();
    }
 
 
-   function getSchoolAdministrator(uint256 _schoolId, uint256 index) external view returns (address) {
-      return schoolAdministrators[_schoolId].at(index);
+   /**
+   * @notice Get the admin for a given school and index
+   * @param _schoolId   id of school
+   * @param _index      index
+   * @return address of admin
+   */
+   function getSchoolAdministrator(uint256 _schoolId, uint256 _index) external view returns (address) {
+      return schoolAdministrators[_schoolId].at(_index);
    }
 
 
+   /**
+   * @notice Get the number of administrators waiting validation for a school
+   * @param _schoolId   id of school
+   * @return count
+   */
    function getSchoolAdministratorsWaitingValidationCount(uint256 _schoolId) external view returns (uint256) {
       return schoolAdministratorsWaitingValidation[_schoolId].length();
    }
 
 
-   function getSchoolAdministratorWaitingValidation(uint256 _schoolId, uint256 index) external view returns (address) {
-      return schoolAdministratorsWaitingValidation[_schoolId].at(index);
+   /**
+   * @notice Get the admin waiting validation for a given school and index
+   * @param _schoolId   id of school
+   * @param _index      index
+   * @return address of admin
+   */
+   function getSchoolAdministratorWaitingValidation(uint256 _schoolId, uint256 _index) external view returns (address) {
+      return schoolAdministratorsWaitingValidation[_schoolId].at(_index);
    }
 
 
+   /**
+   * @notice Get the number of school for which a user is administrator
+   * @param _admin      user address
+   * @return count
+   */
    function getAdministratorSchoolsCount(address _admin) external view returns (uint256) {
       return administratorSchools[_admin].length();
    }
 
 
+   /**
+   * @notice Get the school for a given admin and index
+   * @param _admin      user address
+   * @param _index      index
+   * @return school id
+   */
    function getAdministratorSchools(address _admin, uint256 _index) external view returns (uint256) {
       return administratorSchools[_admin].at(_index);
    }
