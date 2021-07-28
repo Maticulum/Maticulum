@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { Button, Card, Form, Container, Row, Col } from 'react-bootstrap';
-import Web3Context from "../Web3Context";
+import Web3Context from '../../Web3Context';
 import { withTranslation } from "react-i18next";
-import background from './pdf/assets/background.jpg';
+import background from '../pdf/assets/background.jpg';
 import axios from "axios";
 
 class OldDiplome extends Component {

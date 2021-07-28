@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import { SectionList,Button, Card, Form, Container, Row, Col } from 'react-bootstrap';
-import Web3Context from "../Web3Context";
+import Web3Context from '../../Web3Context';
 import { withTranslation } from "react-i18next";
-import background from './pdf/assets/background.jpg';
+import background from '../pdf/assets/background.jpg';
 import axios from "axios";
-import DataFromBase from './DataFromBase';
+import DataFromBase from '../user/DataFromBase';
 import ListGroup from 'react-bootstrap/ListGroup';
 
 // TODO : permettre de charger un prédiplôme avec le user donné enregistré par un admin

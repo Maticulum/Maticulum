@@ -14,7 +14,7 @@ import MaticulumTraining from "./contracts/MaticulumTraining.json";
 import './i18n';
 
 import Home from './components/Home';
-import Registration from './components/Registration';
+import Registration from './components/user/Registration';
 import SchoolList from './components/school/SchoolList';
 import SchoolItem from './components/school/SchoolItem';
 import AdminValidation from './components/school/AdminValidation';
@@ -23,11 +23,11 @@ import TrainingChoice from './components/training/TrainingChoice';
 import RegistrationValidation from './components/training/RegistrationValidation';
 import TrainingValidation from './components/training/TrainingValidation';
 import JuryValidation from './components/training/JuryValidation';
-import Whitelisted from './components/Whitelisted';
-import Diplome from './components/Diplome';
-import OldDiplome from './components/OldDiplome';
-import ShowDiplomas from './components/ShowDiplomas';
-import AdminSetPinataData from './components/AdminSetPinataData';
+import Whitelisted from './components/user/Whitelisted';
+import Diplome from './components/diplomas/Diplome';
+import OldDiplome from './components/diplomas/OldDiplome';
+import ShowDiplomas from './components/diplomas/ShowDiplomas';
+import AdminSetPinataData from './components/diplomas/AdminSetPinataData';
 
 import "./App.css";
 import i18n from "./i18n";

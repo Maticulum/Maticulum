@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import ListGroup from 'react-bootstrap/ListGroup';
-import Web3Context from "../Web3Context";
+import Web3Context from '../../Web3Context';
 
 class Whitelisted extends Component {	
    static contextType = Web3Context;

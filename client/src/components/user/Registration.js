@@ -1,6 +1,6 @@
 import React, { Component, useState} from 'react';
 import { Button, Form } from 'react-bootstrap';
-import Web3Context from "../Web3Context";
+import Web3Context from '../../Web3Context';
 import { withTranslation } from "react-i18next";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
