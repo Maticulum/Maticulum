@@ -22,7 +22,7 @@ class Diplome extends Component {
 	loading:false, gateway:null, jsonUrlApi:null, imageUrlAPi:null,
 	paramPinataApiKey:null, paramPinataSecretApiKey:null, hashesImage:[],
 	urlPinAPI:null, descriptions:[],names:[],
-	trainingUsers:[], schoolId:null,trainingId:null,
+	trainings:[], schoolId:null,trainingId:null,
 	usersValues:[]};
 		
 	// on the load of the page
@@ -43,6 +43,7 @@ class Diplome extends Component {
 		let trainingsCount = await this.context.contractTraining.methods.getTrainingsCount().call();	
 		let trainingsAll = [];
 		trainingsAll.push({name:"",id: -1});
+		
 		for(let i = 0;i<trainingsCount;i++){			
 			let training = await this.context.contractTraining.methods.trainings(i).call();			
 			trainingsAll.push({name:training[1],id: i});
@@ -51,7 +52,7 @@ class Diplome extends Component {
 		this.setState({ gateway : gatewayURL, 
 		jsonUrlApi: jsonAPI, imageUrlAPi: imageAPI,urlPinAPI:pinAPI,
 		paramPinataApiKey:paramPinataApi, paramPinataSecretApiKey:paramPinataSecretApi,
-		trainingUsers:trainingsAll
+		trainings:trainingsAll
 		});
 	}		
 		
@@ -257,9 +258,14 @@ class Diplome extends Component {
 		let pinataApiKey = this.getPinataApiKey();
 		let pinataSecretApiKey = this.getPinataSecretApiKey();		
 		
+		let usersAddresses = [];
+		for(let i = 0;i<usersValues.length;i++){
+			usersAddresses.push(usersValues[i].userAddress);
+		}
+				
 		let annulationNotYetShown = true;
 		let diplomas = { schoolId:schoolId,trainingId:trainingId,
-		userAddresses: ["0xc50405e65d9826242f3e338b6eFC81d463b4d26A"]};
+		userAddresses: usersAddresses};
 				
 		this.context.contractNFT.methods.AddNFTsToAdress(hashes, diplomas)
 		.send({from:this.context.account}) 
@@ -389,7 +395,7 @@ class Diplome extends Component {
 	
 	render() {
 		const { t } = this.props; 
-		let optionTemplate = this.state.trainingUsers.map(v => (
+		let optionTemplate = this.state.trainings.map(v => (
 		  <option value={v.id}>{v.name}</option>
 		));
 		

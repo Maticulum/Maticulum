@@ -4,7 +4,8 @@ pragma solidity 0.8.4;
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./IDiplomasValidation.sol";
+import "./MaticulumTraining.sol";
+import "./ISchool.sol";
 
 contract MaticulumNFT is ERC721URIStorage, Ownable {
       /**
@@ -23,12 +24,10 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
                 string memory _hashtoApikey,string memory _hashtoSecretApikey,
                 string memory _name,
                 string memory _symbol,
-                string memory _hashImageToken,
-                address _validationAddress) ERC721(_name, _symbol) {
+                string memory _hashImageToken) ERC721(_name, _symbol) {
         
         datas = gatewayApiDatas(_gatewayUrl, _urltoJsonApi, _urltoImageApi, _urlToUnPinApi, _hashtoApikey, _hashtoSecretApikey);
         NFTDatas_ = NFTdatas(_name, _symbol, _hashImageToken);
-        validation = IDiplomasValidation(_validationAddress);
         testModeValidationDiploma = false;
     }
     
@@ -64,19 +63,39 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
     
     gatewayApiDatas datas;
     NFTdatas NFTDatas_;
-    IDiplomasValidation validation;
+    ISchool school;
+    MaticulumTraining training;
     bool testModeValidationDiploma;
     
     event NFTMinted(address recipient, string hash, uint256 newItemId);
     event GatewayChanged(string gatewayUrl);
     
+    function registerSchoolTrainingContract(address schoolAddress, address trainingAddress) public{
+        school = ISchool(schoolAddress);
+        training = MaticulumTraining(trainingAddress);
+    }
+    
     function setTestMode(bool _test) external onlyOwner {
         testModeValidationDiploma = _test;
     }
     
-    function areDiplomasValidated(address schoolAdmin,diplomas memory _diplomas) private view returns(bool) {
-        require(validation.areDiplomasValidated(schoolAdmin, _diplomas.schoolId, _diplomas.trainingId, _diplomas.userAddresses), "!diplomasValidated");
+      /*
+    * @param _schoolAdmin   adress of the future owner of the NFT
+   * @param _diplomas       one diploma with schoolId and trainingId informations and the list of all the students adresses of this training
+    */
+    function areDiplomasValidated(address _schoolAdmin, diplomas memory _diplomas) public view returns (bool) {
+        
+        isSchholAdmin(_schoolAdmin, _diplomas.schoolId);
+        
+        for(uint i =0;i < _diplomas.userAddresses.length;i++){
+            require(training.diplomaValidated(_diplomas.userAddresses[i], _diplomas.trainingId), "!DiplomaValidated");
+        } 
+        
         return true;
+    }
+    
+    function isSchholAdmin(address schoolAdmin, uint256 _schoolId) view public{
+        require(school.isSchoolAdmin(_schoolId, schoolAdmin), "!SchoolAdmin");
     }
     
     /**
@@ -108,11 +127,35 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
     function AddNFTsToAdress(string[] memory _hashes, diplomas memory _diplomas) public returns (uint256){
         require(_hashes.length <= maxHashCount, "Gaz limit security");
         
-        uint256 lastUri = 0;
+        if(!testModeValidationDiploma){
+            require(areDiplomasValidated(msg.sender, _diplomas), "!diplomasValidated");
+        } 
         
-         if(!testModeValidationDiploma){
-             require(areDiplomasValidated(msg.sender, _diplomas), "!diplomasValidated");
-         } 
+        return AddNFTsToAdressInternal(_hashes); 
+    }
+    
+   /*
+   * @notice Create a list of NFTs
+   * @param _hashes           list of hashes to retrieve the JSON Metadata on IPFS
+   * @param _diplomas         one diploma with schoolId and trainingId informations and the list of all the students adresses of this training
+   * @return the user address
+   */
+    function AddNFTsToAdressOld(string[] memory _hashes, diplomas memory _diplomas) public returns (uint256){
+        
+        if(!testModeValidationDiploma) require(_hashes.length <= maxHashCount, "Gaz limit security");
+        isSchholAdmin(msg.sender, _diplomas.schoolId);
+        return AddNFTsToAdressInternal(_hashes); 
+    }
+    
+    /*
+   * @notice Create a list of NFTs
+   * @param _hashes           list of hashes to retrieve the JSON Metadata on IPFS
+   * @return the user address
+   */
+    function AddNFTsToAdressInternal(string[] memory _hashes) private returns (uint256){
+        require(_hashes.length <= maxHashCount, "Gaz limit security");
+        
+        uint256 lastUri = 0;
         
         for(uint i =0;i < _hashes.length;i++){
            
@@ -128,7 +171,7 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
         } 
         
         return lastUri; 
-    }
+    } 
     
      /**
    * @notice Get the URI of the last minted NFT

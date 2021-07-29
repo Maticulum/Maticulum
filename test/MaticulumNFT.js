@@ -24,8 +24,10 @@ contract('MaticulumNFT', accounts => {
 			   
   beforeEach(async () => {
 		this.MaticulumNFT = await MaticulumNFT.new(gatewayUrl,urltoJSonApi,urltoImageApi,urlToPinApi,
-		hashtoApikey, hashtoSecretApikey,name,symbol, hashToImageToken, 
-		"0x0000000000000000000000000000000000000000");
+		hashtoApikey, hashtoSecretApikey,name,symbol, hashToImageToken);
+		await this.MaticulumNFT.registerSchoolTrainingContract(
+		"0x0000000000000000000000000000000000000000", "0x0000000000000000000000000000000000000000",
+		{ from: owner });
 		await this.MaticulumNFT.setTestMode(true, { from: owner });
 	 });	
 

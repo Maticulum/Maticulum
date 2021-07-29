@@ -15,7 +15,8 @@ class OldDiplome extends Component {
 	pinataSecretApiKey:'',sendNFTVisibility:false, sizeFile:0, 
 	gateway:null, loading:false,	jsonUrlApi:null, imageUrlAPi:null,
 	paramPinataApiKey:null, paramPinataSecretApiKey:null,hashesImage:[],
-	urlPinAPI:null, cancelTransaction:false};
+	urlPinAPI:null, cancelTransaction:false, trainings:[],
+	schoolId:null,trainingId:null};
 	
 	// on the load of the page
 	componentDidMount = async () => {
@@ -32,11 +33,28 @@ class OldDiplome extends Component {
 		let paramPinataSecretApi = gatewaysData[5];
 		let hashToken = gatewaysData[5];
 		
+		let trainingsCount = await this.context.contractTraining.methods.getTrainingsCount().call();	
+		let trainingsAll = [];
+		trainingsAll.push({name:"",id: -1});
+		
+		for(let i = 0;i<trainingsCount;i++){			
+			let training = await this.context.contractTraining.methods.trainings(i).call();			
+			trainingsAll.push({name:training[1],id: i});
+		}
+		
 		this.setState({ gateway : gatewayURL, 
 		jsonUrlApi: jsonAPI, imageUrlAPi: imageAPI,urlPinAPI:pinAPI,
-		paramPinataApiKey:paramPinataApi, paramPinataSecretApiKey:paramPinataSecretApi
+		paramPinataApiKey:paramPinataApi, paramPinataSecretApiKey:paramPinataSecretApi,
+		trainings:trainingsAll
 		});
-	}		
+	}	
+
+	GetValuePair = async (event) => {	
+		var index = event.nativeEvent.target.selectedIndex;
+		let cbxTrainingId = event.nativeEvent.target[index].value;		
+		let training = await this.context.contractTraining.methods.trainings(cbxTrainingId).call();		
+		this.setState({ schoolId : training[0], trainingId:cbxTrainingId });
+	}
 	
 	// on loading of file
 	handleFile = async(e) => {
@@ -175,15 +193,17 @@ class OldDiplome extends Component {
 	// Send the json hash stored in Pinata in the smart contract MaticulmNFT
 	// and mint the NFT 
 	SendNFT = async() => { 
-		const { hashes, hashesImage, urlPinAPI } = this.state;
+		const { hashes, hashesImage, urlPinAPI, schoolId,trainingId } = this.state;
 		const { t } = this.props;
 		
 		let pinataApiKey = this.getPinataApiKey();
 		let pinataSecretApiKey = this.getPinataSecretApiKey();
 		
 		let annulationNotYetShown = true;
+		let diplomas = { schoolId:schoolId,trainingId:trainingId,
+		userAddresses: ["0x0000000000000000000000000000000000000000"]};
 		
-		this.context.contractNFT.methods.AddNFTsToAdress(this.context.account,hashes)
+		this.context.contractNFT.methods.AddNFTsToAdressOld(hashes, diplomas)
 		.send({from:this.context.account}) 
 		.then(async (response) => {
 			
@@ -244,11 +264,23 @@ class OldDiplome extends Component {
 		
 	render() {
 		const { t } = this.props; 
+		let optionTemplate = this.state.trainings.map(v => (
+		  <option value={v.id}>{v.name}</option>
+		));
 		
 		return(
 		<div style={{display: 'flex', justifyContent: 'center'}}>
 		  <Card style={{ width: '50rem' }}>
             <Card.Header><strong>{t('diplome.sendNFT')}</strong></Card.Header>
+			<Card.Body>	
+				<label>
+				  <select 
+					value={this.state.value} 
+					onChange={this.GetValuePair.bind(this)}>
+					{optionTemplate}
+				  </select>
+			    </label>
+			</Card.Body>
             <Card.Body>			  
 				<input type="file" id="avatar" accept="image/png, image/jpeg" 
 				 multiple="multiple" onChange={this.handleFile} />
