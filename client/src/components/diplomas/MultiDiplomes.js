@@ -42,7 +42,7 @@ class Diplome extends Component {
 
 		let trainingsCount = await this.context.contractTraining.methods.getTrainingsCount().call();	
 		let trainingsAll = [];
-		
+		trainingsAll.push({name:"",id: -1});
 		for(let i = 0;i<trainingsCount;i++){			
 			let training = await this.context.contractTraining.methods.trainings(i).call();			
 			trainingsAll.push({name:training[1],id: i});
@@ -107,7 +107,6 @@ class Diplome extends Component {
         })
         .catch(function (error) {
             alert("error in sendind NFT contact our developpement team");
-			alert(error);
         }); 
 	 
 	};
@@ -357,7 +356,7 @@ class Diplome extends Component {
 		for(let i = 0;i<trainingsUsersCount;i++){			
 			let userAddress = await this.context.contractTraining.methods.getUserForTraining(trainingId,i).call();	
 			let isValidated = await this.context.contractTraining.methods.diplomaValidated(userAddress, trainingId).call();
-			alert(userAddress);
+		
 			if(isValidated) {
 				
 				const CryptoJS = require('crypto-js');
@@ -368,7 +367,10 @@ class Diplome extends Component {
 				let decrypted = CryptoJS.TripleDES.decrypt(datasUserUnHashed, this.tbxPass.value)
 				.toString(CryptoJS.enc.Utf8);	
 				
-				if(decrypted == "") alert("Wrong password");
+				if(decrypted == "") {
+					alert("Wrong password or user datas not defined");
+					return;
+				}
 				let userArray = decrypted.split("#");
 				
 				

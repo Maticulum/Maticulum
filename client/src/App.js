@@ -173,7 +173,7 @@ class App extends Component {
                <Navbar.Collapse>
                   <Nav className='mr-auto'>
                      <NavLink className="nav-link" exact to={'/'}>{t('nav.home')}</NavLink>
-                     { !this.state.isRegistered && <NavLink className="nav-link" to={'/registration'}>{t('nav.registration')}</NavLink> }
+                     { this.state.isSchoolAdmin && <NavLink className="nav-link" to={'/registration'}>{t('nav.registration')}</NavLink> }
                      { this.state.isValidated && <NavLink className="nav-link" to={'/schools/new'}>{t('nav.createSchool')}</NavLink> }
                      { this.state.isSuperAdmin && <NavLink className="nav-link" visibility="hidden" to={'/whitelisted'}>{t('nav.whitelisted')}</NavLink> }
                      { this.state.isSuperAdmin && <NavLink className="nav-link" to={'/schools'}>{t('nav.schools')}</NavLink> }
