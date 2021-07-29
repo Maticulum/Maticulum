@@ -5,7 +5,8 @@
         "registration": "Enregistrement",
         "schools": "Écoles",
 		"training":"Formations",
-		"createDiploma":"Créer diplômes",
+		"createDiploma":"Créer diplôme",
+		"createDiplomas":"Créer diplômes",
 		"oldDiplomas":"Anciens diplômes",
 		"searchDiplomas":"Chercher diplômes",
       "createSchool": "Ajouter école"

@@ -27,6 +27,7 @@ import Whitelisted from './components/user/Whitelisted';
 import Diplome from './components/diplomas/Diplome';
 import OldDiplome from './components/diplomas/OldDiplome';
 import ShowDiplomas from './components/diplomas/ShowDiplomas';
+import MultiDiplomes from './components/diplomas/MultiDiplomes';
 import AdminSetPinataData from './components/diplomas/AdminSetPinataData';
 
 import "./App.css";
@@ -179,6 +180,7 @@ class App extends Component {
                      { this.state.isSchoolAdmin && <NavLink className="nav-link" to={'/trainings/choice'}>{t('nav.training')}</NavLink> }
                      { this.state.isSchoolAdmin && <NavLink className="nav-link" to={'/oldDiplome'}>{t('nav.oldDiplomas')}</NavLink> }
                      { this.state.isSchoolAdmin && <NavLink className="nav-link" to={'/diplome'}>{t('nav.createDiploma')}</NavLink> }
+					 { this.state.isSchoolAdmin && <NavLink className="nav-link" to={'/MultiDiplomes'}>{t('nav.createDiplomas')}</NavLink> }
                      <NavLink className="nav-link" to={'/showDiplomas'}>{t('nav.searchDiplomas')}</NavLink>
                   </Nav>
                </Navbar.Collapse>
@@ -215,6 +217,7 @@ class App extends Component {
                   <Route exact path='/diplome' component={Diplome} /> 
 				  <Route exact path='/oldDiplome' component={OldDiplome} /> 
 				  <Route exact path='/showDiplomas' component={ShowDiplomas} /> 
+				  <Route exact path='/MultiDiplomes' component={MultiDiplomes} /> 
 				  <Route exact path='/adminSetPinataData' component={AdminSetPinataData} />
                </Switch>
             </div>

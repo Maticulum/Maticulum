@@ -22,7 +22,8 @@ class Diplome extends Component {
 	loading:false, gateway:null, jsonUrlApi:null, imageUrlAPi:null,
 	paramPinataApiKey:null, paramPinataSecretApiKey:null, hashesImage:[],
 	urlPinAPI:null, descriptions:[],names:[],
-	trainingUsers:[], schoolId:null,trainingId:null};
+	trainingUsers:[], schoolId:null,trainingId:null,
+	usersValues:[]};
 		
 	// on the load of the page
 	componentDidMount = async () => {
@@ -37,11 +38,20 @@ class Diplome extends Component {
 		let pinAPI = gatewaysData[3];
 		let paramPinataApi = gatewaysData[4];
 		let paramPinataSecretApi = gatewaysData[5];
-		let hashToken = gatewaysData[5];		
+		let hashToken = gatewaysData[5];	
+
+		let trainingsCount = await this.context.contractTraining.methods.getTrainingsCount().call();	
+		let trainingsAll = [];
+		
+		for(let i = 0;i<trainingsCount;i++){			
+			let training = await this.context.contractTraining.methods.trainings(i).call();			
+			trainingsAll.push({name:training[1],id: i});
+		}
 		
 		this.setState({ gateway : gatewayURL, 
 		jsonUrlApi: jsonAPI, imageUrlAPi: imageAPI,urlPinAPI:pinAPI,
-		paramPinataApiKey:paramPinataApi, paramPinataSecretApiKey:paramPinataSecretApi
+		paramPinataApiKey:paramPinataApi, paramPinataSecretApiKey:paramPinataSecretApi,
+		trainingUsers:trainingsAll
 		});
 	}		
 		
@@ -97,6 +107,7 @@ class Diplome extends Component {
         })
         .catch(function (error) {
             alert("error in sendind NFT contact our developpement team");
+			alert(error);
         }); 
 	 
 	};
@@ -155,25 +166,27 @@ class Diplome extends Component {
 	
 	// create the image in the page	with the datas loaded from file or the page
 	onCreateDiplome = async() => {
-		const { files } = this.state; 	
-		this.setState({ showDownload: true });  				
-		await this.createImageDiplome(this.state.firstname, this.state.lastname,this.state.school,
-		this.state.grade, this.state.diplomaName);
+		const { files, usersValues } = this.state; 	
+		this.setState({ showDownload: true });  
+		for(let i = 0;i<usersValues.length;i++){
+			let firstname = usersValues[i].firstname;
+			let lastname = usersValues[i].lastname;
+			let school = usersValues[i].school;
+			let grade = usersValues[i].grade;
+			let diplomaName = usersValues[i].diplomaName;
+			
+			await this.createImageDiplome(firstname, lastname,school,grade, diplomaName);
+		}
 	}
 	
 	// erase all datas to send a new NFT or list of NFTs
 	clearDiplomas = async() =>  {
 		const { linkVisible,isButtonMetamaskVisible, hashes,hashesImage} = this.state;
-		document.getElementById('diplomaImage').innerHTML = "";	
-		this.tbxDiplomaName.value = "";
-		this.tbxGrade.value = "";
-		this.tbxSchool.value = "";
-		this.tbxFirstname.value = "";
-		this.tbxLastname.value = "";
-		
+		document.getElementById('diplomaImage').innerHTML = "";			
 		
 		this.setState({ linkVisible:false,isButtonMetamaskVisible:false, 
-		hashes:[],hashesImage:[],isButtonMetamaskVisible:true, files:[]});
+		hashes:[],hashesImage:[],isButtonMetamaskVisible:false, files:[], usersValues:[],
+		schoolId:null,trainingId:null });
 	}
 	
 	// send one image to dedicated Pinata API 
@@ -204,7 +217,7 @@ class Diplome extends Component {
 	// Take the files created with images to send then to Pinata
 	createImagePinataAxios = async(e) => {		
 		const { formData, linkDiplome, files, imageUrlAPi, hashes, hashesImage,
-		names, descriptions} = this.state; 
+		names, descriptions } = this.state; 
 		
 		let pinataApiKey = this.getPinataApiKey();
 		let pinataSecretApiKey = this.getPinataSecretApiKey();
@@ -239,17 +252,16 @@ class Diplome extends Component {
 	// Send the json hash stored in Pinata in the smart contract MaticulmNFT
 	// and mint the NFT 
 	SendNFTToSmartContract = async() => {
-		const { hashes, hashesImage, urlPinAPI, schoolId, trainingId } = this.state; 
+		const { hashes, hashesImage, urlPinAPI, schoolId, trainingId, usersValues } = this.state; 
 		const { t } = this.props;
-				
 						
 		let pinataApiKey = this.getPinataApiKey();
-		let pinataSecretApiKey = this.getPinataSecretApiKey();
+		let pinataSecretApiKey = this.getPinataSecretApiKey();		
 		
 		let annulationNotYetShown = true;
 		let diplomas = { schoolId:schoolId,trainingId:trainingId,
-		userAddresses: [this.tbxUserAdress.value]};		
-		
+		userAddresses: ["0xc50405e65d9826242f3e338b6eFC81d463b4d26A"]};
+				
 		this.context.contractNFT.methods.AddNFTsToAdress(hashes, diplomas)
 		.send({from:this.context.account}) 
 		.then(async (response) => {
@@ -333,81 +345,44 @@ class Diplome extends Component {
 		  console.log(error);
 		}
     }
-		
-	showFile = async (e) => {
-		e.preventDefault()
-		const reader = new FileReader();
-		reader.onload = async (e) => { 
-		  const text = (e.target.result);
-		  const lines = text.split(/\r\n|\n/);
-		  
-		  for(let i =0;i<lines.length;i++){
-			const line = lines[i].split(',');	
-			await this.createImageDiplome(line[0],line[1],line[2],line[3],line[4]);	
-		  }
-		};
-		
-		reader.onerror = (e) => alert(e.target.error.name);
-		reader.readAsText(e.target.files[0])		
-    }	
-	
-	searchUser = async (e) => {
-		const { trainingUsers } = this.state;
-		let pass = DataFromBase.getDataPass();
-		if(pass == ""){
-			pass = this.tbxPass.value;
-			DataFromBase.setDataPass(pass);
-		}
-		
-		const CryptoJS = require('crypto-js');
-		let userDatas = await this.context.contract.methods.getUserHash(this.tbxUserAdress.value).call();
-		let user = userDatas[0];
-		let datasUserUnHashed = atob(user);
-		
-		let decrypted = CryptoJS.TripleDES.decrypt(datasUserUnHashed, pass)
-	    .toString(CryptoJS.enc.Utf8);	
-		
-		if(decrypted == "") alert("Wrong password");
-		let userArray = decrypted.split("#");
-		
-		this.tbxFirstname.value = this.setData(userArray,1);
-		this.tbxLastname.value = this.setData(userArray,0);
-		
-		let trainingUsersTemp = [];	
-		let trainingsAll = [];
-		
-		let userTrainings = await this.context.contractTraining.methods.getUserTrainingsCount(this.tbxUserAdress.value).call();
-		
-		let trainingIdToStore = null;
-		
-		for(let i = 0;i<userTrainings;i++){			
-			let trainingId = await this.context.contractTraining.methods.getUserTraining(this.tbxUserAdress.value,i).call();			
-			let training = await this.context.contractTraining.methods.trainings(trainingId).call();
-			trainingsAll.push(training);
-			trainingUsersTemp.push({name:training[1],id: trainingId});
-		}
-		
-		let currentTraining = trainingsAll[0];		
-		let schools = await this.context.contractSchool.methods.schools(currentTraining[0]).call();
-		this.tbxSchool.value = schools[0]
-		this.tbxGrade.value = currentTraining[2];
-		this.tbxDiplomaName.value = currentTraining[1];
-		
-		this.setState({trainingUsers:trainingUsersTemp, 
-			diplomaName: this.tbxDiplomaName.value,
-			firstname: this.tbxFirstname.value, lastname: this.tbxLastname.value, 
-			school : this.tbxSchool.value, grade:this.tbxGrade.value,
-			schoolId:currentTraining[0], trainingId : trainingUsersTemp[0].id
-		});
-	}
 	
 	GetValuePair = async (event) => {
 		var index = event.nativeEvent.target.selectedIndex;
-		this.tbxDiplomaName.value = event.nativeEvent.target[index].text;
-		let currentTraining = await this.context.contractTraining.methods.trainings(event.nativeEvent.target[index].value).call();
-		this.tbxGrade.value = currentTraining[2];
-		this.setState({ diplomaName: this.tbxDiplomaName.value, grade:this.tbxGrade.value,
-		trainingId: index, schoolId :currentTraining[0]});
+		let trainingId = event.nativeEvent.target[index].value;
+		let trainingsUsersCount = await this.context.contractTraining.methods.getUsersCountForTraining(trainingId).call();
+		let training = await this.context.contractTraining.methods.trainings(trainingId).call();
+		let schools = await this.context.contractSchool.methods.schools(training[0]).call();
+		let users = [];
+
+		for(let i = 0;i<trainingsUsersCount;i++){			
+			let userAddress = await this.context.contractTraining.methods.getUserForTraining(trainingId,i).call();	
+			let isValidated = await this.context.contractTraining.methods.diplomaValidated(userAddress, trainingId).call();
+			alert(userAddress);
+			if(isValidated) {
+				
+				const CryptoJS = require('crypto-js');
+				let userDatas = await this.context.contract.methods.getUserHash(userAddress).call();
+				let user = userDatas[0];
+				let datasUserUnHashed = atob(user);
+				
+				let decrypted = CryptoJS.TripleDES.decrypt(datasUserUnHashed, this.tbxPass.value)
+				.toString(CryptoJS.enc.Utf8);	
+				
+				if(decrypted == "") alert("Wrong password");
+				let userArray = decrypted.split("#");
+				
+				
+				users.push({firstname : this.setData(userArray,1), 
+							lastname : this.setData(userArray,0),
+							school : schools[0],
+							grade:training[2],
+							diplomaName:training[1],
+							userAddress:userAddress});
+				
+			}
+		}
+		
+		this.setState({usersValues: users, schoolId:training[0],trainingId: trainingId});			
 	}
 	
 	render() {
@@ -420,21 +395,13 @@ class Diplome extends Component {
 		<div style={{display: 'flex', justifyContent: 'center'}}>
 			<Container>
 				<Form>
-					<Form.Group as={Row} >
-						<Form.Label column sm="3">{t('diplome.studentAdress')}</Form.Label>
-						<Col sm="3">
-						  <Form.Control type="text" 
-						  id="tbxUserAdress" ref={(input) => { this.tbxUserAdress = input }}
-						  />
-						</Col>
-						{t('diplome.password')}
-						<Col sm="3">
+					<Form.Group as={Row} >	
+						<Form.Label column sm="3">{t('diplome.password')}</Form.Label>
+						
+						<Col sm="2">
 						  <Form.Control type="password" 
 						  id="tbxPass" ref={(input) => { this.tbxPass = input }}
 						  />
-						</Col>
-						<Col sm="1">
-						  <Button onClick={this.searchUser}>{t('diplome.searchUser')}</Button>
 						</Col>
 					</Form.Group>
 					<Form.Group as={Row} >
@@ -448,56 +415,7 @@ class Diplome extends Component {
 							</select>
 						  </label>
 						</Col>
-					</Form.Group>
-					<Form.Group as={Row} >
-						<Form.Label column sm="3"></Form.Label>
-						<Form.Label column sm="9">{t('diplome.diplomaBuid')}</Form.Label>
-					</Form.Group>	 
-					<Form.Group as={Row} >
-						<Form.Label column sm="3">{t('formlabel.name')}</Form.Label>
-						<Col sm="9">
-						  <Form.Control type="text" 
-						  onChange={(e) => this.setState({firstname: e.target.value})} 
-						  id="tbxLastname" ref={(input) => { this.tbxLastname = input }}
-						  />
-						</Col>
-					</Form.Group>
-					<Form.Group as={Row} >
-						<Form.Label column sm="3">{t('formlabel.firstname')}</Form.Label>
-						<Col sm="9">
-						  <Form.Control type="text"  
-						  onChange={(e) => this.setState({lastname: e.target.value})}
-						  id="tbxFirstname " ref={(input) => { this.tbxFirstname = input }}
-						  />
-						</Col>						
-					 </Form.Group>					
-					<Form.Group as={Row} >
-						<Form.Label column sm="3">{t('diplome.school')}</Form.Label>
-						<Col sm="9">
-							<Form.Control type="text" 
-							onChange={(e) => this.setState({school: e.target.value})} 
-							id="tbxSchool" ref={(input) => { this.tbxSchool = input }}
-							/>
-						</Col>
-					</Form.Group>
-					<Form.Group as={Row} >
-						<Form.Label column sm="3">{t('diplome.grade')}</Form.Label>
-						<Col sm="9">
-							<Form.Control type="text"  
-							onChange={(e) => this.setState({grade: e.target.value})} 
-							id="tbxGrade" ref={(input) => { this.tbxGrade = input }}
-							/>
-						</Col>
-					</Form.Group>
-					<Form.Group as={Row} >
-						<Form.Label column sm="3">{t('diplome.diplomaName')}</Form.Label>
-						<Col sm="9">
-							<Form.Control type="text" 
-							onChange={(e) => this.setState({diplomaName: e.target.value})} 
-							id="tbxDiplomaName" ref={(input) => { this.tbxDiplomaName = input }}
-							/>
-						</Col>
-					</Form.Group>
+					</Form.Group>					
 					<Form.Group as={Row} >
 					  <Form.Label column sm="3"></Form.Label>
 						  <Col sm="2">
@@ -537,24 +455,8 @@ class Diplome extends Component {
 							</Col>
 							: null
 						}						
-					</Form.Group>
-					<Form.Group as={Row} >
-						<Form.Label column sm="3">{t('diplome.publishFromFile')}</Form.Label>
-						<Col sm="9">
-							<input type="file" onChange={(e) => this.showFile(e)} accept="text/csv" />
-						</Col>
-					</Form.Group>
-					<Form.Group as={Row} >
-						<Form.Label column sm="3">{t('diplome.awaitedFormat')}</Form.Label>
-						<Col sm="9">
-							<Form.Control disabled type="text" 
-							value={t('formlabel.firstname') + "," + 
-								  t('formlabel.name') + "," + 
-								  t('diplome.school') + "," + 
-								  t('diplome.grade') + "," + 
-								  t('diplome.diplomaName')} />
-						</Col>
-					</Form.Group>
+					</Form.Group>				
+					
 					<Form.Group as={Row} >
 						<Form.Label column sm="3"></Form.Label>
 						<Col sm="9">
