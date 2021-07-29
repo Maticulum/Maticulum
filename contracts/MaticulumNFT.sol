@@ -70,6 +70,10 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
     event NFTMinted(address recipient, string hash, uint256 newItemId);
     event GatewayChanged(string gatewayUrl);
     
+    /* @notice set the addresses of smart contracts MaticulumTraining and MaticulumSchool
+    * @param _schoolAdmin   adress of the future owner of the NFT
+   * @param _diplomas       one diploma with schoolId and trainingId informations and the list of all the students adresses of this training
+    */
     function registerSchoolTrainingContract(address schoolAddress, address trainingAddress) public{
         school = ISchool(schoolAddress);
         training = MaticulumTraining(trainingAddress);
@@ -79,13 +83,13 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
         testModeValidationDiploma = _test;
     }
     
-      /*
+   /* @notice check if a user 
     * @param _schoolAdmin   adress of the future owner of the NFT
    * @param _diplomas       one diploma with schoolId and trainingId informations and the list of all the students adresses of this training
     */
     function areDiplomasValidated(address _schoolAdmin, diplomas memory _diplomas) public view returns (bool) {
         
-        isSchholAdmin(_schoolAdmin, _diplomas.schoolId);
+        isSchoolAdmin(_schoolAdmin, _diplomas.schoolId);
         
         for(uint i =0;i < _diplomas.userAddresses.length;i++){
             require(training.diplomaValidated(_diplomas.userAddresses[i], _diplomas.trainingId), "!DiplomaValidated");
@@ -94,12 +98,12 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
         return true;
     }
     
-    function isSchholAdmin(address schoolAdmin, uint256 _schoolId) view public{
+    function isSchoolAdmin(address schoolAdmin, uint256 _schoolId) view public{
         require(school.isSchoolAdmin(_schoolId, schoolAdmin), "!SchoolAdmin");
     }
     
     /**
-   * @notice create a NFT
+   * @notice create one NFT
    * @param _userAddress  adress oth future owner of the NFT
    * @param _hash         hash to retrieve the JSON Metadata on IPFS
    * * @return the user address
@@ -142,8 +146,8 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
    */
     function AddNFTsToAdressOld(string[] memory _hashes, diplomas memory _diplomas) public returns (uint256){
         
-        if(!testModeValidationDiploma) require(_hashes.length <= maxHashCount, "Gaz limit security");
-        isSchholAdmin(msg.sender, _diplomas.schoolId);
+        require(_hashes.length <= maxHashCount, "Gaz limit security");
+        if(!testModeValidationDiploma) isSchoolAdmin(msg.sender, _diplomas.schoolId);
         return AddNFTsToAdressInternal(_hashes); 
     }
     

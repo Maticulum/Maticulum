@@ -7,7 +7,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import DataFromBase from './DataFromBase';
 
 class Registration extends Component {
-state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSelected:0x03} 
+state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSelected:0x03,
+	userDatas:[]} 
   static contextType = Web3Context; 	
    
  
@@ -26,9 +27,10 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 	return data;
   }
   
-  	GetValuePair(event) {let val = event.nativeEvent.target.selectedIndex;
-		this.state.userTypeSelected = val;
-	}
+  GetValuePair(event) {
+	let val = event.nativeEvent.target.selectedIndex;
+	this.state.userTypeSelected = val;
+  }
 
   GetThisUser = async() => {
 	const CryptoJS = require('crypto-js');
@@ -68,10 +70,6 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 	}
   }	
   
-  onChange= async() => {
-	  
-  }
-
   CreateModifyUser = async() => {
 	if(this.userAddress.value == "") {
 		alert("user adress must be filled");
@@ -88,8 +86,7 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 						+ date.toDateString()        +"#"
 						+ this.mail.value            +"#"
 						+ this.mobile.value          +"#"
-						+ this.telfixe.value         +"#"
-						+ this.pass.value;
+						+ this.telfixe.value;
 								
 		const CryptoJS = require('crypto-js');
 	    var userDatasCrypted = CryptoJS.TripleDES.encrypt(userDatas, this.pass.value); 
@@ -104,7 +101,45 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 		this.birthDate,this.mail.value,this.mobile.value,this.telfixe.value)
 		.send({from: this.context.account});
 	}	  
-  }		
+  }	
+  
+  fillDatas = async(userAdress,name,firstname,countryBirth,birthDate,mail, phone, mobilePhone) =>{
+	  const { userDatas}= this.state; 
+	  let users =     name          +"#"
+					+ firstname     +"#"
+					+ countryBirth  +"#"
+					+ birthDate     +"#"
+					+ mail          +"#"
+					+ phone         +"#"
+					+ mobilePhone;
+	  const CryptoJS = require('crypto-js');
+	  var userDatasCrypted = CryptoJS.TripleDES.encrypt(users, this.pass.value); 
+	  let userDatasCryptedHashed = btoa(userDatasCrypted);
+	  let userHash = {hash:userDatasCryptedHashed,role:this.state.userTypeSelected,userAdress: userAdress};
+	  userDatas.push(userHash);
+	  this.setState({userDatas:userDatas});
+  }
+
+  showFile = async (e) => {
+		e.preventDefault();
+		const reader = new FileReader();
+		reader.onload = async (e) => { 
+		  const text = (e.target.result);
+		  const lines = text.split(/\r\n|\n/);		  
+		  for(let i =0;i<lines.length;i++){
+			const line = lines[i].split(',');
+			await this.fillDatas(line[0],line[1],line[2],line[3],line[4],line[5],line[6],line[7]);
+		  }
+		};
+		
+		reader.onerror = (e) => alert(e.target.error.name);
+		reader.readAsText(e.target.files[0]);				
+  }  
+  
+  CreateModifyUsers= async() => {
+	  const { userDatas}= this.state;
+	  await this.context.contract.methods.registerUsersHashes(userDatas).send({from: this.context.account});		
+  }
   		
   render() {
 	 const { t } = this.props;  
@@ -196,7 +231,7 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
                 
         <Button className="next" onClick={this.GetThisUser}>{t('registration.getUser')}</Button>
         <Button className="next" onClick={this.CreateModifyUser}>{t('registration.createUser')}</Button>
-	
+		<Button className="next" onClick={this.CreateModifyUsers}>{t('registration.createUser')}s</Button>
       </Form>
     );
   }
