@@ -95,7 +95,8 @@ class App extends Component {
          const isValidated = (user.role & roles.VALIDATED) === roles.VALIDATED;
          const isSuperAdmin = (user.role & roles.SUPER_ADMIN) === roles.SUPER_ADMIN;
 
-         const isSchoolAdmin = await this.state.contractSchool.methods.getAdministratorSchoolsCount(accounts[0]).call() > 0;
+         const schools = await this.state.contractSchool.methods.getAdministratorSchools(accounts[0]).call();
+         const isSchoolAdmin = schools.length > 0;
 
          this.setState({ isRegistered, isValidated, isSuperAdmin, isSchoolAdmin });
       }

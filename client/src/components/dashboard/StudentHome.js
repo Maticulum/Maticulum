@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Container, Table } from 'react-bootstrap';
+import { Container, Table } from 'react-bootstrap';
 import { withRouter } from 'react-router-dom';
 import { withTranslation } from 'react-i18next';
 
@@ -18,21 +18,12 @@ class StudentHome extends Component {
       const cmSchool = this.context.contractSchool.methods;
 
       // get trainings
-      const trainingCount = await cm.getUserTrainingsCount(this.context.account).call();
-      for (let i = 0; i < trainingCount; i++) {
-         const trainingId = await cm.getUserTraining(this.context.account, i).call();
+      const trainingIds = await cm.getUserTrainings(this.context.account).call();
+      for (let i = 0; i < trainingIds.length; i++) {
+         const trainingId = trainingIds[i];
          const training = await cm.trainings(trainingId).call();
          const school = await cmSchool.schools(training.school).call();
          trainings.push({ id: trainingId, school: school.name, name: training.name, waiting: false });
-      }
-
-      // get trainings waiting for validation
-      const waitingCount = await cm.getTrainingsUserWaitingValidationCount(this.context.account).call();
-      for (let i = 0; i < waitingCount; i++) {
-         const trainingId = await cm.getTrainingUserWaitingValidation(this.context.account, i).call();
-         const training = await cm.trainings(trainingId).call();
-         const school = await cmSchool.schools(training.school).call();
-         trainings.push({ id: trainingId, school: school.name, name: training.name, waiting: true });
       }
 
       this.setState({ trainings });
@@ -47,8 +38,7 @@ class StudentHome extends Component {
             <Table>
                <thead>
                   <tr>
-                     <th>Training</th>
-                     <th>Status</th>
+                     <th>{ t('student.training') }</th>
                   </tr>
                </thead>
                <tbody>
@@ -56,8 +46,7 @@ class StudentHome extends Component {
                      <tr key={sindex}>
                         <td>{training.school} - { training.name }</td>
                         <td>
-                           Registered
-                           { training.waiting && ' (Waiting validation)' }
+                           { t('student.registered') }
                         </td>
                      </tr> 
                   )}

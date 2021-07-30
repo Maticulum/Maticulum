@@ -25,24 +25,24 @@ class SchoolAdminHome extends Component {
          diplomasReady.push({ trainingId, user });
       }
 
-      const schoolsCount = await cm.getAdministratorSchoolsCount(this.context.account).call();
+      const schoolIds = await cm.getAdministratorSchools(this.context.account).call();
       // For each school the user is school admin
-      for (let i = 0; i < schoolsCount; i++) {
-         const schoolId = await cm.getAdministratorSchools(this.context.account, i).call();
+      for (let i = 0; i < schoolIds.length; i++) {
+         const schoolId = schoolIds[i];
          const school = await cm.schools(schoolId).call();
 
          const trainings = [];
-         const trainingsCount = await cm.getSchoolTrainingsCount(schoolId).call();
+         const trainingIds = await cm.getSchoolTrainings(schoolId).call();
          // For each training of the school
-         for (let j = 0; j < trainingsCount; j++) {
-            const trainingId = await cm.getSchoolTraining(schoolId, j).call();
+         for (let j = 0; j < trainingIds.length; j++) {
+            const trainingId = trainingIds[j];
             const training = await cmTraining.trainings(trainingId).call();
-
-            const juriesCount = await cmTraining.getTrainingJuriesWaitingValidationCount(trainingId).call();
+            const juryIds = await cmTraining.getTrainingJuriesWaitingValidation(trainingId).call();
             const ready = diplomasReady.filter(e => e.trainingId === trainingId).length;
-            trainings.push({ id: trainingId, ...training, juriesWaitingValidation: juriesCount, ready });
+            trainings.push({ id: trainingId, ...training, juriesWaitingValidation: juryIds.length, ready });
          }
 
+         console.log('trainings', trainings);
          schools.push({ id: schoolId, ...school, trainings });
       }
 
@@ -64,9 +64,9 @@ class SchoolAdminHome extends Component {
                      <Table>
                         <thead>
                            <tr>
-                              <th>Training</th>
-                              <th>Juries waiting validation</th>
-                              <th>Diplomas ready</th>
+                              <th>{ t('training.training') }</th>
+                              <th>{ t('training.juryValidation') }</th>
+                              <th>{ t('training.diplomasReady') }</th>
                            </tr>
                         </thead>
                         <tbody>

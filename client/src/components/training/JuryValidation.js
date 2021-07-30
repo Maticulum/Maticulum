@@ -32,18 +32,11 @@ class JuryValidation extends Component {
          return;
       }
 
-      const juriesId = [];
-      const nbJuries = await cm.getTrainingJuriesCount(trainingId).call();
-      for (let i = 0; i < nbJuries; i++) {
-         juriesId.push(await cm.getTrainingJury(trainingId, i).call());
-      }
-      const nbWaiting = await cm.getTrainingJuriesWaitingValidationCount(trainingId).call();
-      for (let i = 0; i < nbWaiting; i++) {
-         juriesId.push(await cm.getTrainingJuryWaitingValidation(trainingId, i).call());
-      }
-
-      for (let i = 0; i < juriesId.length; i++) {
-         const juryId = juriesId[i];
+      let juriesIds = await cm.getTrainingJuries(trainingId).call();
+      const waitings = await cm.getTrainingJuriesWaitingValidation(trainingId).call();
+      juriesIds = juriesIds.concat(waitings);
+      for (let i = 0; i < juriesIds.length; i++) {
+         const juryId = juriesIds[i];
          const jury = await this.context.contract.methods.users(juryId).call();
 
          const { validated, count } = await cm.getJuryValidationStatus(trainingId, juryId).call();

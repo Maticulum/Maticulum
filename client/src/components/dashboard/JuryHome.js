@@ -18,25 +18,23 @@ class JuryHome extends Component {
       const cm = this.context.contractTraining.methods;
 
       // Trainings for this jury
-      const nbTrainings = await cm.getTrainingsCountForJury(this.context.account).call();
-      for (let i = 0; i < nbTrainings; i++) {
-         const trainingId = await cm.getTrainingForJury(this.context.account, i).call()
+      const trainingIds = await cm.getTrainingsForJury(this.context.account).call();
+      for (let i = 0; i < trainingIds.length; i++) {
+         const trainingId = trainingIds[i];
          const training = await this.context.contractTraining.methods.trainings(trainingId).call();
          const school = await this.context.contractSchool.methods.schools(training.school).call();
-         const count = await this.context.contractTraining.methods.getUserWaitingTrainingValidationCount(trainingId).call();
 
-         trainings.push({ id: trainingId, ...training, school: school.name, count, waiting: false });
+         trainings.push({ id: trainingId, ...training, school: school.name, waiting: false });
       }
 
       // Trainings waiting validation for this jury
-      const trainingsWaitingCount = await cm.getTrainingsWaitingValidationCountForJury(this.context.account).call();
-      for (let i = 0; i < trainingsWaitingCount; i++) {
-         const trainingId = await cm.getTrainingWaitingValidationForJury(this.context.account, i).call()
+      const trainingsWaitingIds = await cm.getTrainingsWaitingValidationForJury(this.context.account).call();
+      for (let i = 0; i < trainingsWaitingIds.length; i++) {
+         const trainingId = trainingsWaitingIds[i];
          const training = await this.context.contractTraining.methods.trainings(trainingId).call();
          const school = await this.context.contractSchool.methods.schools(training.school).call();
-         const count = await this.context.contractTraining.methods.getUserWaitingTrainingValidationCount(trainingId).call();
 
-         trainings.push({ id: trainingId, ...training, school: school.name, count, waiting: true });
+         trainings.push({ id: trainingId, ...training, school: school.name, waiting: true });
       }
 
       this.setState({ trainings });

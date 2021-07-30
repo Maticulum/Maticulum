@@ -19,7 +19,8 @@ class Home extends Component {
    async componentDidMount() {
       const user = await this.context.contract.methods.users(this.context.account).call();
       const isSuperAdmin = (user.role & 0x80) === 0x80;
-      const isSchoolAdmin = await this.context.contractSchool.methods.getAdministratorSchoolsCount(this.context.account).call() > 0;
+      const schools = await this.context.contractSchool.methods.getAdministratorSchools(this.context.account).call();
+      const isSchoolAdmin = schools.length > 0;
       const isJury = await this.context.contractTraining.methods.isJury(this.context.account).call();
       const isStudent = !(isSuperAdmin || isSchoolAdmin || isJury);
 

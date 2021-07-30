@@ -2,16 +2,12 @@
 pragma solidity 0.8.4;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 import "./IMaticulum.sol";
 import "./MaticulumNFT.sol";
 
 
 contract Maticulum is IMaticulum, Ownable {
-
-   using EnumerableSet for EnumerableSet.UintSet;
-   using EnumerableSet for EnumerableSet.AddressSet;
    
    struct UserHash {
       string hash;
@@ -32,10 +28,7 @@ contract Maticulum is IMaticulum, Ownable {
    address trainingContract;
    address payable feesReceiver;
 
-
    mapping(address => UserHash) public users;
-   address firstAdminUniveristy;
-   bool hasAdmin;
    
 
    event UserCreated(address userAdress);

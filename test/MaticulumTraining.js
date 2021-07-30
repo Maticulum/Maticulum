@@ -59,22 +59,22 @@ contract('MaticulumTraining', accounts => {
       const trainingCount = await this.training.getTrainingsCount();
       expect(trainingCount).to.be.bignumber.equal(new BN(1));
 
-      const waitingJuriesCount = await this.training.getTrainingJuriesWaitingValidationCount(0);
-      expect(waitingJuriesCount).to.be.bignumber.equal(new BN(2));
+      const waitingJuries = await this.training.getTrainingJuriesWaitingValidation(0);
+      expect(waitingJuries.length).to.be.bignumber.equal(new BN(2));
    });
 
 
    it("Validate jury", async () => {
-      let waitingJuriesCount = await this.training.getTrainingJuriesWaitingValidationCount(0);
-      expect(waitingJuriesCount).to.be.bignumber.equal(new BN(2));
+      let waitingJuries = await this.training.getTrainingJuriesWaitingValidation(0);
+      expect(waitingJuries.length).to.be.bignumber.equal(new BN(2));
 
       await this.training.validateJuryMultiple(0, [ jury1 ], { from: schoolAdmin2 });
-      waitingJuriesCount = await this.training.getTrainingJuriesWaitingValidationCount(0);
-      expect(waitingJuriesCount).to.be.bignumber.equal(new BN(1));
+      waitingJuries = await this.training.getTrainingJuriesWaitingValidation(0);
+      expect(waitingJuries.length).to.be.bignumber.equal(new BN(1));
 
       await this.training.validateJuryMultiple(0, [ jury2 ], { from: schoolAdmin2 });
-      waitingJuriesCount = await this.training.getTrainingJuriesWaitingValidationCount(0);
-      expect(waitingJuriesCount).to.be.bignumber.equal(new BN(0));
+      waitingJuries = await this.training.getTrainingJuriesWaitingValidation(0);
+      expect(waitingJuries.length).to.be.bignumber.equal(new BN(0));
 
       let isJury = await this.training.isTrainingJury(0, jury1);
       expect(isJury).to.be.true;

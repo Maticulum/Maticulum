@@ -34,18 +34,9 @@ class Training extends Component {
          const training = await cmTraining.trainings(trainingId).call();
          this.setState({ create: false, id: trainingId, ...training });
          
-         const nbJuries = await cmTraining.getTrainingJuriesCount(trainingId).call();
-         const juries = [];
-         for (let i = 0; i < nbJuries; i++) {
-            const jury = await cmTraining.getTrainingJury(trainingId, i).call();
-            juries.push(jury);
-         }
-
-         const nbJuryWaiting = await cmTraining.getTrainingJuriesWaitingValidationCount(trainingId).call();
-         for (let i = 0; i < nbJuryWaiting; i++) {
-            const jury = await cmTraining.getTrainingJuryWaitingValidation(trainingId, i).call();
-            juries.push(jury);
-         }
+         let juries = await cmTraining.getTrainingJuries(trainingId).call();
+         const waitings = await cmTraining.getTrainingJuriesWaitingValidation(trainingId).call();
+         juries = juries.concat(waitings);
          this.setState({ juries, previousJuries: juries });
       }
    }
