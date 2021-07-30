@@ -376,12 +376,12 @@ class Diplome extends Component {
 		let trainingUsersTemp = [];	
 		let trainingsAll = [];
 		
-		let userTrainings = await this.context.contractTraining.methods.getUserTrainingsCount(this.tbxUserAdress.value).call();
+		let userTrainings = await this.context.contractTraining.methods.getUserTrainings(this.tbxUserAdress.value).call();
 		
 		let trainingIdToStore = null;
 		
-		for(let i = 0;i<userTrainings;i++){			
-			let trainingId = await this.context.contractTraining.methods.getUserTraining(this.tbxUserAdress.value,i).call();			
+		for(let i = 0;i<userTrainings.length;i++){	
+			let trainingId = userTrainings[i];
 			let training = await this.context.contractTraining.methods.trainings(trainingId).call();
 			trainingsAll.push(training);
 			trainingUsersTemp.push({name:training[1],id: trainingId});

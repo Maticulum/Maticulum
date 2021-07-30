@@ -40,8 +40,8 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
 	/// to test without diploma validation, only owner can change it
 	bool testModeValidationDiploma;
     NFTdatas NFTDatas_;
-    ISchool school;
-    MaticulumTraining training;
+    ISchool public school;
+    MaticulumTraining public training;
     
     /// datas of the gateway to send and store image and json files on IPFS
     struct gatewayApiDatas{
@@ -101,17 +101,23 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
     */
     function areDiplomasValidated(address _schoolAdmin, diplomas memory _diplomas) public view returns (bool) {
         
-        isSchoolAdmin(_schoolAdmin, _diplomas.schoolId);
+        bool isadmin = isSchoolAdmin(_diplomas.schoolId, _schoolAdmin);
         
         for(uint i =0;i < _diplomas.userAddresses.length;i++){
             require(training.diplomaValidated(_diplomas.userAddresses[i], _diplomas.trainingId), "!DiplomaValidated");
         } 
         
-        return true;
+        return isadmin;
     }
     
-    function isSchoolAdmin(address schoolAdmin, uint256 _schoolId) view public{
-        require(school.isSchoolAdmin(_schoolId, schoolAdmin), "!SchoolAdmin");
+    /** @notice check if a user is admin school
+    * @param _schoolId   id of the shool
+    * @param _user       address of the user
+    */
+    function isSchoolAdmin(uint256 _schoolId, address _user) view public returns(bool){
+        bool isAdmin = school.isSchoolAdmin(_schoolId, _user);
+        require(isAdmin, "!isAdmin");
+        return isAdmin;
     }
     
   /**
@@ -159,7 +165,10 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
     function AddNFTsToAdressOld(string[] memory _hashes, diplomas memory _diplomas) public returns (uint256){
         
         require(_hashes.length <= maxHashCount, "Gaz limit security");
-        if(!testModeValidationDiploma) isSchoolAdmin(msg.sender, _diplomas.schoolId);
+        if(!testModeValidationDiploma) {
+            isSchoolAdmin(_diplomas.schoolId, msg.sender);
+        }
+        
         return AddNFTsToAdressInternal(_hashes); 
     }
     

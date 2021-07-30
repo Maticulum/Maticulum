@@ -28,6 +28,11 @@ module.exports = async (deployer, network, accounts) => {
    "DiplomeNFT",
    "MTCF",
    "QmYFRV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC");
+   
+   const maticulumNFT = await NFTContract.deployed();
+   
+   await maticulumNFT.registerSchoolTrainingContract(
+   SchoolContract.address,TrainingContract.address);
 
    if (network === 'develop' || network === 'rinkeby') {
       console.log('---=== Adding test data ===---');
@@ -66,11 +71,16 @@ module.exports = async (deployer, network, accounts) => {
       console.log('=> addTraining');
       await training.addTraining(0, 'Chef de projet', 'Aucun', 0, 1, [ jury, jury2 ], { from: schoolAdmin });
       await training.addTraining(0, 'Developpeur', 'Aucun', 350, 1, [ jury, jury2 ], { from: schoolAdmin2 });
+	  
+	  console.log('=> register users for trainings');
+      await training.validateUserTrainingRequestDirect(0, student1, { from: schoolAdmin });
+      await training.validateUserTrainingRequestDirect(0, student2, { from: schoolAdmin });
+      await training.validateUserTrainingRequestDirect(0, student3, { from: schoolAdmin });
+      await training.validateUserTrainingRequestDirect(0, student4, { from: schoolAdmin });
 
-      console.log('=> addUserTraining');
-      await training.addUserTraining(student1, 0);
-      await training.addUserTraining(student1, 1);
-      await training.addUserTraining(student2, 1);
+      console.log('=> validate diploma by juries');
+      await training.validateDiplomaMultipleUsers(0, [ student1, student2 , student3, student4 ], { from: jury });
+      await training.validateDiplomaMultipleUsers(0, [ student1, student2 , student3, student4 ], { from: jury2 });
    }
 
 };

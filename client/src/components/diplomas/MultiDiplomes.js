@@ -174,7 +174,6 @@ class Diplome extends Component {
 			let school = usersValues[i].school;
 			let grade = usersValues[i].grade;
 			let diplomaName = usersValues[i].diplomaName;
-			
 			await this.createImageDiplome(firstname, lastname,school,grade, diplomaName);
 		}
 	}
@@ -353,16 +352,18 @@ class Diplome extends Component {
 	
 	GetValuePair = async (event) => {
 		var index = event.nativeEvent.target.selectedIndex;
+		
 		let trainingId = event.nativeEvent.target[index].value;
 		let trainingsUsersCount = await this.context.contractTraining.methods.getUsersCountForTraining(trainingId).call();
 		let training = await this.context.contractTraining.methods.trainings(trainingId).call();
 		let schools = await this.context.contractSchool.methods.schools(training[0]).call();
+
 		let users = [];
 
 		for(let i = 0;i<trainingsUsersCount;i++){			
 			let userAddress = await this.context.contractTraining.methods.getUserForTraining(trainingId,i).call();	
 			let isValidated = await this.context.contractTraining.methods.diplomaValidated(userAddress, trainingId).call();
-		
+			
 			if(isValidated) {
 				
 				const CryptoJS = require('crypto-js');
@@ -378,7 +379,6 @@ class Diplome extends Component {
 					return;
 				}
 				let userArray = decrypted.split("#");
-				
 				
 				users.push({firstname : this.setData(userArray,1), 
 							lastname : this.setData(userArray,0),
