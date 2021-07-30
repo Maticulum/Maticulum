@@ -8,7 +8,7 @@ import "./MaticulumTraining.sol";
 import "./ISchool.sol";
 
 contract MaticulumNFT is ERC721URIStorage, Ownable {
-      /**
+  /**
    * @notice Create the datas for the gateway and for the NFT
    * @param _gatewayUrl           url https of the gateway to IPFS
    * @param _urltoJsonApi         url of the API to store a json file     
@@ -33,13 +33,17 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
     
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
-    mapping(string => bool) hashesStored;
-    mapping(string => bool) hashesStoredTemporary;
-    mapping(address=>uint[]) hashesByUser;
-    mapping(string=>bool) hashesDiplomasValidated;
-    uint[] tokenIdUser;
+	
+	/// limit of the number of hashes sent to be build as NFT to avoid DOS attack
     uint256 maxHashCount = 200;
+	gatewayApiDatas datas;
+	/// to test without diploma validation, only owner can change it
+	bool testModeValidationDiploma;
+    NFTdatas NFTDatas_;
+    ISchool school;
+    MaticulumTraining training;
     
+    /// datas of the gateway to send and store image and json files on IPFS
     struct gatewayApiDatas{
         string gatewayUrl;
         string urltoJSonApi;
@@ -49,43 +53,51 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
         string hashtoSecretApikey;
     }
     
+	/// Datas of the NFT 
     struct NFTdatas{
         string name;
         string symbol;
         string hashImageToken;
     }
     
+	/// To know if the users are authorized to have a diploma
     struct diplomas{
         uint256 schoolId;
         uint256 trainingId;
         address[] userAddresses;
     }
+	
+	/// hashes stored of the json file to find tthe json url on IPFS
+    mapping(string => bool) hashesStored;
+    mapping(string => bool) hashesStoredTemporary;	
+	/// to know by address the URIs of a user 
+    mapping(address=>uint[]) hashesByUser;
+        
     
-    gatewayApiDatas datas;
-    NFTdatas NFTDatas_;
-    ISchool school;
-    MaticulumTraining training;
-    bool testModeValidationDiploma;
     
     event NFTMinted(address recipient, string hash, uint256 newItemId);
     event GatewayChanged(string gatewayUrl);
     
-    /* @notice set the addresses of smart contracts MaticulumTraining and MaticulumSchool
-    * @param _schoolAdmin   adress of the future owner of the NFT
-   * @param _diplomas       one diploma with schoolId and trainingId informations and the list of all the students adresses of this training
+   /** @notice set the addresses of smart contracts MaticulumSchool and MaticulumTraining and 
+    * @param _schoolAddress     address of the MaticulumSchool smart contract
+    * @param _trainingAddress   address of the MaticulumTraining smart contract
     */
-    function registerSchoolTrainingContract(address schoolAddress, address trainingAddress) public{
-        school = ISchool(schoolAddress);
-        training = MaticulumTraining(trainingAddress);
+    function registerSchoolTrainingContract(address _schoolAddress, address _trainingAddress) public{
+        school = ISchool(_schoolAddress);
+        training = MaticulumTraining(_trainingAddress);
     }
     
+    /** @notice To put test mode not to check if diploma is or not validated
+     *  @param _test to decide test mode on or off
+     * 
+     */ 
     function setTestMode(bool _test) external onlyOwner {
         testModeValidationDiploma = _test;
     }
     
-   /* @notice check if a user 
+   /** @notice check if a user 
     * @param _schoolAdmin   adress of the future owner of the NFT
-   * @param _diplomas       one diploma with schoolId and trainingId informations and the list of all the students adresses of this training
+    * @param _diplomas       one diploma with schoolId and trainingId informations and the list of all the students adresses of this training
     */
     function areDiplomasValidated(address _schoolAdmin, diplomas memory _diplomas) public view returns (bool) {
         
@@ -102,7 +114,7 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
         require(school.isSchoolAdmin(_schoolId, schoolAdmin), "!SchoolAdmin");
     }
     
-    /**
+  /**
    * @notice create one NFT
    * @param _userAddress  adress oth future owner of the NFT
    * @param _hash         hash to retrieve the JSON Metadata on IPFS
@@ -123,7 +135,7 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
         return newItemId;   
     }
     
-    /**
+  /**
    * @notice Create a list of NFTs
    * @param _hashes           list of hashes to retrieve the JSON Metadata on IPFS
    * @return the user address
@@ -138,7 +150,7 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
         return AddNFTsToAdressInternal(_hashes); 
     }
     
-   /*
+  /**
    * @notice Create a list of NFTs
    * @param _hashes           list of hashes to retrieve the JSON Metadata on IPFS
    * @param _diplomas         one diploma with schoolId and trainingId informations and the list of all the students adresses of this training
@@ -151,7 +163,7 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
         return AddNFTsToAdressInternal(_hashes); 
     }
     
-    /*
+  /**
    * @notice Create a list of NFTs
    * @param _hashes           list of hashes to retrieve the JSON Metadata on IPFS
    * @return the user address
@@ -177,7 +189,7 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
         return lastUri; 
     } 
     
-     /**
+  /**
    * @notice Get the URI of the last minted NFT
    * @return the user address
    */
@@ -185,7 +197,7 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
         return _tokenIds.current();
     }
     
-   /**
+  /**
    * @notice Get the URI by passing id
    * @param _id    id of the URI stored in blockchain
    * @return the user address
@@ -195,7 +207,7 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
         return tokenURI(_id);
     }
     
-    /**
+  /**
    * @notice Create the gateway datas to interact with IPFS
    * @param _gatewayUrl           url https of the gateway to IPFS
    * @param _urltoJsonApi         url of the API to store a json file     
@@ -210,7 +222,7 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
         datas = gatewayApiDatas(_gatewayUrl, _urltoJsonApi, _urltoImageApi, _urlToUnPinApi, _hashtoApikey, _hashtoSecretApikey);
     }
     
-    /**
+  /**
    * @notice Get all the datas of the gateway API and the NFT token
    * * @return the datas
    */
@@ -218,7 +230,7 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
         return datas;
     }
     
-     /**
+  /**
    * @notice Modify the hash of the stored image for the NFT token
    * @param _hashImageToken       hash of the image
    */
@@ -227,18 +239,18 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
         NFTDatas_.hashImageToken = _hashImageToken;
     }
     
-     /**
+  /**
    * @notice Get all the datas of the gateway API and the NFT token
-   * * @return the datas
+   * @return the datas
    */
     function getNFTDatas() public view returns(NFTdatas memory){
         return NFTDatas_;
     }
     
-    /**
+  /**
    * @notice Get all the hashes of one user by address
-   * * @param _userAddress       address of the user
-   * * @return the datas
+   * @param _userAddress       address of the user
+   * @return the datas
    */
     function getUrisByAddress(address _userAddress) public view returns(uint[] memory){
         return hashesByUser[_userAddress];

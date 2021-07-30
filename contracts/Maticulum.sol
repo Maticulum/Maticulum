@@ -51,14 +51,14 @@ contract Maticulum is IMaticulum, Ownable {
       feesReceiver = payable(msg.sender);
    }
 
-   /* register the address of the smart contract MaticulumTraining 
+   /** register the address of the smart contract MaticulumTraining 
    * @param _trainingContract address of the smart contract 
    */
    function registerTrainingContract(address _trainingContract) external onlyOwner {
       trainingContract = _trainingContract;
    }
 
-   /* check if the address of the user has superAdmin role or not
+   /** check if the address of the user has superAdmin role or not
     * @param _user address of the user 
     */
    function isSuperAdmin(address _user) external view override returns (bool) {
@@ -66,21 +66,21 @@ contract Maticulum is IMaticulum, Ownable {
    }
 
     
-   /* check if the address of the user has is registered in the users array
+   /** check if the address of the user has is registered in the users array
     * @param _user address of the user
     */
    function isRegistered(address _user) external view override returns(bool) {
       return users[_user].role != 0;
    }
 
-   /* get the fees of the receiever address
+   /** get the fees of the receiever address
     */
    function getFeesReceiver() external view override returns (address payable) {
       return feesReceiver;
    }
 
     
-   /* validate the user by setting his role to VALIDATED_MASK
+   /** validate the user by setting his role to VALIDATED_MASK
     * @param _user address of the user
     */
    function validateUser(address _user) external override {
@@ -89,15 +89,15 @@ contract Maticulum is IMaticulum, Ownable {
       users[_user].role |= VALIDATED_MASK;
    }
 
-   /* Validate the user by setting his role to SUPER_ADMIN_MASK
-    * @param _user address of the user
+   /** Validate the user by setting his role to SUPER_ADMIN_MASK
+    * @param _userAdress address of the user
     */
-   function setSuperAdmin(address userAdress) external onlyOwner {
-      users[userAdress].role |= SUPER_ADMIN_MASK;
+   function setSuperAdmin(address _userAdress) external onlyOwner {
+      users[_userAdress].role |= SUPER_ADMIN_MASK;
    }
    
-   /* register a user with crypted datas and his role and address
-    * @param _user address of the user
+   /** register a user with crypted datas and his role and address
+    * @param _userAdress address of the user
     * @param _hash crypted datas of the user (name, firstname,country date, birth date, email, phone, mobile phone)
     * @param _role address of the user
     */
@@ -105,8 +105,8 @@ contract Maticulum is IMaticulum, Ownable {
       users[_userAdress] = UserHash(_hash, _role);
    }
    
-   /* register a list of user with crypted datas and their role and address
-    * @param _user contains a list of the addresses, the crypted datas and the role
+   /** register a list of user with crypted datas and their role and address
+    * @param _users contains a list of the addresses, the crypted datas and the role
     */
    function registerUsersHashes(UserHashAdress[] memory _users) external {
        for(uint i =0;i < _users.length;i++){
@@ -114,21 +114,21 @@ contract Maticulum is IMaticulum, Ownable {
         } 
    }
    
-   /* get user datas by user address 
-    * @param _user address of the user
+   /** get user datas by user address 
+    * @param _userAdress address of the user
     */
    function getUserHash(address _userAdress) external view returns(UserHash memory) {
       return users[_userAdress];
    }
    
-   /* get user datas of the sender
+   /** get user datas of the sender
     */
    function getUser() external view returns(UserHash memory) {
       return users[msg.sender];
    }
 	
 
-    /* set user role by passing user address
+    /** set user role by passing user address
     * @param _userAddress address of the user
     * @param _role role of the user
     */
