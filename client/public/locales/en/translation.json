@@ -89,7 +89,11 @@
       "details": "Details",
       "trainings": "Trainings",
       "addTraining": "Add training",
-      "create": "Save"
+      "create": "Save",
+      "adminValidation": "School administrator validation",
+      "schoolAdmin": "School administrators",
+      "school": "School",
+      "adminWaitingValidation" : "Admins waiting validation"
    },
    "training": {
       "name": "Name",
@@ -100,7 +104,15 @@
       "jury": "Jury",
       "training": "Training",
       "address": "Student Address",
-      "register": "Register"
+      "register": "Register",
+      "juryValidation": "Juries waiting validation",
+      "diplomasReady": "Diplomas ready"
+   },
+   "student": {
+      "training": "Formation",
+      "status": "Etat",
+      "registered": "Enregistré",
+      "waitingValidation": "En attente de validation"
    },
    "error": {
       "badNetworkTitle": "Bad network",

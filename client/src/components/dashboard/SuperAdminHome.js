@@ -18,11 +18,11 @@ class SuperAdminHome extends Component {
 
       const schoolsCount = await cm.getSchoolsCount().call();
       for (let schoolId = 0; schoolId < schoolsCount; schoolId++) {
-         const adminsCount = await cm.getSchoolAdministratorsWaitingValidationCount(schoolId).call();
-         if (adminsCount !== 0) {
+         const waitings = await cm.getSchoolAdministratorsWaitingValidation(schoolId).call();
+         if (waitings.length !== 0) {
             const school = await cm.schools(schoolId).call();
 
-            admins.push({ id: schoolId, name: school.name, count: adminsCount });
+            admins.push({ id: schoolId, name: school.name, count: waitings.length });
          }
       }
       
@@ -41,12 +41,12 @@ class SuperAdminHome extends Component {
          <>
             { this.state.admins && 
                <>
-               <h3>School admins</h3>
+               <h3>{ t('school.schoolAdmin') }</h3>
                <Table>
                   <thead>
                      <tr>
-                        <th>School</th>
-                        <th>Admins waiting validation</th>
+                        <th>{ t('school.school') }</th>
+                        <th>{ t('school.adminWaitingValidation') }</th>
                      </tr>
                   </thead>
                   <tbody>

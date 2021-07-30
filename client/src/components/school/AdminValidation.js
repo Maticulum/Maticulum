@@ -32,15 +32,9 @@ class AdminValidation extends Component {
          return;
       }
 
-      const adminIds = [];
-      const nbAdmins = await cm.getSchoolAdministratorsCount(schoolId).call();
-      for (let i = 0; i < nbAdmins; i++) {
-         adminIds.push(await cm.getSchoolAdministrator(schoolId, i).call());
-      }
-      const nbWaiting = await cm.getSchoolAdministratorsWaitingValidationCount(schoolId).call();
-      for (let i = 0; i < nbWaiting; i++) {
-         adminIds.push(await cm.getSchoolAdministratorWaitingValidation(schoolId, i).call());
-      }
+      let adminIds = await cm.getSchoolAdministrators(schoolId).call();
+      const waitings = await cm.getSchoolAdministratorsWaitingValidation(schoolId).call();
+      adminIds = adminIds.concat(waitings);
 
       for (let i = 0; i < adminIds.length; i++) {
          const adminId = adminIds[i];
@@ -100,7 +94,7 @@ class AdminValidation extends Component {
 
       return (
          <Container>
-            <h3>Admin validation - { this.state.school.name }</h3>
+            <h3>{ t('school.adminValidation') } - { this.state.school.name }</h3>
             <Form>
                <Table>
                   <thead>

@@ -45,9 +45,9 @@ class TrainingChoice extends Component {
          const cmSchool = this.context.contractSchool.methods;
          const cmTraining = this.context.contractTraining.methods;
 
-         const trainingsCount = await cmSchool.getSchoolTrainingsCount(schoolId).call();
-         for (let i = 0; i< trainingsCount; i++) {
-            const trainingId = await cmSchool.getSchoolTraining(schoolId, i).call();
+         const trainingIds = await cmSchool.getSchoolTrainings(schoolId).call();
+         for (let i = 0; i< trainingIds.length; i++) {
+            const trainingId = trainingIds[i];
             const training = await cmTraining.trainings(trainingId).call();
             const { registered, validated } = await cmTraining.getRegistrationStatus(trainingId, this.context.account).call();
 

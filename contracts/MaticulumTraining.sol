@@ -2,7 +2,7 @@
 pragma solidity 0.8.4;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import "./openzeppelin/EnumerableSet.sol";
 
 import "./IMaticulum.sol";
 import "./ISchool.sol";
@@ -49,10 +49,6 @@ contract MaticulumTraining is Ownable {
    /// List of (training, jury) validated by School Admin
    mapping(uint256 => EnumerableSet.AddressSet) trainingJuries;
    mapping(address => EnumerableSet.UintSet) juryTrainings;
-
-   /// List of (training, student) waiting validation after registration to a training
-   mapping(uint256 => EnumerableSet.AddressSet) trainingUsersWaitingValidation;
-   mapping(address => EnumerableSet.UintSet) userWaitingTrainingValidation;
 
    /// List of validated (training, student)
    mapping(uint256 => EnumerableSet.AddressSet) trainingUsers;
@@ -115,6 +111,7 @@ contract MaticulumTraining is Ownable {
       return diplomasReady.length;
    }
 
+
    /**
    * @notice Get the status of a registration request
    * @param _trainingId id of training
@@ -124,26 +121,14 @@ contract MaticulumTraining is Ownable {
    */
    function getRegistrationStatus(uint256 _trainingId, address _user) external view returns (bool registered, bool validated) {
       validated = trainingUsers[_trainingId].contains(_user);
-      registered = validated || trainingUsersWaitingValidation[_trainingId].contains(_user);
+      registered = validated || maticulum.isRegistered(_user);
    }
 
    /**
    * @notice Register for a training
    * @param _trainingId id of training
+   * @param _user       user address
    */
-   function registerForTraining(uint256 _trainingId) external {
-      require(maticulum.isRegistered(msg.sender), "!Registered");
-      require(!userWaitingTrainingValidation[msg.sender].contains(_trainingId), "Already registered");
-
-      trainingUsersWaitingValidation[_trainingId].add(msg.sender);
-      userWaitingTrainingValidation[msg.sender].add(_trainingId);
-
-      trainingStudentRegistrationDates[_trainingId][msg.sender] = block.timestamp; // TODO here or at validation step ?
-
-      emit UserTrainingRequest(_trainingId, msg.sender);
-   }
-   
-
    function validateUserTrainingRequestDirect(uint256 _trainingId, address _user) external {
       require(school.isSchoolAdmin(trainings[_trainingId].school, msg.sender), "!SchoolAdmin");
       require(!userTrainings[_user].contains(_trainingId), "Already validated");
@@ -159,97 +144,12 @@ contract MaticulumTraining is Ownable {
 
 
    /**
-   * @notice Valide the user request to register for a training
-   * @param _trainingId id of the training
-   * @param _user       address of user
-   */
-   function validateUserTrainingRequest(uint256 _trainingId, address _user) public {
-      require(school.isSchoolAdmin(trainings[_trainingId].school, msg.sender), "!SchoolAdmin");
-      require(userWaitingTrainingValidation[_user].contains(_trainingId), "Training !Registered");
-      require(!userTrainings[_user].contains(_trainingId), "Already validated");
-
-      userTrainings[_user].add(_trainingId);
-      trainingUsers[_trainingId].add(_user);
-
-      trainingUsersWaitingValidation[_trainingId].remove(_user);
-      userWaitingTrainingValidation[_user].remove(_trainingId);
-
-      emit UserTrainingRequestValidation(_trainingId, _user, msg.sender);
-   }
-
-
-   /**
-   * @notice Validate multiple users request to register for a training
-   * @param _trainingId id of the training
-   * @param _users      array of users addresses
-   */
-   function validateUserTrainingRequestMultiple(uint256 _trainingId, address[] memory _users) external {
-      for (uint256 i = 0; i < _users.length; i++) {
-         validateUserTrainingRequest(_trainingId, _users[i]);
-      }
-   }
-
-
-   /**
-   * @notice Get the number of users who have request a registration for the given training
-   * @param _trainingId    id of training
-   * @return Count of users
-   */
-   function getUserWaitingTrainingValidationCount(uint256 _trainingId) external view returns (uint256) {
-      return trainingUsersWaitingValidation[_trainingId].length();
-   }
-
-
-   /**
-   * @notice Get the user waiting registration for the given training and index
-   * @param _trainingId    id of training
-   * @param _index         index of user
-   * @return User address at this index
-   */
-   function getUserWaitingTrainingValidation(uint256 _trainingId, uint256 _index) external view returns (address) {
-      return trainingUsersWaitingValidation[_trainingId].at(_index);
-   }
-   
-
-   /**
-   * @notice Get the number of trainings a user is waiting for registration validation
+   * @notice Get the training list for a user
    * @param _user    address of user
-   * @return Count of trainings
+   * @return Training id list
    */
-   function getTrainingsUserWaitingValidationCount(address _user) external view returns (uint256) {
-      return userWaitingTrainingValidation[_user].length();
-   }
-
-
-   /**
-   * @notice Get the training a user is waiting for registration validation for the given index
-   * @param _user    address of user
-   * @param _index   training index
-   * @return Training at this index
-   */
-   function getTrainingUserWaitingValidation(address _user, uint256 _index) external view returns (uint256) {
-      return userWaitingTrainingValidation[_user].at(_index);
-   }
-
-
-   /**
-   * @notice Get the number of trainings for a user
-   * @param _user    address of user
-   * @return Count of trainings
-   */
-   function getUserTrainingsCount(address _user) external view returns (uint256) {
-      return userTrainings[_user].length();
-   }
-
-
-   /**
-   * @notice Get the training for a user for the given index
-   * @param _user    address of user
-   * @param _index   training index
-   * @return Training at this index
-   */
-   function getUserTraining(address _user, uint256 _index) external view returns (uint256) {
-      return userTrainings[_user].at(_index);
+   function getUserTrainings(address _user) external view returns (uint256[] memory) {
+      return userTrainings[_user].values();
    }
 
 
@@ -314,44 +214,22 @@ contract MaticulumTraining is Ownable {
 
 
    /**
-   * @notice Get the number of juries for a training
-   * @param _id   id of training
-   * @return number of juries
-   */
-   function getTrainingJuriesCount(uint256 _id) external view returns (uint256) {
-      return trainingJuries[_id].length();
-   }
-
-
-   /**
    * @notice Get a jury for specified training
    * @param _id      id of training
-   * @param _index   index of jury's list
    * @return address of jury
    */
-   function getTrainingJury(uint256 _id, uint256 _index) external view returns (address) {
-      return trainingJuries[_id].at(_index);
+   function getTrainingJuries(uint256 _id) external view returns (address[] memory) {
+      return trainingJuries[_id].values();
    }
 
 
    /**
-   * @notice Get the number of trainings a jury participates in.
-   * @param _jury jurys address
-   * @return jury's training count
+   * @notice Get the trainingId list of a jury
+   * @param _jury    address of jury
+   * @return the list training ids
    */
-   function getTrainingsCountForJury(address _jury) external view returns (uint256) {
-      return juryTrainings[_jury].length();
-   }
-
-
-   /**
-   * @notice Get the Nth trainingId of the jury
-   * @param _jury jurys address
-   * @param _index   index in the jury's training list
-   * @return the training id
-   */
-   function getTrainingForJury(address _jury, uint256 _index) external view returns (uint256) {
-      return juryTrainings[_jury].at(_index);
+   function getTrainingsForJury(address _jury) external view returns (uint256[] memory) {
+      return juryTrainings[_jury].values();
    }
 
 
@@ -376,33 +254,22 @@ contract MaticulumTraining is Ownable {
 
 
    /**
-   * @notice Get the count of juries waiting a validation for a given training
+   * @notice Get the juries waiting a validation for a given training
    * @param _trainingId id of the training
-   * @return 
+   * @return jury list
    */
-   function getTrainingJuriesWaitingValidationCount(uint256 _trainingId) external view returns (uint256) {
-      return trainingJuriesWaitingValidation[_trainingId].length();
+   function getTrainingJuriesWaitingValidation(uint256 _trainingId) external view returns (address[] memory) {
+      return trainingJuriesWaitingValidation[_trainingId].values();
    }
 
 
    /**
-   * @notice Get the jury waiting a validation for a given training and index
-   * @param _trainingId id of the training
-   * @param _index      element index
-   * @return jury
+   * @notice Get the trainings for a given jury waiting a validation 
+   * @param _jury    jury address
+   * @return trainings list
    */
-   function getTrainingJuryWaitingValidation(uint256 _trainingId, uint256 _index) external view returns (address) {
-      return trainingJuriesWaitingValidation[_trainingId].at(_index);
-   }
-
-
-   function getTrainingsWaitingValidationCountForJury(address _jury) external view returns (uint256) {
-      return juryWaitingTrainingValidation[_jury].length();
-   }
-
-
-   function getTrainingWaitingValidationForJury(address _jury, uint256 index) external view returns (uint256) {
-      return juryWaitingTrainingValidation[_jury].at(index);
+   function getTrainingsWaitingValidationForJury(address _jury) external view returns (uint256[] memory) {
+      return juryWaitingTrainingValidation[_jury].values();
    }
 
 
@@ -505,6 +372,11 @@ contract MaticulumTraining is Ownable {
    */
    function getUserForTraining(uint256 _trainingId, uint256 _index) external view returns (address) {
       return trainingUsers[_trainingId].at(_index);
+   }
+
+
+   function getUsersForTraining(uint256 _trainingId) external view returns (address[] memory) {
+      return trainingUsers[_trainingId].values();
    }
    
 

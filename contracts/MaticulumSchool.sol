@@ -2,7 +2,7 @@
 pragma solidity 0.8.4;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import "./openzeppelin/EnumerableSet.sol";
 
 import "./IMaticulum.sol";
 import "./ISchool.sol";
@@ -237,65 +237,32 @@ contract MaticulumSchool is ISchool, Ownable {
 
 
    /**
-   * @notice Get the number of administrators for a school
+   * @notice Get the admins list for a given school
    * @param _schoolId   id of school
-   * @return count
+   * @return addresses of admin
    */
-   function getSchoolAdministratorsCount(uint256 _schoolId) external view returns (uint256) {
-      return schoolAdministrators[_schoolId].length();
+   function getSchoolAdministrators(uint256 _schoolId) external view returns (address[] memory) {
+      return schoolAdministrators[_schoolId].values();
    }
 
 
    /**
-   * @notice Get the admin for a given school and index
+   * @notice Get the admins list waiting validation for a given school
    * @param _schoolId   id of school
-   * @param _index      index
-   * @return address of admin
+   * @return addresses of admin
    */
-   function getSchoolAdministrator(uint256 _schoolId, uint256 _index) external view returns (address) {
-      return schoolAdministrators[_schoolId].at(_index);
+   function getSchoolAdministratorsWaitingValidation(uint256 _schoolId) external view returns (address[] memory) {
+      return schoolAdministratorsWaitingValidation[_schoolId].values();
    }
 
 
    /**
-   * @notice Get the number of administrators waiting validation for a school
-   * @param _schoolId   id of school
-   * @return count
-   */
-   function getSchoolAdministratorsWaitingValidationCount(uint256 _schoolId) external view returns (uint256) {
-      return schoolAdministratorsWaitingValidation[_schoolId].length();
-   }
-
-
-   /**
-   * @notice Get the admin waiting validation for a given school and index
-   * @param _schoolId   id of school
-   * @param _index      index
-   * @return address of admin
-   */
-   function getSchoolAdministratorWaitingValidation(uint256 _schoolId, uint256 _index) external view returns (address) {
-      return schoolAdministratorsWaitingValidation[_schoolId].at(_index);
-   }
-
-
-   /**
-   * @notice Get the number of school for which a user is administrator
+   * @notice Get the schools for a given admin and index
    * @param _admin      user address
-   * @return count
+   * @return schools id
    */
-   function getAdministratorSchoolsCount(address _admin) external view returns (uint256) {
-      return administratorSchools[_admin].length();
-   }
-
-
-   /**
-   * @notice Get the school for a given admin and index
-   * @param _admin      user address
-   * @param _index      index
-   * @return school id
-   */
-   function getAdministratorSchools(address _admin, uint256 _index) external view returns (uint256) {
-      return administratorSchools[_admin].at(_index);
+   function getAdministratorSchools(address _admin) external view returns (uint256[] memory) {
+      return administratorSchools[_admin].values();
    }
 
 
@@ -326,23 +293,12 @@ contract MaticulumSchool is ISchool, Ownable {
 
 
    /**
-   * @notice Get the number of trainings for a school
-   * @param _schoolId   id of school
-   * @return number of trainings
-   */
-   function getSchoolTrainingsCount(uint256 _schoolId) external view returns (uint256) {
-      return schoolTrainings[_schoolId].length();
-   }
-
-
-   /**
-   * @notice Get a training for specified school
+   * @notice Get trainings list for specified school
    * @param _schoolId      id of school
-   * @param _index   index of training
    * @return address of jury
    */
-   function getSchoolTraining(uint256 _schoolId, uint256 _index) external view returns (uint256) {
-      return schoolTrainings[_schoolId].at(_index);
+   function getSchoolTrainings(uint256 _schoolId) external view returns (uint256[] memory) {
+      return schoolTrainings[_schoolId].values();
    }
 
 

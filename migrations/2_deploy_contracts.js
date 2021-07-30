@@ -2,7 +2,7 @@ var NFTContract = artifacts.require("./MaticulumNFT.sol");
 var MaticulumContract = artifacts.require("./Maticulum.sol");
 var SchoolContract = artifacts.require("./MaticulumSchool.sol");
 var TrainingContract = artifacts.require("./MaticulumTraining.sol");
-var DiplomasValidationContract = artifacts.require("./DiplomasValidation.sol");
+
 
 module.exports = async (deployer, network, accounts) => {
 
@@ -17,9 +17,7 @@ module.exports = async (deployer, network, accounts) => {
 
    await maticulum.registerTrainingContract(TrainingContract.address);
    await school.registerTrainingContract(TrainingContract.address);
-   
-   await deployer.deploy(DiplomasValidationContract, SchoolContract.address,TrainingContract.address);
-   
+      
    await deployer.deploy(NFTContract, 
    "https://gateway.pinata.cloud/ipfs/",
    "https://api.pinata.cloud/pinning/pinJSONToIPFS/",
@@ -29,8 +27,7 @@ module.exports = async (deployer, network, accounts) => {
    "MjMwZWNlZDljNDk3Mzc1MmFhZDE0MTMwYzI0NTI5ZGQ2YjljNDY1ZmI4ZTQ5OGEyYmZmMjNmZGEyOTljYTVkNGFudA==",
    "DiplomeNFT",
    "MTCF",
-   "QmYFRV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC",
-   DiplomasValidationContract.address);
+   "QmYFRV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC");
 
    if (network === 'develop' || network === 'rinkeby') {
       console.log('---=== Adding test data ===---');
@@ -61,16 +58,14 @@ module.exports = async (deployer, network, accounts) => {
       await maticulum.setSuperAdmin(superAdmin);
       await maticulum.setSuperAdmin(superAdmin2);
 
-      console.log('=> updateSchoolValidationThreshold');
-      await school.updateSchoolValidationThreshold(1);
-
       console.log('=> addSchool');
-      await school.addSchool('Alyra', 'Paris', 'France', 2, superAdmin, schoolAdmin, { value: "100000000000000000" });
-      await school.validateAdministratorMultiple(0, [superAdmin]);
+      await school.addSchool('Alyra', 'Paris', 'France', 2, schoolAdmin, schoolAdmin2, { value: "100000000000000000" });
+      await school.validateAdministratorMultiple(0, [schoolAdmin, schoolAdmin2]);
+      await school.validateAdministratorMultiple(0, [schoolAdmin, schoolAdmin2], { from: superAdmin2 });
 
       console.log('=> addTraining');
-      await training.addTraining(0, 'Chef de projet', 'Aucun', 350, 1, [ jury, jury2 ]);
-      await training.addTraining(0, 'Developpeur', 'Aucun', 350, 1, [ jury, jury2 ]);
+      await training.addTraining(0, 'Chef de projet', 'Aucun', 0, 1, [ jury, jury2 ], { from: schoolAdmin });
+      await training.addTraining(0, 'Developpeur', 'Aucun', 350, 1, [ jury, jury2 ], { from: schoolAdmin2 });
 
       console.log('=> addUserTraining');
       await training.addUserTraining(student1, 0);

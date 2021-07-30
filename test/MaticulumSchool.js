@@ -53,26 +53,26 @@ contract('MaticulumSchool', accounts => {
       await this.school.validateAdministratorMultiple(0, [ schoolAdmin1 ], { from: superAdmin1 });
       adminCount = await this.school.getSchoolAdministratorsWaitingValidationCount(0);
       expect(adminCount).to.be.bignumber.equal(new BN(2));
-      adminCount = await this.school.getSchoolAdministratorsCount(0);
-      expect(adminCount).to.be.bignumber.equal(new BN(0));
+      admins = await this.school.getSchoolAdministrators(0);
+      expect(admins.length).to.be.bignumber.equal(new BN(0));
 
       await this.school.validateAdministratorMultiple(0, [ schoolAdmin1 ], { from: superAdmin2 });
       adminCount = await this.school.getSchoolAdministratorsWaitingValidationCount(0);
       expect(adminCount).to.be.bignumber.equal(new BN(1));
-      adminCount = await this.school.getSchoolAdministratorsCount(0);
-      expect(adminCount).to.be.bignumber.equal(new BN(1));
+      admins = await this.school.getSchoolAdministrators(0);
+      expect(admins.length).to.be.bignumber.equal(new BN(1));
 
       await this.school.validateAdministratorMultiple(0, [ schoolAdmin2 ], { from: superAdmin1 });
       adminCount = await this.school.getSchoolAdministratorsWaitingValidationCount(0);
       expect(adminCount).to.be.bignumber.equal(new BN(1));
-      adminCount = await this.school.getSchoolAdministratorsCount(0);
-      expect(adminCount).to.be.bignumber.equal(new BN(1));
+      admins = await this.school.getSchoolAdministrators(0);
+      expect(admins.length).to.be.bignumber.equal(new BN(1));
 
       await this.school.validateAdministratorMultiple(0, [ schoolAdmin2 ], { from: superAdmin2 });
       adminCount = await this.school.getSchoolAdministratorsWaitingValidationCount(0);
       expect(adminCount).to.be.bignumber.equal(new BN(0));
-      adminCount = await this.school.getSchoolAdministratorsCount(0);
-      expect(adminCount).to.be.bignumber.equal(new BN(2));
+      admins = await this.school.getSchoolAdministrators(0);
+      expect(admins.length).to.be.bignumber.equal(new BN(2));
 
       let isSchoolAdmin = await this.school.isSchoolAdmin(0, schoolAdmin1);
       expect(isSchoolAdmin).to.be.true;

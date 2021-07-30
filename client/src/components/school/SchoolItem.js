@@ -34,16 +34,10 @@ class SchoolItem extends Component {
          this.loadTrainings(id);
 
          const administrators = [];
-         const administratorsCount = await cm.getSchoolAdministratorsCount(id).call();
-         for (let i = 0; i < administratorsCount; i++) {
-            const administrator = await cm.getSchoolAdministrator(id, i).call();
-            administrators.push(administrator);
-         }
-         const administratorsWaitingCount = await cm.getSchoolAdministratorsWaitingValidationCount(id).call();
-         for (let i = 0; i < administratorsWaitingCount; i++) {
-            const administrator = await cm.getSchoolAdministratorWaitingValidation(id, i).call();
-            administrators.push(administrator);
-         }
+         const admins = await cm.getSchoolAdministrators(id).call();
+         administrators.push(...admins);
+         const waiting = await cm.getSchoolAdministratorsWaitingValidation(id).call();
+         administrators.push(...waiting);
 
          this.setState({ create: false, id, ...school, administrators });
       }
@@ -54,9 +48,9 @@ class SchoolItem extends Component {
       const list = [];
       const cm = this.context.contractSchool.methods;
 
-      const nbTrainings = await cm.getSchoolTrainingsCount(schoolId).call();
-      for (let i = 0; i < nbTrainings; i++) {
-         const id = await cm.getSchoolTraining(schoolId, i).call();
+      const trainingIds = await cm.getSchoolTrainings(schoolId).call();
+      for (let i = 0; i < trainingIds.length; i++) {
+         const id = trainingIds[i];
          const training = await this.context.contractTraining.methods.trainings(id).call();
          list.push({ id: id, name: training.name });
       }
