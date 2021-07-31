@@ -204,7 +204,7 @@ contract('MaticulumNFT', accounts => {
   it("mint validated diplomas", async () => {
 	await this.MaticulumNFT.setTestMode(false, { from: owner });
 	this.MaticulumContract = await MaticulumContract.new();
-	this.SchoolContract = await SchoolContract.new(MaticulumContract.address);
+	this.SchoolContract = await SchoolContract.new(this.MaticulumContract.address);
 	this.TrainingContract = await TrainingContract.new(
 	this.MaticulumContract.address, this.SchoolContract.address);
 
@@ -239,15 +239,13 @@ contract('MaticulumNFT', accounts => {
 
     await this.TrainingContract.addTraining(0, 'Chef de projet Blockchain', 'n/a', 0, 1, [ jury], { from: schoolAdmin });
     
-    await this.TrainingContract.validateJuryMultiple(0, [ jury], { from: schoolAdmin });
-	
     await this.TrainingContract.validateUserTrainingRequestDirect(0, student1, { from: schoolAdmin });
 
     await this.TrainingContract.validateDiplomaMultipleUsers(0, [student1], { from: jury });
 	
 	const hashOne = "7mYFRV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC";
 	let diplomas = { schoolId:0,trainingId:0,userAddresses: [student1]};		
-	await this.MaticulumNFT.AddNFTsToAdress(hashOne,diplomas, { from: schoolAdmin });
+	await this.MaticulumNFT.AddNFTsToAdress([hashOne],diplomas, { from: schoolAdmin });
 	assert.equal(await this.MaticulumNFT.getURI(1,{ from: schoolAdmin }),gatewayUrl + hashOne, "Not awaited hash");
   });
   
