@@ -1,4 +1,10 @@
 const MaticulumNFT = artifacts.require('./MaticulumNFT.sol');
+const Maticulum = artifacts.require('./Maticulum.sol');
+
+const MaticulumContract = artifacts.require("./Maticulum.sol");
+const SchoolContract = artifacts.require("./MaticulumSchool.sol");
+const TrainingContract = artifacts.require("./MaticulumTraining.sol");
+
 const {expectRevert} = require('@openzeppelin/test-helpers');
 
 contract('MaticulumNFT', accounts => {
@@ -80,7 +86,7 @@ contract('MaticulumNFT', accounts => {
 	const hashThree= "rmTRqsdvJGPViJFHoCdQ4jcWhDDqb7D4H1Ynpk15EgKXua";
 	hashes.push(hashTwo);
 	hashes.push(hashThree);
-    await this.MaticulumNFT.AddNFTsToAdress(hashes,diplomas, { from: owner })	
+    await this.MaticulumNFT.AddNFTsToAdress(hashes,diplomas, { from: owner });	
     let tokenURI = await this.MaticulumNFT.tokenURI(1);
 	assert.equal(gatewayUrl + hashDefaut, tokenURI, "The initial gateway should be https://gateway.pinata.cloud/ipfs/.");
   }); 
@@ -193,6 +199,56 @@ contract('MaticulumNFT', accounts => {
 	}
 	
 	await expectRevert(this.MaticulumNFT.AddNFTsToAdress(hashes200,diplomas, { from: owner }), "Gaz limit security");	
+  });
+  
+  it("mint validated diplomas", async () => {
+	await this.MaticulumNFT.setTestMode(false, { from: owner });
+	this.MaticulumContract = await MaticulumContract.new();
+	this.SchoolContract = await SchoolContract.new(MaticulumContract.address);
+	this.TrainingContract = await TrainingContract.new(
+	this.MaticulumContract.address, this.SchoolContract.address);
+
+    await this.MaticulumContract.registerTrainingContract(this.TrainingContract.address);
+    await this.SchoolContract.registerTrainingContract(this.TrainingContract.address);
+	
+	await this.MaticulumNFT.registerSchoolTrainingContract(
+		this.SchoolContract.address, this.TrainingContract.address,
+		{ from: owner });
+	
+	const superAdmin = accounts[0];
+    const superAdmin2 = '0x487F7092D1866b7426514a543651a70C4F2E3dbB';
+    const schoolAdmin = '0xffA883E5a748fb540cc7aC7BEaf1eC9E66704DA7';
+    const schoolAdmin2 = '0x3Fb7497eB291Ef633d383829bE11bD971353BFf8';
+    const jury = '0xc12C11E57Ecb2AD9B498b539A7CFA0D2e96C5f6C';
+    const student1 = '0xaAb6D3B45938653DB06932b581038Ddf25D9F254';
+
+    await this.MaticulumContract.addUser(superAdmin, 0x03);
+    await this.MaticulumContract.addUser(superAdmin2, 0x03);
+    await this.MaticulumContract.addUser(schoolAdmin, 0x03);
+    await this.MaticulumContract.addUser(schoolAdmin2, 0x03);
+    await this.MaticulumContract.addUser(jury, 0x03);
+    await this.MaticulumContract.addUser(student1, 0x03);
+
+    await this.MaticulumContract.setSuperAdmin(superAdmin);
+    await this.MaticulumContract.setSuperAdmin(superAdmin2);
+
+    await this.SchoolContract.addSchool('Alyra', 'Paris', 'France', 2, schoolAdmin, schoolAdmin2, { value: "100000000000000000" });
+
+    await this.SchoolContract.validateAdministratorMultiple(0, [schoolAdmin, schoolAdmin2]);
+    await this.SchoolContract.validateAdministratorMultiple(0, [schoolAdmin, schoolAdmin2], { from: superAdmin2 });
+
+    await this.TrainingContract.addTraining(0, 'Chef de projet Blockchain', 'n/a', 0, 1, [ jury], { from: schoolAdmin });
+    
+    await this.TrainingContract.validateJuryMultiple(0, [ jury], { from: schoolAdmin });
+	
+    await this.TrainingContract.validateUserTrainingRequestDirect(0, student1, { from: schoolAdmin });
+
+    await this.TrainingContract.validateDiplomaMultipleUsers(0, [student1], { from: jury });
+	
+	const hashOne = "7mYFRV2wZtPjGgKXQkHKEcw8ayuYDcNyUcuYFy726h5DuC";
+	let diplomas = { schoolId:0,trainingId:0,userAddresses: [student1]};		
+	await this.MaticulumNFT.AddNFTsToAdress(hashOne,diplomas, { from: schoolAdmin });
+	assert.equal(await this.MaticulumNFT.getURI(1,{ from: schoolAdmin }),gatewayUrl + hashOne, "Not awaited hash");
   });
   
 });
