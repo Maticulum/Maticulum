@@ -34,7 +34,7 @@ module.exports = async (deployer, network, accounts) => {
    await maticulumNFT.registerSchoolTrainingContract(
    SchoolContract.address,TrainingContract.address);
 
-   if (network === 'develop' || network === 'rinkeby') {
+   if (network === 'develop' || network === 'rinkeby' || network === 'mumbai') {
       console.log('---=== Adding test data ===---');
 
       const superAdmin = accounts[0];
@@ -64,7 +64,7 @@ module.exports = async (deployer, network, accounts) => {
       await maticulum.setSuperAdmin(superAdmin2);
 
       console.log('=> addSchool');
-      await school.addSchool('Alyra', 'Paris', 'France', 2, schoolAdmin, schoolAdmin2, { value: "100000000000000000" });
+      await school.addSchool('Alyra', 'Paris', 'France', 2, schoolAdmin, schoolAdmin2, { value: "100000000000000000", from: superAdmin });
       await school.validateAdministratorMultiple(0, [schoolAdmin, schoolAdmin2]);
       await school.validateAdministratorMultiple(0, [schoolAdmin, schoolAdmin2], { from: superAdmin2 });
 
