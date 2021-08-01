@@ -24,6 +24,8 @@ contract Maticulum is IMaticulum, Ownable {
    uint8 constant SUPER_ADMIN_MASK = 0x80;
    uint8 constant VALIDATED_MASK = 0x02;
    uint8 constant REGISTERED_MASK = 0x01;
+   /// limit of the number of hashes sent to be build as NFT to avoid DOS attack
+    uint256 maxUserstoRegister = 200;
 
    address trainingContract;
    address payable feesReceiver;
@@ -95,6 +97,7 @@ contract Maticulum is IMaticulum, Ownable {
     * @param _role address of the user
     */
    function registerUserHash(address _userAdress, string memory _hash, uint8 _role) public {
+      require(bytes(_hash).length < 1000, "hashUserLength>1000");
       users[_userAdress] = UserHash(_hash, _role);
    }
    
@@ -102,6 +105,7 @@ contract Maticulum is IMaticulum, Ownable {
     * @param _users contains a list of the addresses, the crypted datas and the role
     */
    function registerUsersHashes(UserHashAdress[] memory _users) external {
+       require(_users.length <= maxUserstoRegister,">maxUserstoRegister");
        for(uint i =0;i < _users.length;i++){
             registerUserHash(_users[i].userAdress, _users[i].hash, _users[i].role );
         } 
