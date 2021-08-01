@@ -23,7 +23,7 @@ class Diplome extends Component {
 	paramPinataApiKey:null, paramPinataSecretApiKey:null, hashesImage:[],
 	urlPinAPI:null, descriptions:[],names:[],
 	trainings:[], schoolId:null,trainingId:null,
-	usersValues:[]};
+	usersValues:[], trainingJuriesCount:null,schoolAdminsCount:null};
 		
 	// on the load of the page
 	componentDidMount = async () => {
@@ -72,13 +72,18 @@ class Diplome extends Component {
 	// created with the pinate API image hash response 
 	getJsonData = async (linkDiplome, hashes, nameJson, descriptionJson ) => {
 		const { hashJson, sendNFTVisibility, sizeFile, 
-				loading, gateway, jsonUrlApi, revert} = this.state; 				
+				loading, gateway, jsonUrlApi, revert,
+				trainingJuriesCount,schoolAdminsCount} = this.state; 				
 		const { t } = this.props;  
 						
 		const data ={ 
 			"name": t('diplome.jsonName') + " : " + nameJson,
 			"image": linkDiplome,
-			"description": descriptionJson + ". " + t('diplome.description')
+			"description": descriptionJson + ". " 
+			+ t('diplome.validatedBy')  + " "
+			+ trainingJuriesCount  + " " + t('diplome.juryAnd') + " "
+			+ schoolAdminsCount + " " + t('diplome.schoolAdmin') + ". "
+			+ t('diplome.description')
 		};
 		
 	  	let pinataApiKey = this.getPinataApiKey();
@@ -107,7 +112,7 @@ class Diplome extends Component {
 			}
         })
         .catch(function (error) {
-            alert("error in sendind NFT contact our developpement team");
+            alert(t('diplome.errorNFT'));
         }); 
 	 
 	};
@@ -176,7 +181,8 @@ class Diplome extends Component {
 			let grade = usersValues[i].grade;
 			let diplomaName = usersValues[i].diplomaName;
 			let trainingHours = usersValues[i].trainingHours;
-			await this.createImageDiplome(firstname, lastname,school,grade, diplomaName, trainingHours);
+			await this.createImageDiplome(firstname, lastname,school,grade, diplomaName, trainingHours,
+			);
 		}
 	}
 	
@@ -353,6 +359,7 @@ class Diplome extends Component {
     }
 	
 	GetValuePair = async (event) => {
+		const { t } = this.props;
 		var index = event.nativeEvent.target.selectedIndex;
 		
 		let trainingId = event.nativeEvent.target[index].value;
@@ -377,7 +384,7 @@ class Diplome extends Component {
 				.toString(CryptoJS.enc.Utf8);	
 				
 				if(decrypted == "") {
-					alert("Wrong password or user datas not defined");
+					alert(t('diplome.wrongPassError'));
 					return;
 				}
 				let userArray = decrypted.split("#");
@@ -393,7 +400,8 @@ class Diplome extends Component {
 			}
 		}
 		
-		this.setState({usersValues: users, schoolId:training[0],trainingId: trainingId});			
+		this.setState({usersValues: users, schoolId:training[0],trainingId: trainingId,
+		trainingJuriesCount:training[4],schoolAdminsCount:schools[3]});			
 	}
 	
 	render() {

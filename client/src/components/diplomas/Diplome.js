@@ -22,7 +22,8 @@ class Diplome extends Component {
 	loading:false, gateway:null, jsonUrlApi:null, imageUrlAPi:null,
 	paramPinataApiKey:null, paramPinataSecretApiKey:null, hashesImage:[],
 	urlPinAPI:null, descriptions:[],names:[],
-	trainingUsers:[], schoolId:null,trainingId:null, trainingHours:null};
+	trainingUsers:[], schoolId:null,trainingId:null, trainingHours:null,
+	trainingJuriesCount:null,schoolAdminsCount:null};
 		
 	// on the load of the page
 	componentDidMount = async () => {
@@ -61,13 +62,18 @@ class Diplome extends Component {
 	// created with the pinate API image hash response 
 	getJsonData = async (linkDiplome, hashes, nameJson, descriptionJson ) => {
 		const { hashJson, sendNFTVisibility, sizeFile, 
-				loading, gateway, jsonUrlApi, revert} = this.state; 				
+				loading, gateway, jsonUrlApi, revert,
+				trainingJuriesCount,schoolAdminsCount} = this.state; 				
 		const { t } = this.props;  
-						
+			
 		const data ={ 
 			"name": t('diplome.jsonName') + " : " + nameJson,
 			"image": linkDiplome,
-			"description": descriptionJson + ". " + t('diplome.description')
+			"description": descriptionJson + ". " 
+			+ t('diplome.validatedBy')  + " "
+			+ trainingJuriesCount  + " " + t('diplome.juryAnd') + " "
+			+ schoolAdminsCount + " " + t('diplome.schoolAdmin') + ". "
+			+ t('diplome.description')
 		};
 		
 	  	let pinataApiKey = this.getPinataApiKey();
@@ -95,8 +101,8 @@ class Diplome extends Component {
 				this.setState({ hashJson : ipfsHash});
 			}
         })
-        .catch(function (error) {
-            alert("error in sendind NFT contact our developpement team");
+        .catch(function (err) {
+            alert(t('diplome.errorSendingNFT') + err); 
         }); 
 	 
 	};
@@ -171,7 +177,7 @@ class Diplome extends Component {
 		this.tbxSchool.value = "";
 		this.tbxFirstname.value = "";
 		this.tbxLastname.value = "";
-		
+		this.tbxTrainingHours.value = "";
 		
 		this.setState({ linkVisible:false,isButtonMetamaskVisible:false, 
 		hashes:[],hashesImage:[],isButtonMetamaskVisible:true, files:[]});
@@ -354,6 +360,7 @@ class Diplome extends Component {
 	
 	searchUser = async (e) => {
 		const { trainingUsers } = this.state;
+		const { t } = this.props; 
 		let pass = DataFromBase.getDataPass();
 		if(pass == ""){
 			pass = this.tbxPass.value;
@@ -368,7 +375,7 @@ class Diplome extends Component {
 		let decrypted = CryptoJS.TripleDES.decrypt(datasUserUnHashed, pass)
 	    .toString(CryptoJS.enc.Utf8);	
 		
-		if(decrypted == "") alert("Wrong password");
+		if(decrypted == "") alert(t('diplome.wrongPass'));
 		let userArray = decrypted.split("#");
 		
 		this.tbxFirstname.value = this.setData(userArray,1);
@@ -399,17 +406,23 @@ class Diplome extends Component {
 			firstname: this.tbxFirstname.value, lastname: this.tbxLastname.value, 
 			school : this.tbxSchool.value, grade:this.tbxGrade.value,
 			schoolId:currentTraining[0], trainingId : trainingUsersTemp[0].id,
-			trainingHours:this.tbxTrainingHours.value
+			trainingHours:this.tbxTrainingHours.value,
+			trainingJuriesCount:currentTraining[4],schoolAdminsCount:schools[3] 
 		});
 	}
 	
 	GetValuePair = async (event) => {
 		var index = event.nativeEvent.target.selectedIndex;
 		this.tbxDiplomaName.value = event.nativeEvent.target[index].text;
+		let trainingId = event.nativeEvent.target[index].value;
 		let currentTraining = await this.context.contractTraining.methods.trainings(event.nativeEvent.target[index].value).call();
+		let schools = await this.context.contractSchool.methods.schools(currentTraining[0]).call();
 		this.tbxGrade.value = currentTraining[2];
+		this.tbxTrainingHours.value = currentTraining[3];
 		this.setState({ diplomaName: this.tbxDiplomaName.value, grade:this.tbxGrade.value,
-		trainingId: index, schoolId :currentTraining[0]});
+		trainingId: trainingId, schoolId :currentTraining[0],
+		trainingHours:this.tbxTrainingHours.value,
+		trainingJuriesCount:currentTraining[4],schoolAdminsCount:schools[3]});
 	}
 	
 	render() {

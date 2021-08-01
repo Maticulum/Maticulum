@@ -7,15 +7,14 @@ import "react-datepicker/dist/react-datepicker.css";
 import DataFromBase from './DataFromBase';
 
 class Registration extends Component {
-state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSelected:0x03,
+state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSelected:-1,
 	userDatas:[]} 
-  static contextType = Web3Context; 	
-   
+  static contextType = Web3Context; 	   
  
   componentDidMount = async () => {
 	const isRegistered = await this.context.contract.methods.isRegistered(this.context.account).call();	
-	this.state.userType.push({name:'schoolAdmin',id: 0x03});
-	this.state.userType.push({name:'Jury',id: 0x03});
+	this.state.userType.push({name:'',id: -1});
+	this.state.userType.push({name:'schoolAdmin/Jury',id: 0x03});
 	this.state.userType.push({name:'Student',id: 0x01});
 	this.setState({ isRegistered: isRegistered});
   }
@@ -27,7 +26,7 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 	return data;
   }
   
-  GetValuePair(event) {
+  handleChange(event) {
 	let val = event.nativeEvent.target.selectedIndex;
 	this.state.userTypeSelected = val;
   }
@@ -62,7 +61,7 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 		this.mail.value = this.setData(userArray,4);
 		this.mobile.value = this.setData(userArray,5);
 		this.telfixe.value = this.setData(userArray,6);
-		
+		this.state.userTypeSelected = userDatas[1];
 		this.setState({ date: new Date(this.setData(userArray,3))});
 	}
 	catch{
@@ -121,6 +120,11 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
   }
 
   showFile = async (e) => {
+		const { t } = this.props; 
+		if(this.pass.value == "" ) {
+			alert(t('registration.passwordEmpty'));
+			return;		
+		}
 		e.preventDefault();
 		const reader = new FileReader();
 		reader.onload = async (e) => { 
@@ -136,7 +140,7 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 		reader.readAsText(e.target.files[0]);				
   }  
   
-  CreateModifyUsers= async() => {
+  CreateModifyUsers= async() => {	  
 	  const { userDatas}= this.state;
 	  await this.context.contract.methods.registerUsersHashes(userDatas).send({from: this.context.account});		
   }
@@ -211,9 +215,9 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 		<Form.Group>
           <Form.Label>{t('registration.userType')}</Form.Label><br />
           <label>
-			<select 
+			<select name="idRole"
 				value={this.state.value} 
-				onChange={this.GetValuePair.bind(this)}>
+				onChange={this.handleChange.bind(this)}>
 				{optionTemplate}
 			</select>
 		  </label>		

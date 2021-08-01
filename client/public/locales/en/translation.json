@@ -35,7 +35,7 @@
 		"fixedPhone":"Telephone number"
 	},
 	"registration":{
-		"register":"User register",
+		"register":"User registration",
 		"userNoreg":"User not registered",
 		"userEmpty":"User or password fields are empty",
 		"wrongPass":"Wrong password",
@@ -43,7 +43,8 @@
 		"userAddress":"User address",
 		"userType":"User Type",
 		"getUser":"Get recorded User datas",
-		"createUser":"Create/Update User"
+		"createUser":"Create/Update User",
+		"passwordEmpty":"Password field must be filled and you must chosse a role"
 	},
 	"diplome":{
 		"createNFT":"Create NFT",
@@ -79,7 +80,13 @@
 		"password":"Password",
 		"hourDuration":"Training duration",
 		"nbhours":"Duration (hours)",
-		"hours":"hours"	
+		"hours":"hours",
+		"wrongPass":"Wrong password",
+		"juryAnd": "jury(s) and",
+		"schoolAdmin" : "school administrator(s)",
+		"validatedBy" : "Validated by",
+		"errorNFT" : "error in sendind NFT contact our developpement team",
+		"wrongPassError" : "Wrong password or user datas not defined"
 		
 	},
    "school": {

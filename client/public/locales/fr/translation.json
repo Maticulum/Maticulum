@@ -43,7 +43,8 @@
 		"userAddress":"Adresse de l'utilisateur",
 		"userType":"Type d'utilisateur",
 		"getUser":"Afficher les données de l'utilisateur",
-		"createUser":"Créer ou mettre à jour un utilisateur"
+		"createUser":"Créer ou mettre à jour un utilisateur",
+		"passwordEmpty":"Le champ mot de passe doit être rempli et vous devez choisir un rôle"
 	},
 	"diplome":{
 		"createNFT":"Créer NFT",
@@ -79,8 +80,13 @@
 		"password":"Mot de passe",
 		"hourDuration":"Durée enseignement",
 		"nbhours":"Durée (heures)",
-	    "hours":"heures"
-		
+	    "hours":"heures",
+		"wrongPass":"Mot de passe erroné",
+		"juryAnd": "jury(s) et",
+		"schoolAdmin" : "administrateur(s) scolaire",
+		"validatedBy" : "Validé par",
+		"errorNFT" : "Erreur lors de l'envoi du NFT. Merci de contacter léquipe de développement",
+		"wrongPassError" : "Mot de passe erroné ou données utilisateurs non définies"
 	},
    "school": {
       "name": "Nom",
