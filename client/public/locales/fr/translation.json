@@ -76,7 +76,11 @@
 		"diplomaof":"Diplome de ",
 		"studentAdress": "Adresse de l'étudiant",
 		"searchUser":"Rechercher",
-		"password":"Mot de passe"		
+		"password":"Mot de passe",
+		"hourDuration":"Durée enseignement",
+		"nbhours":"Durée (heures)",
+	    "hours":"heures"
+		
 	},
    "school": {
       "name": "Nom",

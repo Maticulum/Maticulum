@@ -76,7 +76,10 @@
 		"diplomaof":"Diploma of ",
 		"studentAdress": "Student Address",
 		"searchUser":"Search",
-		"password":"Password"
+		"password":"Password",
+		"hourDuration":"Training duration",
+		"nbhours":"Duration (hours)",
+		"hours":"hours"	
 		
 	},
    "school": {

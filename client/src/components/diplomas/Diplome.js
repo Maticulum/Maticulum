@@ -22,7 +22,7 @@ class Diplome extends Component {
 	loading:false, gateway:null, jsonUrlApi:null, imageUrlAPi:null,
 	paramPinataApiKey:null, paramPinataSecretApiKey:null, hashesImage:[],
 	urlPinAPI:null, descriptions:[],names:[],
-	trainingUsers:[], schoolId:null,trainingId:null};
+	trainingUsers:[], schoolId:null,trainingId:null, trainingHours:null};
 		
 	// on the load of the page
 	componentDidMount = async () => {
@@ -106,7 +106,7 @@ class Diplome extends Component {
 	}
 	
 	// create the images in the canvas web page
-	createImageDiplome = async(firstname, lastname,school, grade, diplomaName) => {
+	createImageDiplome = async(firstname, lastname,school, grade, diplomaName, trainingHours) => {
 		const { files,names, descriptions  } = this.state; 
 		const { t } = this.props;
 		
@@ -131,7 +131,8 @@ class Diplome extends Component {
 		  context.fillText(firstname, 125, 175);
 		  context.fillText(lastname, 125, 215);	
 		  context.fillText(school, 10, 35);		
-		  context.fillText(grade + " " + diplomaName, 175, 120);
+		  context.fillText(grade + " " + diplomaName, 175, 110);
+		  context.fillText(t('diplome.hourDuration') + " " + trainingHours + " " + t('diplome.hours'), 175, 140);
 		  
 		  const timeElapsed = Date.now();
 		  const today = new Date(timeElapsed);
@@ -158,7 +159,7 @@ class Diplome extends Component {
 		const { files } = this.state; 	
 		this.setState({ showDownload: true });  				
 		await this.createImageDiplome(this.state.firstname, this.state.lastname,this.state.school,
-		this.state.grade, this.state.diplomaName);
+		this.state.grade, this.state.diplomaName, this.tbxTrainingHours.value);
 	}
 	
 	// erase all datas to send a new NFT or list of NFTs
@@ -392,12 +393,13 @@ class Diplome extends Component {
 		this.tbxSchool.value = schools[0]
 		this.tbxGrade.value = currentTraining[2];
 		this.tbxDiplomaName.value = currentTraining[1];
-		
+		this.tbxTrainingHours.value = currentTraining[3];
 		this.setState({trainingUsers:trainingUsersTemp, 
 			diplomaName: this.tbxDiplomaName.value,
 			firstname: this.tbxFirstname.value, lastname: this.tbxLastname.value, 
 			school : this.tbxSchool.value, grade:this.tbxGrade.value,
-			schoolId:currentTraining[0], trainingId : trainingUsersTemp[0].id
+			schoolId:currentTraining[0], trainingId : trainingUsersTemp[0].id,
+			trainingHours:this.tbxTrainingHours.value
 		});
 	}
 	
@@ -486,6 +488,15 @@ class Diplome extends Component {
 							<Form.Control type="text"  
 							onChange={(e) => this.setState({grade: e.target.value})} 
 							id="tbxGrade" ref={(input) => { this.tbxGrade = input }}
+							/>
+						</Col>
+					</Form.Group>
+					<Form.Group as={Row} >
+						<Form.Label column sm="3">{t('diplome.nbhours')}</Form.Label>
+						<Col sm="9">
+							<Form.Control type="text"  
+							onChange={(e) => this.setState({grade: e.target.value})} 
+							id="tbxTrainingHours" ref={(input) => { this.tbxTrainingHours = input }}
 							/>
 						</Col>
 					</Form.Group>

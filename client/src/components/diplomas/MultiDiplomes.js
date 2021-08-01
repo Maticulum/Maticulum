@@ -117,7 +117,7 @@ class Diplome extends Component {
 	}
 	
 	// create the images in the canvas web page
-	createImageDiplome = async(firstname, lastname,school, grade, diplomaName) => {
+	createImageDiplome = async(firstname, lastname,school, grade, diplomaName, trainingHours) => {
 		const { files,names, descriptions  } = this.state; 
 		const { t } = this.props;
 		
@@ -142,7 +142,8 @@ class Diplome extends Component {
 		  context.fillText(firstname, 125, 175);
 		  context.fillText(lastname, 125, 215);	
 		  context.fillText(school, 10, 35);		
-		  context.fillText(grade + " " + diplomaName, 175, 120);
+		  context.fillText(grade + " " + diplomaName, 175, 110);
+		  context.fillText(t('diplome.hourDuration') + " " + trainingHours + " " + t('diplome.hours'), 175, 140);
 		  
 		  const timeElapsed = Date.now();
 		  const today = new Date(timeElapsed);
@@ -174,7 +175,8 @@ class Diplome extends Component {
 			let school = usersValues[i].school;
 			let grade = usersValues[i].grade;
 			let diplomaName = usersValues[i].diplomaName;
-			await this.createImageDiplome(firstname, lastname,school,grade, diplomaName);
+			let trainingHours = usersValues[i].trainingHours;
+			await this.createImageDiplome(firstname, lastname,school,grade, diplomaName, trainingHours);
 		}
 	}
 	
@@ -385,7 +387,8 @@ class Diplome extends Component {
 							school : schools[0],
 							grade:training[2],
 							diplomaName:training[1],
-							userAddress:userAddress});
+							userAddress:userAddress,
+							trainingHours:training[3]});
 				
 			}
 		}

@@ -69,8 +69,8 @@ module.exports = async (deployer, network, accounts) => {
       await school.validateAdministratorMultiple(0, [schoolAdmin, schoolAdmin2], { from: superAdmin2 });
 
       console.log('=> addTraining');
-      await training.addTraining(0, 'Chef de projet', 'Aucun', 0, 1, [ jury, jury2 ], { from: schoolAdmin });
-      await training.addTraining(0, 'Developpeur', 'Aucun', 350, 1, [ jury, jury2 ], { from: schoolAdmin2 });
+      await training.addTraining(0, 'Chef de projet', 'Licence', 0, 1, [ jury, jury2 ], { from: schoolAdmin });
+      await training.addTraining(0, 'Developpeur', 'Licence', 350, 1, [ jury, jury2 ], { from: schoolAdmin2 });
 	  
 	  console.log('=> register users for trainings');
       await training.validateUserTrainingRequestDirect(0, student1, { from: schoolAdmin });
