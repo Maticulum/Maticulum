@@ -23,7 +23,7 @@ class StudentHome extends Component {
          const trainingId = trainingIds[i];
          const training = await cm.trainings(trainingId).call();
          const school = await cmSchool.schools(training.school).call();
-         trainings.push({ id: trainingId, school: school.name, name: training.name, waiting: false });
+         trainings.push({ id: trainingId, school: school.name, name: training.name });
       }
 
       this.setState({ trainings });
@@ -45,9 +45,6 @@ class StudentHome extends Component {
                   { this.state.trainings.map((training, sindex) => 
                      <tr key={sindex}>
                         <td>{training.school} - { training.name }</td>
-                        <td>
-                           { t('student.registered') }
-                        </td>
                      </tr> 
                   )}
                </tbody>

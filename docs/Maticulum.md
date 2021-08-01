@@ -4,276 +4,90 @@
 
 
 
-### `onlySuperAdmin()`
-
-
-
-
-
-### `onlySchoolAdmin(uint256 _id)`
-
-
-
-
-
 ### `onlyRegistered()`
 
 
 
 
 
-### `schoolValidated(uint256 id)`
 
+### `registerTrainingContract(address _trainingContract)` (external)
 
+register the address of the smart contract MaticulumTraining 
 
 
 
 
-### `setSuperAdmin(address userAdress)` (external)
+### `isSuperAdmin(address _user) → bool` (external)
 
+check if the address of the user has superAdmin role or not
 
 
 
 
-### `registerUser(string name, string firstname, string birthCountry, string birthDate, string mail, string telfixe, string mobile)` (external)
+### `isRegistered(address _user) → bool` (external)
 
+check if the address of the user has is registered in the users array
 
 
 
 
-### `updateUser(string name, string firstname, string birthCountry, string birthDate, string mail, string telfixe, string mobile)` (public)
+### `getFeesReceiver() → address payable` (external)
 
+get the fees of the receiever address
 
 
 
+### `validateUser(address _user)` (external)
 
-### `getUser() → struct Maticulum.User` (external)
+validate the user by setting his role to VALIDATED_MASK
 
 
 
 
+### `setSuperAdmin(address _userAdress)` (external)
 
-### `isRegistered() → bool` (external)
+Validate the user by setting his role to SUPER_ADMIN_MASK
 
 
 
 
+### `registerUserHash(address _userAdress, string _hash, uint8 _role)` (public)
 
-### `isRegistered(address _user) → bool` (public)
+register a user with crypted datas and his role and address
 
 
 
 
+### `registerUsersHashes(struct Maticulum.UserHashAdress[] _users)` (external)
 
-### `isSchoolAdmin(uint256 _id) → bool` (public)
+register a list of user with crypted datas and their role and address
 
-Checks that a user is admin of a given school
 
 
 
+### `getUserHash(address _userAdress) → struct Maticulum.UserHash` (external)
 
-### `isTrainingJury(uint256 _id) → bool` (public)
+get user datas by user address 
 
-Check that a user is jury of given training
 
 
 
+### `getUser() → struct Maticulum.UserHash` (external)
 
-### `addSchool(string _name, string _town, string _country, address _admin1, address _admin2) → uint256` (external)
+get user datas of the sender
 
 
 
+### `addUser(address _userAddress, uint8 _role)` (external)
 
-
-### `addSchoolAdministrator(uint256 _id, address _administrator)` (external)
-
-
-
-
-
-### `updateSchool(uint256 _id, string _name, string _town, string _country)` (external)
-
-
-
-
-
-### `updateSchoolValidationThreshold(uint8 _validationThreshold)` (external)
-
-
-
-
-
-### `updateSchoolRegistrationFees(uint256 _registrationFees)` (external)
-
-
-
-
-
-### `validateSchool(uint256 _id)` (external)
-
-
-
-
-
-### `getNbSchools() → uint256 length` (external)
-
-
-
-
-
-### `getSchool(uint256 _id) → string name, string town, string country, address[] administrators, address[] validators, uint256[] _trainings` (external)
-
-
-
-
-
-### `isSchoolValidated(uint256 _id) → bool` (public)
-
-
-
-
-
-### `addTraining(uint256 _schoolId, string _name, string _level, uint16 _duration, uint16 _validationThreshold) → uint256` (external)
-
-Registers a school's training 
-
-
-
-
-### `updateTraining(uint256 _id, string _name, string _level, uint16 _duration, uint16 _validationThreshold, address[] _juries)` (external)
-
-Update a school's training 
-
-
-
-
-### `getTraining(uint256 _id) → string name, string level, uint16 duration, uint16 validationThreshold` (external)
-
-Returns training data
-
-
-
-
-### `getTrainingNbJuries(uint256 _id) → uint256` (external)
-
-Get the number of juries for a training
-
-
-
-
-### `getTrainingJury(uint256 _id, uint256 _index) → address` (external)
-
-Get a jury for specified training
-
-
-
-
-### `addJury(uint256 _schoolId, uint256 _trainingId, address _jury)` (public)
-
-Add a jury to a training
-
-
-
-
-### `removeJury(uint256 _trainingId, address _jury)` (external)
-
-Remove a jury from a training
-
-
-
-
-### `createDiplomeNFT(address ownerAddressNFT, string hash) → uint256` (public)
-
-
-
-
-
-### `getNFTAddress() → address` (public)
-
-
-
-
-
-### `getlastUriId() → uint256` (public)
-
-
-
-
-
-### `createDiplomeNFTs(address ownerAddressNFT, string[] hashes) → uint256` (external)
-
+set user role by passing user address
 
 
 
 
 
 ### `UserCreated(address userAdress)`
-
-
-
-
-
-### `SchoolAdded(uint256 id, string name, string town, string country, address addedBy)`
-
-
-
-
-
-### `SchoolUpdated(uint256 id, string name, string town, string country, address updatedBy)`
-
-
-
-
-
-### `SchoolAdminAdded(uint256 id, address admin, address updatedBy)`
-
-
-
-
-
-### `SchoolValidationThresholdUpdated(uint8 validationThreshold, address updatedBy)`
-
-
-
-
-
-### `SchoolRegistrationFeesUpdated(uint256 registrationFees, address updatedBy)`
-
-
-
-
-
-### `SchoolValidated(uint256 id, string name, address validator, uint256 count)`
-
-
-
-
-
-### `TrainingAdded(uint256 schoolId, uint256 trainingId, string name, string level, uint16 duration, uint16 validationThreshold, address addedBy)`
-
-
-
-
-
-### `TrainingUpdated(uint256 schoolId, uint256 trainingId, string name, string level, uint16 duration, uint16 validationThreshold, address updatedBy)`
-
-
-
-
-
-### `JuryAdded(uint256 schoolId, uint256 trainingId, address jury, address addedBy)`
-
-
-
-
-
-### `JuryRemoved(uint256 schoolId, uint256 trainingId, address jury, address removedBy)`
-
-
-
-
-
-### `JuryValidated(uint256 schoolId, uint256 trainingId, address jury, address validator, uint16 count)`
 
 
 

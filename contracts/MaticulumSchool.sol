@@ -2,13 +2,14 @@
 pragma solidity 0.8.4;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 import "./openzeppelin/EnumerableSet.sol";
 
 import "./IMaticulum.sol";
 import "./ISchool.sol";
 
 
-contract MaticulumSchool is ISchool, Ownable {
+contract MaticulumSchool is ISchool, Ownable, ReentrancyGuard {
 
    using EnumerableSet for EnumerableSet.AddressSet;
    using EnumerableSet for EnumerableSet.UintSet;
@@ -118,7 +119,7 @@ contract MaticulumSchool is ISchool, Ownable {
    */
    function addSchool(string memory _name, string memory _town, string memory _country, uint8 _juryValidationThreshold, address _admin1, address _admin2) 
          external payable
-         onlyRegistered {
+         onlyRegistered nonReentrant {
       require(msg.value == schoolRegistrationFees, "MissingFees");
       if (!maticulum.getFeesReceiver().send(msg.value)) {
          revert("Error sending fess");
@@ -280,15 +281,13 @@ contract MaticulumSchool is ISchool, Ownable {
 
 
    /**
-   * @notice Get the address who validates this admin, for the given school and index
-   * @dev count can be retrieve with getAdminValidationStatus
+   * @notice Get the address who validates this admin, for the given school
    * @param _schoolId   id of school
    * @param _admin      admin address
-   * @param _index      index of validator
-   * @return the address
+   * @return the addresses of validators
    */
-   function getAdminValidator(uint256 _schoolId, address _admin, uint256 _index) external view returns (address) {
-      return adminValidations[_schoolId][_admin].at(_index);
+   function getAdminValidators(uint256 _schoolId, address _admin) external view returns (address[] memory) {
+      return adminValidations[_schoolId][_admin].values();
    }
 
 
