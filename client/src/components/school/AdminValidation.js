@@ -41,12 +41,10 @@ class AdminValidation extends Component {
          const admin = await this.context.contract.methods.users(adminId).call();
 
          const { validated, count } = await cm.getAdminValidationStatus(schoolId, adminId).call();
-         const validators = [];
+         const validators = await cm.getAdminValidators(schoolId, adminId).call();
          let validatedByAdmin = false;
-         for (let j = 0; j < count; j++) {
-            const validator = await cm.getAdminValidator(schoolId, adminId, j).call();
-            validatedByAdmin |= validator === this.context.account;
-            validators.push(validator);
+         for (let j = 0; j < validators.length; j++) {
+            validatedByAdmin |= validators[j] === this.context.account;
          }
 
          admins.push({ id: adminId, ...admin, validated, validatedByAdmin, count, validators });
