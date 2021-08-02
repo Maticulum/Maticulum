@@ -60,8 +60,6 @@ class TrainingChoice extends Component {
 
 
    onRegister = async (trainingId) => {
-	   alert(trainingId);
-	   alert(this.state.trainings[trainingId].user);
 	   await this.context.contractTraining.methods
 	      .validateUserTrainingRequestDirect(trainingId, this.state.trainings[trainingId].user).send({from: this.context.account});
       
