@@ -29,17 +29,17 @@ Enfin nous testons le nombre de hash envoyés et leur valeurset nous récupéron
 
 ## Tests unitaires pour MaticulumSchool
 * Tests des cas nominaux
-** ajout d'une école
-** validation d'un administrateur école par un administrateur Maticulum
-** mise à jour d'une école
+  - ajout d'une école
+  - validation d'un administrateur école par un administrateur Maticulum
+  - mise à jour d'une école
 * Tests de sécurité
-** test d'accès par différents profils
-** la création d'une école doit être accompagnée du paiement
+  - test d'accès par différents profils
+  - la création d'une école doit être accompagnée du paiement
 
 ## Tests unitaires pour MaticulumTraining
 * Tests des cas nominaux
-** ajout d'une formation
-** validation du ou des jurys par un administrateur école
-** validation du diplome par un ou des jurys
+  - ajout d'une formation
+  - validation du ou des jurys par un administrateur école
+  - validation du diplome par un ou des jurys
 * Tests de sécurité
-** test d'accès par différents profils
+  - test d'accès par différents profils
