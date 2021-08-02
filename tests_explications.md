@@ -1,30 +1,28 @@
-Raisons des tests unitaires sur le smart contract MaticulumNFT :
+## Tests unitaires pour MaticulumNFT
+* Tests des cas nominaux
+  - Création d'un ou plusieurs NFT avec le user qui a le droit school admin
+  et un diplôme validé par des jurys
+  - Récupération des données du NFT créé
+  - Modification et récupération des données de passerelle
+  - Modification et récupération des données du NFT : name, symbol
+  
+* Tests de sécurité 
+  - ne pas pouvoir créé deux NFTs avec le même hash
+  - ne pas pouvoir créé un NFT avec un hash invalide
+  - lever une erreur si on recherche un NFT avec une uri inexistante 
+  - lever une erreur si on tente de créer plus de 200 NFTs en une transaction
 
-S'assurer qu'on ne puisse envoyer 2 fois le même hash pour créer l'URL vers le fichier JSON.
-A la fois via plusieurs envois ou dans le même envoi.
-Dans le cas de doublon la transaction est annulée.
-Dans ce cas l'error "Hash already minted" est levée.
-
-Un hash a un format particulier avec une longueur précise, c'est celui que renvoie Pinata quand il stoke un fichier sur IPFS.
-Si elle n'est pas respectée une erreur est levée : "Invalid hash length"
-Le but est de s'assurer qu'il n'y a pas autre chose que des hash stockés dans le smart contract.
-
-La gateway est aussi stockée dans la blockchain, elle permet d'accèder à Pinata pour aller chercher le fichier JSON qui contient le lien vers l'image.
-Elle peut être modifiée.
-Nous testons la valeur initiale de cette URL.
-Nous testons aussi sa modification éventuelle.
-
-Pour rechercher un hash nous utilisons une méthode.
-Si le hash n'existe pas nous retournons l'erreur "Uri not yet stored"
-
-Les Urls des API PInata sont aussi stockés dans le cas où on voudrait changer d'API.
-Nous testons également les valeurs par défaut et leur changement éventuel.
-
-De la même façon les données concernant le NFT, nom, symbôle et hash de l'adresse de l'image dans Metamask
-sont stockés dans le smart contract.
-Nous testons si ces valeurs correspondent à celles attendues.
-
-Enfin nous testons le nombre de hash envoyés et leur valeurset nous récupérons la valeur des URIs.
+## Tests unitaires pour Maticulum
+* Tests des cas nominaux
+  - Création d'un ou plusieurs utilisateurs avec un hash chiffré et un rôle
+  - Vérifier si l'utilisateur a le rôle admin
+  - Vérifier si l'utilisateur est enregistré
+  - Récupérer le rôle ou le hash de l'utilisateur enregistré
+  
+* Tests de sécurité
+  - Lever une erreur si on tente de créer plus de 200 utilisateurs en une transaction
+  - Lever une erreur si on tente de un utilisateur avec un hash 
+  d'une longueur supérieure à 1000
 
 
 ## Tests unitaires pour MaticulumSchool
