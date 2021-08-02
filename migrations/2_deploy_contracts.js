@@ -34,7 +34,7 @@ module.exports = async (deployer, network, accounts) => {
    await maticulumNFT.registerSchoolTrainingContract(
    SchoolContract.address,TrainingContract.address);
 
-   if (network === 'develop' || network === 'mumbai') {
+   if (network === 'develop') {
       console.log('---=== Adding test data ===---');
 
       const superAdmin = accounts[0];
