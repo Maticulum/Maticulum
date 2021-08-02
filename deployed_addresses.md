@@ -7,9 +7,9 @@
 - MaticulumTraining : 0x7981405E67bF2a8D5AB25dCe0eDa631ED3C848d9
 
 # Mumbai
-- Heroku: 			  https://rocky-scrubland-42872.herokuapp.com
-- Explorer: 		  https://mumbai.polygonscan.com/
-- Maticulum: 		  0x3C9334Fe61C0738F6F7e84322bf2D644B04fae25
-- MaticulumNFT: 	  0xE00c8d3c13F6BfEd1D71A73655256F077A9b962e
-- MaticulumSchool: 	  0xb23FFbc3Eb97e52E95eE76dF5659C4d3fCF1A36b
-- MaticulumTraining:  0xcF6b1ae1E2f9B169FC06Da7B8a7E4E7a9faf9E34
+- Heroku: https://rocky-scrubland-42872.herokuapp.com
+- Explorer: https://mumbai.polygonscan.com/
+- Maticulum: 0x8514F67A9445584A11e9dfed90a2323aD7A78662
+- MaticulumNFT: 0xE00c8d3c13F6BfEd1D71A73655256F077A9b962e
+- MaticulumSchool: 0xD5B15f5a0b30EeaaD286b751f36Ae49e4eE36eC3
+- MaticulumTraining: 0x48065A8296d45a08d0D3F932D10F95f3Cf62727d
