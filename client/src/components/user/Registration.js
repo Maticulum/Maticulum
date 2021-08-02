@@ -235,7 +235,7 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
                 
         <Button className="next" onClick={this.GetThisUser}>{t('registration.getUser')}</Button>
         <Button className="next" onClick={this.CreateModifyUser}>{t('registration.createUser')}</Button>
-		<Button className="next" onClick={this.CreateModifyUsers}>{t('registration.createUser')}s</Button>
+		<Button className="next" onClick={this.CreateModifyUsers}>{t('registration.createUsers')}s</Button>
       </Form>
     );
   }

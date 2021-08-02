@@ -34,7 +34,7 @@ module.exports = async (deployer, network, accounts) => {
    await maticulumNFT.registerSchoolTrainingContract(
    SchoolContract.address,TrainingContract.address);
 
-   if (network === 'develop' || network === 'rinkeby' || network === 'mumbai') {
+   if (network === 'develop' || network === 'mumbai') {
       console.log('---=== Adding test data ===---');
 
       const superAdmin = accounts[0];
@@ -81,6 +81,34 @@ module.exports = async (deployer, network, accounts) => {
       console.log('=> validate diploma by juries');
       await training.validateDiplomaMultipleUsers(0, [ student1, student2 , student3, student4 ], { from: jury });
       await training.validateDiplomaMultipleUsers(0, [ student1, student2 , student3, student4 ], { from: jury2 });
+   }
+   
+   if (network === 'rinkeby' || network === 'mumbai') {
+      console.log('---=== Adding test data ===---');
+
+      const superAdmin = accounts[0];
+      const superAdmin2 = '0x487F7092D1866b7426514a543651a70C4F2E3dbB';
+      const schoolAdmin = '0xffA883E5a748fb540cc7aC7BEaf1eC9E66704DA7';
+      const schoolAdmin2 = '0x3Fb7497eB291Ef633d383829bE11bD971353BFf8';
+      const jury = '0xc12C11E57Ecb2AD9B498b539A7CFA0D2e96C5f6C';
+      const jury2 = '0xcD6c39F7D241E752ae22fD75C2644C73d3071585';
+      const student1 = '0xaAb6D3B45938653DB06932b581038Ddf25D9F254';
+
+      console.log('=> addUser');
+      await maticulum.addUser(superAdmin, 0x03);
+      await maticulum.addUser(superAdmin2, 0x03);
+      await maticulum.addUser(schoolAdmin, 0x03);
+      await maticulum.addUser(schoolAdmin2, 0x03);
+      await maticulum.addUser(jury, 0x03);
+      await maticulum.addUser(jury2, 0x03);
+      await maticulum.addUser(student1, 0x03);
+
+      await maticulum.setSuperAdmin(superAdmin);
+      await maticulum.setSuperAdmin(superAdmin2);
+
+      console.log('=> add school');
+      await school.addSchool('Alyra', 'Paris', 'France', 2, schoolAdmin, schoolAdmin2, { value: "100000000000000000" });
+      
    }
 
 };

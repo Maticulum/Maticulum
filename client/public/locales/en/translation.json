@@ -2,7 +2,7 @@
     "nav": {
         "home": "Home",
         "whitelisted": "Whitelisted",
-        "registration": "Registration",
+        "registration": "Create user",
         "schools": "Schools",
 		"training":"Trainings",
 		"createDiploma":"Create diploma",
@@ -44,7 +44,8 @@
 		"userType":"User Type",
 		"getUser":"Get recorded User datas",
 		"createUser":"Create/Update User",
-		"passwordEmpty":"Password field must be filled and you must chosse a role"
+		"passwordEmpty":"Password field must be filled and you must chosse a role",
+		"createUsers":"Create a list of users"
 	},
 	"diplome":{
 		"createNFT":"Create NFT",

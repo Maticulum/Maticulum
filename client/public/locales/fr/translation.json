@@ -2,7 +2,7 @@
     "nav": {
         "home": "Accueil",
         "whitelisted": "Liste blanche",
-        "registration": "Enregistrement",
+        "registration": "Créer utilisateur",
         "schools": "Écoles",
 		"training":"Formations",
 		"createDiploma":"Créer diplôme",
@@ -44,7 +44,8 @@
 		"userType":"Type d'utilisateur",
 		"getUser":"Afficher les données de l'utilisateur",
 		"createUser":"Créer ou mettre à jour un utilisateur",
-		"passwordEmpty":"Le champ mot de passe doit être rempli et vous devez choisir un rôle"
+		"passwordEmpty":"Le champ mot de passe doit être rempli et vous devez choisir un rôle",
+		"createUsers":"Créer une liste d'utilisateurs"
 	},
 	"diplome":{
 		"createNFT":"Créer NFT",
