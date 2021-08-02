@@ -1,17 +1,20 @@
-MaticulumNFT
+#MaticulumNFT
 AddNFTsToAdress
 Utilisation de require pour la gestion du NFT 
 pour empêcher d'envoyer deux fois le même hash.
 
-Maticulum
+#Maticulum
 Gestion de modifier comme le onlyOwner du smart contract Ownable d'OpenZeppelin 
 pour le smart contract Maticulum et de droits utilisateurs.
 
-MaticulumSchool
-addSchoolAdministrator et updateSchool
-Utilistation de require pour les formations pour 
-que seul l'admin puisse ajouter une école.
+#MaticulumSchool
+* Pour toutes les fonctions transactionnelles, le msg.sender est contrôlé suivant son profil:
+** super admin Maticulum
+** school admin pour une école définie
+* utilisation du nonReentrant pour le paiement des frais d'inscription lors de la création d'une école
 
-MaticulumTraining
-validateUserTrainingRequest
-Utilisation de plusieurs require pour ajouter un étudiant à une formation 
+#MaticulumTraining
+* Pour toutes les fonctions transactionnelles, le msg.sender est contrôlé suivant son profil:
+** super admin Maticulum
+** school admin pour une école définie
+** jury pour une formation définie
