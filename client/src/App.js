@@ -58,7 +58,7 @@ class App extends Component {
          const networkId = await web3.eth.net.getId();
          const deployedNetwork = Maticulum.networks[networkId];
          const instance = new web3.eth.Contract(Maticulum.abi, deployedNetwork && deployedNetwork.address,);
-		   const instanceNFT = new web3.eth.Contract(MaticulumNFT.abi, deployedNetwork && MaticulumNFT.networks[networkId].address);
+		 const instanceNFT = new web3.eth.Contract(MaticulumNFT.abi, deployedNetwork && MaticulumNFT.networks[networkId].address);
          const instanceSchool = new web3.eth.Contract(MaticulumSchool.abi, deployedNetwork && MaticulumSchool.networks[networkId].address);
          const instanceTraining = new web3.eth.Contract(MaticulumTraining.abi, deployedNetwork && MaticulumTraining.networks[networkId].address);
 
@@ -163,7 +163,7 @@ class App extends Component {
             web3: this.state.web3,
             contract: this.state.contract,
             account: this.state.accounts[0],
-			   contractNFT: this.state.contractNFT,
+			contractNFT: this.state.contractNFT,
             contractSchool: this.state.contractSchool,
             contractTraining: this.state.contractTraining,
             isSuperAdmin: this.state.isSuperAdmin

@@ -308,8 +308,8 @@ class Diplome extends Component {
 	// To add the symbolNFT in Metamask with one image
 	AddInMetamask = async() => {
 		const { hashTokenNFT, gateway}= this.state; 
-		const tokenAddress = await this.context.contract.methods.nft().call();
 		
+		let tokenAddress = await this.context.contractNFT._address;
 		let nftDatas = await this.context.contractNFT.methods.getNFTDatas().call();
 		
 		const tokenSymbol = nftDatas[1];		

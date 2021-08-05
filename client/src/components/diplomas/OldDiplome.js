@@ -46,7 +46,7 @@ class OldDiplome extends Component {
 		jsonUrlApi: jsonAPI, imageUrlAPi: imageAPI,urlPinAPI:pinAPI,
 		paramPinataApiKey:paramPinataApi, paramPinataSecretApiKey:paramPinataSecretApi,
 		trainings:trainingsAll
-		});
+		});			
 	}	
 
 	GetValuePair = async (event) => {	
@@ -108,12 +108,10 @@ class OldDiplome extends Component {
 	
 	// To add the symbolNFT in Metamask with one image
 	AddInMetamask = async() => {
-		const { hashTokenNFT, gateway}= this.state; 
-		const tokenAddress = await this.context.contract.methods.nft().call();
+		const { hashTokenNFT, gateway}= this.state;		
+		const tokenAddress = await this.context.contractNFT._address;
 		
-		let nftDatas = await this.context.contractNFT.methods.getNFTDatas().call();
-		
-		
+		let nftDatas = await this.context.contractNFT.methods.getNFTDatas().call();						
 		const tokenSymbol = nftDatas[1];		
 		const tokenImage = gateway + nftDatas[2];		
 		const tokenDecimals = 0;
