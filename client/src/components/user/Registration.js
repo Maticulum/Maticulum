@@ -233,7 +233,8 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 		<Form.Group as={Row} >	
 			<Form.Label column sm="3">{t('registration.userType')}</Form.Label>				
 			<Col sm="4">
-			  <select name="idRole"
+			  <select name="idRole" 
+			    style={{width: "350px"}}
 				value={this.state.value} 
 				onChange={this.handleChange.bind(this)}>
 				{optionTemplate}

@@ -42,3 +42,10 @@ button:hover {
 .nav-link:hover{
 	color: rgb(212,213,213);
 }
+
+.react-datepicker-wrapper,
+.react-datepicker__input-container,
+.react-datepicker__input-container input {
+    display: block;
+    width: 100%;
+}
