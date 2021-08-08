@@ -11,4 +11,4 @@ et le droit adminSchool
 
 ## MaticulumTraining
 Injection de dépendances avec les 2 interfaces IMaticulum et ISchool pour gérer les droits utilisateurs
-et le droit adminSchool
+et le droit adminSchool 
