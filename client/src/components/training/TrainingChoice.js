@@ -60,8 +60,10 @@ class TrainingChoice extends Component {
 
 
    onRegister = async (trainingId) => {
+      const training = this.state.trainings[trainingId];
+      //console.log(training.id, training.name, training.user);
 	   await this.context.contractTraining.methods
-	      .validateUserTrainingRequestDirect(trainingId, this.state.trainings[trainingId].user).send({from: this.context.account});
+	      .validateUserTrainingRequestDirect(training.id, training.user).send({from: this.context.account});
       
       this.onSchoolChange(this.state.selectedSchool);
    }
@@ -117,7 +119,7 @@ class TrainingChoice extends Component {
                            />
                         </td>
                         <td>
-                           <Button variant="outline-primary" onClick={ () => this.onRegister(training.id) }>{ t('training.register') }</Button>
+                           <Button variant="outline-primary" onClick={ () => this.onRegister(index) }>{ t('training.register') }</Button>
                         </td>
                      </tr>
                   )}
