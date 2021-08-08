@@ -45,7 +45,8 @@
 		"getUser":"Afficher les données de l'utilisateur",
 		"createUser":"Créer ou mettre à jour un utilisateur",
 		"passwordEmpty":"Le champ mot de passe doit être rempli et vous devez choisir un rôle",
-		"createUsers":"Créer une liste d'utilisateurs"
+		"createUsers":"Créer une liste d'utilisateurs",
+		"usersCreated":"Utilisateur(s) créé(s)"
 	},
 	"diplome":{
 		"createNFT":"Créer NFT",
@@ -87,7 +88,8 @@
 		"schoolAdmin" : "administrateur(s) scolaire",
 		"validatedBy" : "Validé par",
 		"errorNFT" : "Erreur lors de l'envoi du NFT. Merci de contacter léquipe de développement",
-		"wrongPassError" : "Mot de passe erroné ou données utilisateurs non définies"
+		"wrongPassError" : "Mot de passe erroné ou données utilisateurs non définies",
+		"diplomaCreated":"Diplôme(s) créé(s)"
 	},
    "school": {
       "name": "Nom",

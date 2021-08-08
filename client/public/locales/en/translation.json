@@ -45,7 +45,8 @@
 		"getUser":"Get recorded User datas",
 		"createUser":"Create/Update User",
 		"passwordEmpty":"Password field must be filled and you must chosse a role",
-		"createUsers":"Create a list of users"
+		"createUsers":"Create a list of users",
+		"usersCreated":"User(s) created"
 	},
 	"diplome":{
 		"createNFT":"Create NFT",
@@ -87,7 +88,8 @@
 		"schoolAdmin" : "school administrator(s)",
 		"validatedBy" : "Validated by",
 		"errorNFT" : "error in sendind NFT contact our developpement team",
-		"wrongPassError" : "Wrong password or user datas not defined"
+		"wrongPassError" : "Wrong password or user datas not defined",
+		"diplomaCreated":"Diploma(s) created"
 		
 	},
    "school": {
