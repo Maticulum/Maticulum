@@ -14,7 +14,9 @@
 
 button {
    color: black;
-   background-color:purple;
+   background-color:purple  !important;
+   color: white !important;
+   font-weight: bold !important;
 }
 
 button:hover {

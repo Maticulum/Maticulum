@@ -172,11 +172,18 @@ class App extends Component {
 			<Router>
 			<div className='maticulum'> 
 				<Navbar bg="purple" variant="white">
-				   <img src="https://gateway.pinata.cloud/ipfs/QmP4xzubJh8auv9NgYDP75b9ms9NDjwYVTJxkPNMddNWok" />
-				   <Navbar.Brand href='/' className='maticulum'>&nbsp;Maticulum</Navbar.Brand>
+				   
+				   <Navbar.Brand href='/' className='maticulum'>
+						
+				   </Navbar.Brand>
 				   <Navbar.Collapse>
 					  <Nav>
-						 <NavLink className="nav-link" exact to={'/'}>{t('nav.home')}</NavLink>
+						 <NavLink className="nav-link" exact to={'/'}>
+							<img src="https://gateway.pinata.cloud/ipfs/QmP4xzubJh8auv9NgYDP75b9ms9NDjwYVTJxkPNMddNWok" />
+						 </NavLink>
+						 <NavLink className="nav-link" exact to={'/'}>
+							<div>Maticulum</div>
+						 </NavLink>
 						 { this.state.isSchoolAdmin && <NavLink className="nav-link" to={'/registration'}>{t('nav.registration')}</NavLink> }
 						 { this.state.isValidated && <NavLink className="nav-link" to={'/schools/new'}>{t('nav.createSchool')}</NavLink> }
 						 { this.state.isSuperAdmin && <NavLink className="nav-link" visibility="hidden" to={'/whitelisted'}>{t('nav.whitelisted')}</NavLink> }
