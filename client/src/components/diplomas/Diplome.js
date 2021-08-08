@@ -437,13 +437,16 @@ class Diplome extends Component {
 			<Container>
 				<Form>
 					<Form.Group as={Row} >
+						<Form.Label column sm="3"></Form.Label>
+					</Form.Group>
+					<Form.Group as={Row} >
 						<Form.Label column sm="3">{t('diplome.studentAdress')}</Form.Label>
 						<Col sm="3">
 						  <Form.Control type="text" 
 						  id="tbxUserAdress" ref={(input) => { this.tbxUserAdress = input }}
 						  />
 						</Col>
-						{t('diplome.password')}
+						<Form.Label>{t('diplome.password')}</Form.Label>						
 						<Col sm="3">
 						  <Form.Control type="password" 
 						  id="tbxPass" ref={(input) => { this.tbxPass = input }}

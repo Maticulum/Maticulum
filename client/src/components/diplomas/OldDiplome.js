@@ -268,51 +268,87 @@ class OldDiplome extends Component {
 		
 		return(
 		<div style={{display: 'flex', justifyContent: 'center'}}>
-		  <Card style={{ width: '50rem' }}>
-            <Card.Header><strong>{t('diplome.sendNFT')}</strong></Card.Header>
-			<Card.Body>	
-				<label>
-				  <select 
-					value={this.state.value} 
-					onChange={this.GetValuePair.bind(this)}>
-					{optionTemplate}
-				  </select>
-			    </label>
-			</Card.Body>
-            <Card.Body>			  
-				<input type="file" id="avatar" accept="image/png, image/jpeg" 
-				 multiple="multiple" onChange={this.handleFile} />
-			</Card.Body>
-			{t('diplome.IPFSkey')}
-			<Form.Control type="password" id="mdp" ref={(input) => { this.mdp = input }} />
-			
-			{ 
-				this.state.linkVisible ? 
-				<Card.Body>
-					<Button onClick={this.createImagePinataAxios}>{t('diplome.createNFT')}</Button>
-				</Card.Body>
-				: null
-			}
-			
-			{ 
-				this.state.loading ? 
-				<Card.Body>
-					<label>{t('diplome.loading')}</label>
-				</Card.Body>
-				: null
-			}			
-			
-			{ 
-				this.state.isButtonMetamaskVisible ? 
-				<Card.Body>
-					<Button onClick={this.AddInMetamask}>{t('diplome.addMetamask')}</Button>
-				</Card.Body>
-				: null
-			}	
-          </Card>
+			<Container>
+				<Form>
+					<Form.Group as={Row} >
+						<Form.Label column sm="3"></Form.Label>
+					</Form.Group>
+					<Form.Group as={Row} >	
+						<Form.Label column sm="5"><strong>{t('diplome.sendNFT')}</strong></Form.Label>						
+						<Col sm="2"></Col>
+					</Form.Group>
+					<Form.Group as={Row} >
+						<Form.Label column sm="3"></Form.Label>
+					</Form.Group>
+					<Form.Group as={Row} >	
+						<Form.Label column sm="3">Formation</Form.Label>
+						
+						<Col sm="2">
+						  <label>
+							  <select 
+								value={this.state.value} 
+								onChange={this.GetValuePair.bind(this)}>
+								{optionTemplate}
+							  </select>
+							</label>
+						</Col>
+					</Form.Group>
+					<Form.Group as={Row} >	
+						<Form.Label column sm="3">Choisir</Form.Label>
+						
+						<Col sm="2">
+						  <label>
+							  <input type="file" id="avatar" accept="image/png, image/jpeg" 
+								multiple="multiple" onChange={this.handleFile} />
+							</label>
+						</Col>
+					</Form.Group>
+					<Form.Group as={Row} >	
+						<Form.Label column sm="3">{t('diplome.IPFSkey')}</Form.Label>
+						
+						<Col sm="2">
+						  <label>
+							  <Form.Control type="password" id="mdp" ref={(input) => { this.mdp = input }} />
+							</label>
+						</Col>
+					</Form.Group>
+					
+					{ 
+						this.state.linkVisible ? 
+						<Form.Group as={Row} >	
+							<Form.Label column sm="3"></Form.Label>							
+							<Col sm="2">
+							  <Button onClick={this.createImagePinataAxios}>{t('diplome.createNFT')}</Button>
+							</Col>
+						</Form.Group>
+						: null
+					}
+					
+					{ 
+						this.state.loading ? 
+						<Form.Group as={Row} >	
+							<Form.Label column sm="3"></Form.Label>							
+							<Col sm="2">
+							  <label>{t('diplome.loading')}</label>
+							</Col>
+						</Form.Group>
+						: null
+					}			
+					
+					{ 
+						this.state.isButtonMetamaskVisible ? 
+						<Form.Group as={Row} >	
+							<Form.Label column sm="3"></Form.Label>							
+							<Col sm="2">
+							  <Button onClick={this.AddInMetamask}>{t('diplome.addMetamask')}</Button>
+							</Col>
+						</Form.Group>
+						: null
+					}	
+							
+				</Form>
+			</Container>		  
         </div>	
-
-		
 		);
 	}
 }

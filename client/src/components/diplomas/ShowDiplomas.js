@@ -62,20 +62,35 @@ class ShowDiplomas extends Component {
    	render() {
 		const { t } = this.props;
 		return (
-			<Card>
-				<Card.Body>
-					<label>{t('diplome.userAdress')}</label>
-					<Form.Control type="text" id="searchDiploma" 
-					ref={(input) => { this.searchDiploma = input }} />
-				</Card.Body>
-				<Card.Body>
-					<Button onClick={ this.getDiplomas }>{t('diplome.searchDiplomas')}</Button> 
-				</Card.Body>				
-				<Card.Body>
-					<img src={this.state.imageUrl}/>
-				</Card.Body>	
-				<div id="diplomasImage"></div>
-			</Card>
+		<div>	
+			<Container>
+				<Form.Group as={Row} >
+						<Form.Label column sm="3"></Form.Label>
+					</Form.Group>
+				<Form>
+					<Form.Group as={Row} >	
+						<Form.Label column sm="3">{t('diplome.userAdress')}</Form.Label>						
+						<Col sm="2">
+						  <Form.Control type="text" id="searchDiploma" 
+					      ref={(input) => { this.searchDiploma = input }}
+						  />
+						</Col>
+					</Form.Group>
+					<Form.Group as={Row} >	
+						<Form.Label column sm="3"></Form.Label>						
+						<Col sm="2">
+						  <Button onClick={ this.getDiplomas }>{t('diplome.searchDiplomas')}</Button> 
+						</Col>
+					</Form.Group>
+					<Form.Group as={Row} >	
+						<img src={this.state.imageUrl}/>
+						<div id="diplomasImage"></div>
+					</Form.Group>
+				</Form>
+			</Container>
+		</div>
+		
+			
 		);
 	}
 }

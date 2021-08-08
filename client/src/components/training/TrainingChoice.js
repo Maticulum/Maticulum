@@ -83,6 +83,9 @@ class TrainingChoice extends Component {
       return (
          <Container>
             <Form>
+				<Form.Group as={Row} >
+					<Form.Label column sm="3"></Form.Label>
+				</Form.Group>
                <Form.Group as={Row}>
                   <Form.Label column sm="2">School</Form.Label>
                   <Col sm="10">

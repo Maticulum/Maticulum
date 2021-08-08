@@ -414,6 +414,9 @@ class Diplome extends Component {
 		<div style={{display: 'flex', justifyContent: 'center'}}>
 			<Container>
 				<Form>
+					<Form.Group as={Row} >
+						<Form.Label column sm="3"></Form.Label>
+					</Form.Group>
 					<Form.Group as={Row} >	
 						<Form.Label column sm="3">{t('diplome.password')}</Form.Label>
 						

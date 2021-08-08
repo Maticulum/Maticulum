@@ -1,5 +1,5 @@
 import React, { Component, useState} from 'react';
-import { Button, Form } from 'react-bootstrap';
+import { Button, Form, Container, Col, Row } from 'react-bootstrap';
 import Web3Context from '../../Web3Context';
 import { withTranslation } from "react-i18next";
 import DatePicker from "react-datepicker";
@@ -158,90 +158,126 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 	 ));
 	 
     return (
-      <Form>
-        <h1>{t('registration.register')}</h1>  
-        <Form.Group>
-          <Form.Label>{t('formlabel.name')}</Form.Label>
-          <Form.Control type="text" id="nameUser"
-            ref={(input) => { this.nameUser = input }}
-          />
-        </Form.Group>
-
-        <Form.Group>
-          <Form.Label>{t('formlabel.firstname')}</Form.Label>
-          <Form.Control type="text" id="firstnameUser" 		  
+	<Container>
+      <Form> 
+		<Form.Group as={Row} >	
+			<Form.Label column sm="3"></Form.Label>				
+			<Col sm="5">					  
+			</Col>
+		</Form.Group>
+        <Form.Group as={Row} >	
+			<Form.Label column sm="3">{t('formlabel.name')}</Form.Label>				
+			<Col sm="4">	
+			  <Form.Control type="text" id="nameUser"
+				ref={(input) => { this.nameUser = input }}
+			  />					  
+			</Col>
+		</Form.Group>
+		<Form.Group as={Row} >	
+			<Form.Label column sm="3">{t('formlabel.firstname')}</Form.Label>				
+			<Col sm="4">
+			  <Form.Control type="text" id="firstnameUser" 		  
             ref={(input) => { this.firstnameUser = input }}
-          />	
-        </Form.Group>
-		
-		<Form.Group>
-          <Form.Label>{t('formlabel.birthCountry')}</Form.Label>
-          <Form.Control type="text" id="birthCountry" 		  
+          />					  
+			</Col>
+		</Form.Group>
+		<Form.Group as={Row} >	
+			<Form.Label column sm="3">{t('formlabel.birthCountry')}</Form.Label>				
+			<Col sm="4">
+			  <Form.Control type="text" id="birthCountry" 		  
             ref={(input) => { this.birthCountry = input }}
-          />	
-        </Form.Group>
-		
-		<Form.Group>
-          <Form.Label> {t('formlabel.birthDate')}</Form.Label>
-		  <br/ >
-          <DatePicker id="birthDate" selected={date} mode='default' display='default'
-		  dateFormat="dd/MM/yyyy"
-			onChange={ date => this.setState({ date }) } />
-        </Form.Group>
-		
-		<Form.Group>
-          <Form.Label>{t('formlabel.mail')}</Form.Label>
-          <Form.Control type="text" id="mail" 		  
-            ref={(input) => { this.mail = input }} 
-          />	
-        </Form.Group>
-		
-		<Form.Group>
-          <Form.Label>{t('formlabel.mobilePhone')}</Form.Label>
-          <Form.Control type="text" id="mobile" 		  
-            ref={(input) => { this.mobile = input }}
-          />	
-        </Form.Group>
-		
-		<Form.Group>
-          <Form.Label>{t('formlabel.fixedPhone')}</Form.Label>
-          <Form.Control type="text" id="telfixe"
+			/>					  
+			</Col>
+		</Form.Group>
+		<Form.Group as={Row} >	
+			<Form.Label column sm="3">{t('formlabel.birthDate')}</Form.Label>				
+			<Col sm="4">
+			  <DatePicker  id="birthDate" 
+			  selected={date} mode='default' display='default'
+				dateFormat="dd/MM/yyyy"
+				onChange={ date => this.setState({ date }) } />		  
+			</Col>
+		</Form.Group>
+		<Form.Group as={Row} >	
+			<Form.Label column sm="3">{t('formlabel.mail')}</Form.Label>				
+			<Col sm="4">
+			  <Form.Control type="text" id="mail" 		  
+            ref={(input) => { this.mail = input }}
+			/>					  
+			</Col>
+		</Form.Group>
+		<Form.Group as={Row} >	
+			<Form.Label column sm="3">{t('formlabel.mobilePhone')}</Form.Label>				
+			<Col sm="4">
+			  <Form.Control type="text" id="mobilePhone" 		  
+            ref={(input) => { this.mobilePhone = input }}
+			/>					  
+			</Col>
+		</Form.Group>
+		<Form.Group as={Row} >	
+			<Form.Label column sm="3">{t('formlabel.fixedPhone')}</Form.Label>				
+			<Col sm="4">
+			  <Form.Control type="text" id="telfixe" 		  
             ref={(input) => { this.telfixe = input }}
-          />	
-        </Form.Group>
-		
-		<Form.Group>
-          <Form.Label>{t('registration.userAddress')}</Form.Label>
-          <Form.Control type="text" id="userAddress"
+			/>					  
+			</Col>
+		</Form.Group>		
+		<Form.Group as={Row} >	
+			<Form.Label column sm="3">{t('registration.userAddress')}</Form.Label>				
+			<Col sm="4">
+			  <Form.Control type="text" id="userAddress" 		  
             ref={(input) => { this.userAddress = input }}
-          />	
-        </Form.Group>
-		
-		<Form.Group>
-          <Form.Label>{t('registration.userType')}</Form.Label><br />
-          <label>
-			<select name="idRole"
+			/>					  
+			</Col>
+		</Form.Group>
+		<Form.Group as={Row} >	
+			<Form.Label column sm="3">{t('registration.userType')}</Form.Label>				
+			<Col sm="4">
+			  <select name="idRole"
 				value={this.state.value} 
 				onChange={this.handleChange.bind(this)}>
 				{optionTemplate}
-			</select>
-		  </label>		
-        </Form.Group>		
-		
-		<Form.Group>
-          <Form.Label>{t('diplome.password')}</Form.Label>
-          <Form.Control type="password" id="pass"
-            ref={(input) => { this.pass = input }}
-          />
-        </Form.Group>		
-		<Form.Group>
-			<input type="file" onChange={(e) => this.showFile(e)} />
+			</select>  
+			</Col>
+		</Form.Group>	
+		<Form.Group as={Row} >	
+			<Form.Label column sm="3">{t('diplome.password')}</Form.Label>				
+			<Col sm="4">
+			  <Form.Control type="password" id="pass"
+				ref={(input) => { this.pass = input }}
+				/> 
+			</Col>
+		</Form.Group>
+		<Form.Group as={Row} >	
+			<Form.Label column sm="3">Multi users</Form.Label>				
+			<Col sm="4">
+			  <input type="file" onChange={(e) => this.showFile(e)} />
+			</Col>
+		</Form.Group>	
+		<Form.Group as={Row} >
+			<Form.Label column sm="3">{t('diplome.awaitedFormat')}</Form.Label>
+			<Col sm="8">
+				<Form.Control disabled type="text" 
+				value={
+					  t('registration.userAddress') + "," +
+					  t('formlabel.firstname') + "," + 
+					  t('formlabel.name') + "," + 
+					  t('formlabel.birthCountry') + "," + 
+					  t('formlabel.birthDate') + "," + 
+					  t('formlabel.mail') + "," + 
+					  "mobile,fixe"}
+					  />
+			</Col>
 		</Form.Group>
                 
         <Button className="next" onClick={this.GetThisUser}>{t('registration.getUser')}</Button>
         <Button className="next" onClick={this.CreateModifyUser}>{t('registration.createUser')}</Button>
 		<Button className="next" onClick={this.CreateModifyUsers}>{t('registration.createUsers')}s</Button>
-      </Form>
+		<Form.Group>
+          <Form.Label></Form.Label>          
+        </Form.Group>
+	  </Form>
+	</Container>
     );
   }
 }
