@@ -420,7 +420,7 @@ class Diplome extends Component {
 					<Form.Group as={Row} >	
 						<Form.Label column sm="3">{t('diplome.password')}</Form.Label>
 						
-						<Col sm="2">
+						<Col sm="5">
 						  <Form.Control type="password" 
 						  id="tbxPass" ref={(input) => { this.tbxPass = input }}
 						  />
@@ -428,9 +428,10 @@ class Diplome extends Component {
 					</Form.Group>
 					<Form.Group as={Row} >
 						<Form.Label column sm="3">{t('training.training')}(s)</Form.Label>
-						<Col sm="9">
+						<Col sm="5">
 						  <label>
 							<select 
+								style={{width: "440px"}}
 								value={this.state.value} 
 								onChange={this.GetValuePair.bind(this)}>
 								{optionTemplate}
@@ -450,7 +451,7 @@ class Diplome extends Component {
 					</Form.Group>
 					<Form.Group as={Row} >
 						<Form.Label column sm="3">{t('diplome.IPFSkey')}</Form.Label>
-						<Col sm="9">
+						<Col sm="5">
 							<Form.Control type="password" id="mdp" ref={(input) => { this.mdp = input }} />
 						</Col>
 					</Form.Group>					
