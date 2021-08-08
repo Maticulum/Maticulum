@@ -168,37 +168,40 @@ class App extends Component {
             contractTraining: this.state.contractTraining,
             isSuperAdmin: this.state.isSuperAdmin
          }} >
-         <Router>
-            <Navbar>
-               <Navbar.Brand href='/'>Maticulum</Navbar.Brand>
-               <Navbar.Collapse>
-                  <Nav className='mr-auto'>
-                     <NavLink className="nav-link" exact to={'/'}>{t('nav.home')}</NavLink>
-                     { this.state.isSchoolAdmin && <NavLink className="nav-link" to={'/registration'}>{t('nav.registration')}</NavLink> }
-                     { this.state.isValidated && <NavLink className="nav-link" to={'/schools/new'}>{t('nav.createSchool')}</NavLink> }
-                     { this.state.isSuperAdmin && <NavLink className="nav-link" visibility="hidden" to={'/whitelisted'}>{t('nav.whitelisted')}</NavLink> }
-                     { this.state.isSuperAdmin && <NavLink className="nav-link" to={'/schools'}>{t('nav.schools')}</NavLink> }
-                     { this.state.isSchoolAdmin && <NavLink className="nav-link" to={'/trainings/choice'}>{t('nav.training')}</NavLink> }
-                     { this.state.isSchoolAdmin && <NavLink className="nav-link" to={'/oldDiplome'}>{t('nav.oldDiplomas')}</NavLink> }
-                     { this.state.isSchoolAdmin && <NavLink className="nav-link" to={'/diplome'}>{t('nav.createDiploma')}</NavLink> }
-					 { this.state.isSchoolAdmin && <NavLink className="nav-link" to={'/MultiDiplomes'}>{t('nav.createDiplomas')}</NavLink> }
-                     <NavLink className="nav-link" to={'/showDiplomas'}>{t('nav.searchDiplomas')}</NavLink>
-                  </Nav>
-               </Navbar.Collapse>
-               <Navbar.Collapse className="justify-content-end">
-                  <Button { ...polygon ? {} : {href: '#'}} variant={ polygon ? "outline-info" : "outline-danger" } onClick={this.connectPolygon} >
-                     { polygon ? config.NETWORK_NAME : 'Réseau non supporté' }
-                  </Button>
-                  <Button { ...connected ? {} : {href: '#'}} className="next" variant="outline-primary" onClick={this.connectUser}>
-                     { connected ? this.getEllipsis(accounts[0]) : 'Connection' }
-                  </Button>
-                  <NavDropdown title={i18n.language.toUpperCase()} id="language">
-                     <NavDropdown.Item onClick={() => i18n.changeLanguage('en')}>EN</NavDropdown.Item>
-                     <NavDropdown.Item onClick={() => i18n.changeLanguage('fr')}>FR</NavDropdown.Item>
-                  </NavDropdown>
-               </Navbar.Collapse>
-            </Navbar>
-
+		 
+			<Router>
+			<div className='maticulum'> 
+				<Navbar bg="purple" variant="white">
+				   <img src="https://gateway.pinata.cloud/ipfs/QmP4xzubJh8auv9NgYDP75b9ms9NDjwYVTJxkPNMddNWok" />
+				   <Navbar.Brand href='/' className='maticulum'>&nbsp;Maticulum</Navbar.Brand>
+				   <Navbar.Collapse>
+					  <Nav>
+						 <NavLink className="nav-link" exact to={'/'}>{t('nav.home')}</NavLink>
+						 { this.state.isSchoolAdmin && <NavLink className="nav-link" to={'/registration'}>{t('nav.registration')}</NavLink> }
+						 { this.state.isValidated && <NavLink className="nav-link" to={'/schools/new'}>{t('nav.createSchool')}</NavLink> }
+						 { this.state.isSuperAdmin && <NavLink className="nav-link" visibility="hidden" to={'/whitelisted'}>{t('nav.whitelisted')}</NavLink> }
+						 { this.state.isSuperAdmin && <NavLink className="nav-link" to={'/schools'}>{t('nav.schools')}</NavLink> }
+						 { this.state.isSchoolAdmin && <NavLink className="nav-link" to={'/trainings/choice'}>{t('nav.training')}</NavLink> }
+						 { this.state.isSchoolAdmin && <NavLink className="nav-link" to={'/oldDiplome'}>{t('nav.oldDiplomas')}</NavLink> }
+						 { this.state.isSchoolAdmin && <NavLink className="nav-link" to={'/diplome'}>{t('nav.createDiploma')}</NavLink> }
+						 { this.state.isSchoolAdmin && <NavLink className="nav-link" to={'/MultiDiplomes'}>{t('nav.createDiplomas')}</NavLink> }
+						 <NavLink className="nav-link" to={'/showDiplomas'}>{t('nav.searchDiplomas')}</NavLink>
+					  </Nav>
+				   </Navbar.Collapse>
+				   <Navbar.Collapse className="justify-content-end">
+					  <Button { ...polygon ? {} : {href: '#'}} variant={ polygon ? "outline-info" : "outline-danger" } onClick={this.connectPolygon} >
+						 { polygon ? config.NETWORK_NAME : 'Réseau non supporté' }
+					  </Button>
+					  <Button { ...connected ? {} : {href: '#'}} className="next" variant="outline-primary" onClick={this.connectUser}>
+						 { connected ? this.getEllipsis(accounts[0]) : 'Connection' }
+					  </Button>
+					  <NavDropdown title={i18n.language.toUpperCase()} id="language">
+						 <NavDropdown.Item onClick={() => i18n.changeLanguage('en')}>EN</NavDropdown.Item>
+						 <NavDropdown.Item onClick={() => i18n.changeLanguage('fr')}>FR</NavDropdown.Item>
+					  </NavDropdown>					  
+				   </Navbar.Collapse>
+				</Navbar>
+			</div>
             <div className="main">
                <Switch>
                   <Route exact path='/' component={Home} />
@@ -222,7 +225,9 @@ class App extends Component {
 				  <Route exact path='/adminSetPinataData' component={AdminSetPinataData} />
                </Switch>
             </div>
-         </Router>
+			</Router>
+		 
+         
          </Web3Context.Provider>
       );
    }

@@ -260,7 +260,7 @@ class Diplome extends Component {
 		this.context.contractNFT.methods.AddNFTsToAdress(hashes, diplomas)
 		.send({from:this.context.account}) 
 		.then(async (response) => {
-			
+			alert(t('diplome.diplomaCreated'));
 		})
 		.catch(function (error, receipt) {
 			for(let i = 0;i<hashes.length;i++){	
@@ -418,11 +418,12 @@ class Diplome extends Component {
 		let currentTraining = await this.context.contractTraining.methods.trainings(event.nativeEvent.target[index].value).call();
 		let schools = await this.context.contractSchool.methods.schools(currentTraining[0]).call();
 		this.tbxGrade.value = currentTraining[2];
+		this.tbxSchool.value = schools[0];
 		this.tbxTrainingHours.value = currentTraining[3];
 		this.setState({ diplomaName: this.tbxDiplomaName.value, grade:this.tbxGrade.value,
 		trainingId: trainingId, schoolId :currentTraining[0],
 		trainingHours:this.tbxTrainingHours.value,
-		trainingJuriesCount:currentTraining[4],schoolAdminsCount:schools[3]});
+		trainingJuriesCount:currentTraining[4],schoolAdminsCount:schools[3],school : this.tbxSchool.value});
 	}
 	
 	render() {

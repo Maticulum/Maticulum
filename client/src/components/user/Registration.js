@@ -142,7 +142,12 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
   
   CreateModifyUsers= async() => {	  
 	  const { userDatas}= this.state;
-	  await this.context.contract.methods.registerUsersHashes(userDatas).send({from: this.context.account});		
+	  const { t } = this.props; 
+	  await this.context.contract.methods.registerUsersHashes(userDatas).send({from: this.context.account})
+	  .then(async (response) => {
+		alert(t('registration.usersCreated'));
+	})
+	  
   }
   		
   render() {
