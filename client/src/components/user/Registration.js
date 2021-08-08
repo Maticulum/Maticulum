@@ -59,7 +59,7 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 		this.firstnameUser.value = this.setData(userArray,1);		
 		this.birthCountry.value = this.setData(userArray,2);
 		this.mail.value = this.setData(userArray,4);
-		this.mobile.value = this.setData(userArray,5);
+		this.mobilePhone.value = this.setData(userArray,5);
 		this.telfixe.value = this.setData(userArray,6);
 		this.state.userTypeSelected = userDatas[1];
 		this.setState({ date: new Date(this.setData(userArray,3))});
@@ -84,7 +84,7 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 						+ this.birthCountry.value    +"#"
 						+ date.toDateString()        +"#"
 						+ this.mail.value            +"#"
-						+ this.mobile.value          +"#"
+						+ this.mobilePhone.value          +"#"
 						+ this.telfixe.value;
 								
 		const CryptoJS = require('crypto-js');
@@ -97,7 +97,7 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 	else{
 		await this.context.contract.methods.updateUser(
 		this.nameUser.value,this.firstnameUser.value,this.birthCountry.value,
-		this.birthDate,this.mail.value,this.mobile.value,this.telfixe.value)
+		this.birthDate,this.mail.value,this.mobilePhone.value,this.telfixe.value)
 		.send({from: this.context.account});
 	}	  
   }	
@@ -167,7 +167,7 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 		</Form.Group>
         <Form.Group as={Row} >	
 			<Form.Label column sm="3">{t('formlabel.name')}</Form.Label>				
-			<Col sm="4">	
+			<Col sm="5">	
 			  <Form.Control type="text" id="nameUser"
 				ref={(input) => { this.nameUser = input }}
 			  />					  
@@ -175,7 +175,7 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 		</Form.Group>
 		<Form.Group as={Row} >	
 			<Form.Label column sm="3">{t('formlabel.firstname')}</Form.Label>				
-			<Col sm="4">
+			<Col sm="5">
 			  <Form.Control type="text" id="firstnameUser" 		  
             ref={(input) => { this.firstnameUser = input }}
           />					  
@@ -183,7 +183,7 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 		</Form.Group>
 		<Form.Group as={Row} >	
 			<Form.Label column sm="3">{t('formlabel.birthCountry')}</Form.Label>				
-			<Col sm="4">
+			<Col sm="5">
 			  <Form.Control type="text" id="birthCountry" 		  
             ref={(input) => { this.birthCountry = input }}
 			/>					  
@@ -191,7 +191,7 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 		</Form.Group>
 		<Form.Group as={Row} >	
 			<Form.Label column sm="3">{t('formlabel.birthDate')}</Form.Label>				
-			<Col sm="4">
+			<Col sm="5">
 			  <DatePicker  id="birthDate" 
 			  selected={date} mode='default' display='default'
 				dateFormat="dd/MM/yyyy"
@@ -200,7 +200,7 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 		</Form.Group>
 		<Form.Group as={Row} >	
 			<Form.Label column sm="3">{t('formlabel.mail')}</Form.Label>				
-			<Col sm="4">
+			<Col sm="5">
 			  <Form.Control type="text" id="mail" 		  
             ref={(input) => { this.mail = input }}
 			/>					  
@@ -208,7 +208,7 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 		</Form.Group>
 		<Form.Group as={Row} >	
 			<Form.Label column sm="3">{t('formlabel.mobilePhone')}</Form.Label>				
-			<Col sm="4">
+			<Col sm="5">
 			  <Form.Control type="text" id="mobilePhone" 		  
             ref={(input) => { this.mobilePhone = input }}
 			/>					  
@@ -216,7 +216,7 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 		</Form.Group>
 		<Form.Group as={Row} >	
 			<Form.Label column sm="3">{t('formlabel.fixedPhone')}</Form.Label>				
-			<Col sm="4">
+			<Col sm="5">
 			  <Form.Control type="text" id="telfixe" 		  
             ref={(input) => { this.telfixe = input }}
 			/>					  
@@ -224,7 +224,7 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 		</Form.Group>		
 		<Form.Group as={Row} >	
 			<Form.Label column sm="3">{t('registration.userAddress')}</Form.Label>				
-			<Col sm="4">
+			<Col sm="5">
 			  <Form.Control type="text" id="userAddress" 		  
             ref={(input) => { this.userAddress = input }}
 			/>					  
@@ -232,9 +232,9 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 		</Form.Group>
 		<Form.Group as={Row} >	
 			<Form.Label column sm="3">{t('registration.userType')}</Form.Label>				
-			<Col sm="4">
+			<Col sm="5">
 			  <select name="idRole" 
-			    style={{width: "350px"}}
+			    style={{width: "440px"}}
 				value={this.state.value} 
 				onChange={this.handleChange.bind(this)}>
 				{optionTemplate}
@@ -243,7 +243,7 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 		</Form.Group>	
 		<Form.Group as={Row} >	
 			<Form.Label column sm="3">{t('diplome.password')}</Form.Label>				
-			<Col sm="4">
+			<Col sm="5">
 			  <Form.Control type="password" id="pass"
 				ref={(input) => { this.pass = input }}
 				/> 
@@ -251,7 +251,7 @@ state = {isRegistered : false, isCreated: false,date:null,userType:[],userTypeSe
 		</Form.Group>
 		<Form.Group as={Row} >	
 			<Form.Label column sm="3">Multi users</Form.Label>				
-			<Col sm="4">
+			<Col sm="5">
 			  <input type="file" onChange={(e) => this.showFile(e)} />
 			</Col>
 		</Form.Group>	

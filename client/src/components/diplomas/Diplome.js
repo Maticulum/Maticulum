@@ -441,24 +441,29 @@ class Diplome extends Component {
 					</Form.Group>
 					<Form.Group as={Row} >
 						<Form.Label column sm="3">{t('diplome.studentAdress')}</Form.Label>
-						<Col sm="3">
-						  <Form.Control type="text" 
-						  id="tbxUserAdress" ref={(input) => { this.tbxUserAdress = input }}
+						<Col sm="5">
+							<Form.Control type="text" 
+							id="tbxUserAdress" ref={(input) => { this.tbxUserAdress = input }}
 						  />
-						</Col>
-						<Form.Label>{t('diplome.password')}</Form.Label>						
-						<Col sm="3">
-						  <Form.Control type="password" 
-						  id="tbxPass" ref={(input) => { this.tbxPass = input }}
-						  />
-						</Col>
-						<Col sm="1">
-						  <Button onClick={this.searchUser}>{t('diplome.searchUser')}</Button>
 						</Col>
 					</Form.Group>
 					<Form.Group as={Row} >
+						<Form.Label column sm="3">{t('diplome.password')}</Form.Label>
+						<Col sm="5">
+							<Form.Control type="password" 
+						  id="tbxPass" ref={(input) => { this.tbxPass = input }}
+						  />
+						</Col>
+					</Form.Group>
+					<Form.Group as={Row} >
+						<Form.Label column sm="3"></Form.Label>
+						<Col sm="5">
+							<Button onClick={this.searchUser}>{t('diplome.searchUser')}</Button>
+						</Col>
+					</Form.Group>					
+					<Form.Group as={Row} >
 						<Form.Label column sm="3">{t('training.training')}(s)</Form.Label>
-						<Col sm="9">
+						<Col sm="5">
 						  <label>
 							<select 
 								value={this.state.value} 
@@ -474,7 +479,7 @@ class Diplome extends Component {
 					</Form.Group>	 
 					<Form.Group as={Row} >
 						<Form.Label column sm="3">{t('formlabel.name')}</Form.Label>
-						<Col sm="9">
+						<Col sm="5">
 						  <Form.Control type="text" 
 						  onChange={(e) => this.setState({firstname: e.target.value})} 
 						  id="tbxLastname" ref={(input) => { this.tbxLastname = input }}
@@ -483,7 +488,7 @@ class Diplome extends Component {
 					</Form.Group>
 					<Form.Group as={Row} >
 						<Form.Label column sm="3">{t('formlabel.firstname')}</Form.Label>
-						<Col sm="9">
+						<Col sm="5">
 						  <Form.Control type="text"  
 						  onChange={(e) => this.setState({lastname: e.target.value})}
 						  id="tbxFirstname " ref={(input) => { this.tbxFirstname = input }}
@@ -492,7 +497,7 @@ class Diplome extends Component {
 					 </Form.Group>					
 					<Form.Group as={Row} >
 						<Form.Label column sm="3">{t('diplome.school')}</Form.Label>
-						<Col sm="9">
+						<Col sm="5">
 							<Form.Control type="text" 
 							onChange={(e) => this.setState({school: e.target.value})} 
 							id="tbxSchool" ref={(input) => { this.tbxSchool = input }}
@@ -501,7 +506,7 @@ class Diplome extends Component {
 					</Form.Group>
 					<Form.Group as={Row} >
 						<Form.Label column sm="3">{t('diplome.grade')}</Form.Label>
-						<Col sm="9">
+						<Col sm="5">
 							<Form.Control type="text"  
 							onChange={(e) => this.setState({grade: e.target.value})} 
 							id="tbxGrade" ref={(input) => { this.tbxGrade = input }}
@@ -510,7 +515,7 @@ class Diplome extends Component {
 					</Form.Group>
 					<Form.Group as={Row} >
 						<Form.Label column sm="3">{t('diplome.nbhours')}</Form.Label>
-						<Col sm="9">
+						<Col sm="5">
 							<Form.Control type="text"  
 							onChange={(e) => this.setState({grade: e.target.value})} 
 							id="tbxTrainingHours" ref={(input) => { this.tbxTrainingHours = input }}
@@ -519,7 +524,7 @@ class Diplome extends Component {
 					</Form.Group>
 					<Form.Group as={Row} >
 						<Form.Label column sm="3">{t('diplome.diplomaName')}</Form.Label>
-						<Col sm="9">
+						<Col sm="5">
 							<Form.Control type="text" 
 							onChange={(e) => this.setState({diplomaName: e.target.value})} 
 							id="tbxDiplomaName" ref={(input) => { this.tbxDiplomaName = input }}
@@ -538,7 +543,7 @@ class Diplome extends Component {
 					</Form.Group>
 					<Form.Group as={Row} >
 						<Form.Label column sm="3">{t('diplome.IPFSkey')}</Form.Label>
-						<Col sm="9">
+						<Col sm="5">
 							<Form.Control type="password" id="mdp" ref={(input) => { this.mdp = input }} />
 						</Col>
 					</Form.Group>					
@@ -568,13 +573,13 @@ class Diplome extends Component {
 					</Form.Group>
 					<Form.Group as={Row} >
 						<Form.Label column sm="3">{t('diplome.publishFromFile')}</Form.Label>
-						<Col sm="9">
+						<Col sm="5">
 							<input type="file" onChange={(e) => this.showFile(e)} accept="text/csv" />
 						</Col>
 					</Form.Group>
 					<Form.Group as={Row} >
 						<Form.Label column sm="3">{t('diplome.awaitedFormat')}</Form.Label>
-						<Col sm="9">
+						<Col sm="5">
 							<Form.Control disabled type="text" 
 							value={t('formlabel.firstname') + "," + 
 								  t('formlabel.name') + "," + 
@@ -585,7 +590,7 @@ class Diplome extends Component {
 					</Form.Group>
 					<Form.Group as={Row} >
 						<Form.Label column sm="3"></Form.Label>
-						<Col sm="9">
+						<Col sm="5">
 							<div id="diplomaImage"></div>
 						</Col>
 					</Form.Group>

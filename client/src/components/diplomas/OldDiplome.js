@@ -199,7 +199,7 @@ class OldDiplome extends Component {
 		
 		let annulationNotYetShown = true;
 		let diplomas = { schoolId:schoolId,trainingId:trainingId,
-		userAddresses: ["0x0000000000000000000000000000000000000000"]};
+		userAddresses: [this.userAddress.value]};
 		
 		this.context.contractNFT.methods.AddNFTsToAdressOld(hashes, diplomas)
 		.send({from:this.context.account}) 
@@ -281,11 +281,17 @@ class OldDiplome extends Component {
 						<Form.Label column sm="3"></Form.Label>
 					</Form.Group>
 					<Form.Group as={Row} >	
+						<Form.Label column sm="3">{t('diplome.studentAdress')}</Form.Label>						
+						<Col sm="5">
+						  <Form.Control type="password" id="userAddress" ref={(input) => { this.userAddress = input }} />
+						</Col>
+					</Form.Group>
+					<Form.Group as={Row} >	
 						<Form.Label column sm="3">Formation</Form.Label>
 						
-						<Col sm="2">
+						<Col sm="5">
 						  <label>
-							  <select 
+							  <select style={{width: "440px"}}
 								value={this.state.value} 
 								onChange={this.GetValuePair.bind(this)}>
 								{optionTemplate}
@@ -294,9 +300,8 @@ class OldDiplome extends Component {
 						</Col>
 					</Form.Group>
 					<Form.Group as={Row} >	
-						<Form.Label column sm="3">Choisir</Form.Label>
-						
-						<Col sm="2">
+						<Form.Label column sm="3">Choisir</Form.Label>						
+						<Col sm="5">
 						  <label>
 							  <input type="file" id="avatar" accept="image/png, image/jpeg" 
 								multiple="multiple" onChange={this.handleFile} />
@@ -304,12 +309,9 @@ class OldDiplome extends Component {
 						</Col>
 					</Form.Group>
 					<Form.Group as={Row} >	
-						<Form.Label column sm="3">{t('diplome.IPFSkey')}</Form.Label>
-						
-						<Col sm="2">
-						  <label>
-							  <Form.Control type="password" id="mdp" ref={(input) => { this.mdp = input }} />
-							</label>
+						<Form.Label column sm="3">{t('diplome.IPFSkey')}</Form.Label>						
+						<Col sm="5">
+							<Form.Control type="password" id="mdp" ref={(input) => { this.mdp = input }} />
 						</Col>
 					</Form.Group>
 					
