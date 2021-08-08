@@ -1,6 +1,6 @@
 
 const local = {
-    NETWORK_ID: 5777,
+    NETWORK_ID: 1000,
     NETWORK_NAME: 'Ganache',
 
     CHAIN_ID: '0x1691',

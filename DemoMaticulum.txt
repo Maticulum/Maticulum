@@ -1,0 +1,53 @@
+admin2 : 0x3Fb7497eB291Ef633d383829bE11bD971353BFf8
+admin1 : 0xffA883E5a748fb540cc7aC7BEaf1eC9E66704DA7
+student1 : 0xaAb6D3B45938653DB06932b581038Ddf25D9F254
+student2 : 0xc50405e65d9826242f3e338b6eFC81d463b4d26A
+
+1. ouvrir fichier user2 et modifier les noms
+2. en tant qu'admin create user => pour des raisons de 
+RGPD Hash user chiffré (attendre 20 sec)
+3. create diplomas => délai pour les diplômes = 0 sinon jury ne peut valider ERC721 NFT, 
+Pinata IPFS (attendre 20 sec)
+4. TU => Les montrer ou lancer : limitation à 200 pour les diplômes et les users
+5. SC User et NFT + chiffrement user
+6. rechercher avec admin ou admin2
+7. opensea => 0x3Fb7497eB291Ef633d383829bE11bD971353BFf8
+8. polygonscan 0x3Fb7497eB291Ef633d383829bE11bD971353BFf8
+9. chercher 
+10. english ?
+
+A la fin questions :
+? design pattern injection de dépendances
+? temps ok ou pas niveau devs entre demo et tests
+ERC115 pour les étudiants
+multisig pour NFT pas encore intégré
+
+
+pas dire petite 
+ajouter logo
+présentation : pour capter attention diagramme
+organigramme : petite partie token economy, point financier histogramme
+business plan
+business model : 1er avec stratégie model
+page 2 phrase distordue (justifier le texte)
+titres aux graphes
+index
+stratégie commerciale : manque aspect marketing
+risques en parle pas sur sécurité ni sur pourquoi blockchain
+
+manque de fluidité sur démo
+multisig plus multi adresses
+
+partie sécurité compléter les 2 : 
+liste des attaques communes et attaques basiques
+
+lister attaques et dire si on est dans ces cas ou non
+même si n'a pas à le gérer
+
+côté front : travailler UI si a le temps fond écran 
+
+Jeudi 12/08
+12h15 et 13h10
+
+
+
