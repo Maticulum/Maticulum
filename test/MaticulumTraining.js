@@ -117,5 +117,11 @@ contract('MaticulumTraining', accounts => {
       await expectRevert(this.training.validateDiploma(0, student1, { from: student2 }), '!jury');
       await expectRevert(this.training.validateDiploma(0, student1, { from: superAdmin1 }), '!jury');
    });
+
+   it("Diploma can't be validated before training duration", async () => {
+      await this.training.updateTraining(0, "School 1", "Level 1", 350, 2, [], [], { from: schoolAdmin1 });
+
+      await expectRevert.unspecified(this.training.validateDiploma(0, student1, { from: jury1 }));
+   });
      
 });
