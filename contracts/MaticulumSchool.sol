@@ -2,14 +2,13 @@
 pragma solidity 0.8.4;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 import "./openzeppelin/EnumerableSet.sol";
 
 import "./IMaticulum.sol";
 import "./ISchool.sol";
 
 
-contract MaticulumSchool is ISchool, Ownable, ReentrancyGuard {
+contract MaticulumSchool is ISchool, Ownable {
 
    using EnumerableSet for EnumerableSet.AddressSet;
    using EnumerableSet for EnumerableSet.UintSet;
@@ -119,7 +118,7 @@ contract MaticulumSchool is ISchool, Ownable, ReentrancyGuard {
    */
    function addSchool(string memory _name, string memory _town, string memory _country, uint8 _juryValidationThreshold, address _admin1, address _admin2) 
          external payable
-         onlyRegistered nonReentrant {
+         onlyRegistered {
       require(msg.value == schoolRegistrationFees, "MissingFees");
       if (!maticulum.getFeesReceiver().send(msg.value)) {
          revert("Error sending fess");

@@ -119,13 +119,17 @@
       "address": "Student Address",
       "register": "Register",
       "juryValidation": "Juries waiting validation",
-      "diplomasReady": "Diplomas ready"
+      "diplomasReady": "Diplomas ready",
+      "trainingJury": "Jury for trainings",
+      "school": "School",
+      "diplomaWaiting": "Diplomas waiting validation",
+      "waitingValidation": "Waiting validation"
    },
    "student": {
-      "training": "Formation",
-      "status": "Etat",
-      "registered": "Enregistré",
-      "waitingValidation": "En attente de validation"
+      "training": "Training",
+      "status": "Status",
+      "registered": "Registered",
+      "waitingValidation": "Waiting validation"
    },
    "error": {
       "badNetworkTitle": "Bad network",

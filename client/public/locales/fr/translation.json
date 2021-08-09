@@ -118,13 +118,17 @@
       "address": "Adresse étudiant",
       "register": "Enregistrer",
       "juryValidation": "Jurys en attente de validation",
-      "diplomasReady": "Diplomes prêts"
+      "diplomasReady": "Diplomes prêts",
+      "trainingJury": "Jury pour les formations",
+      "school": "Ecole",
+      "diplomaWaiting": "Diplomes en attente de validation",
+      "waitingValidation": "En attente de validation"
    },
    "student": {
-      "training": "Training",
-      "status": "Status",
-      "registered": "Registered",
-      "waitingValidation": "Waiting validation"
+      "training": "Formation",
+      "status": "Etat",
+      "registered": "Enregistré",
+      "waitingValidation": "En attente de validation"
    },
    "error": {
       "badNetworkTitle": "Erreur réseau",

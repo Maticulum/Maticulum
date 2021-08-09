@@ -41,3 +41,4 @@
   - validation du diplome par un ou des jurys
 * Tests de sécurité
   - test d'accès par différents profils
+  - time lock de la durée de la formation pour la validation du diplome

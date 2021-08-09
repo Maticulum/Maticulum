@@ -42,20 +42,19 @@ class JuryHome extends Component {
 
 
    render() {
-      //const { t } = this.props;  
+      const { t } = this.props;  
 
       return (
          <>
             { this.state.trainings && 
                <>
-               <h3>Jury pour les formations</h3>
+               <h3>{t('training.trainingJury')}</h3>
                <Table>
                   <thead>
                      <tr>
-                        <th>School</th>
-                        <th>Training</th>
-                        { /* <th>Students waiting registration validation</th> */ }
-                        <th>Diplomas waiting validation</th>
+                        <th>{t('training.school')}</th>
+                        <th>{t('training.training')}</th>
+                        <th>{t('training.diplomaWaiting')}</th>
                      </tr>
                   </thead>
                   <tbody>
@@ -64,17 +63,10 @@ class JuryHome extends Component {
                            <td>{ training.school }</td>
                            <td>
                               { training.name } &nbsp;
-                              { training.waiting && <Badge bg="secondary warning" className="bg-secondary bg-warning">Waiting validation</Badge> }
+                              { training.waiting && <Badge bg="secondary warning" className="bg-secondary bg-warning">{t('training.waitingValidation')}</Badge> }
                            </td>
-{ /*                           <td>
-                              { training.count > 0 ?
-                                 <a href={`/trainings/${training.id}/registration`}>{ training.count }</a> :
-                                 training.count
-                              }
-                           </td>
-                           */ }
                            <td>
-                              <a href={`/trainings/${training.id}/validation`}>Validate</a>
+                              <a href={`/trainings/${training.id}/validation`}>{t('button.validate')}}</a>
                            </td>
                         </tr> 
                      )}
