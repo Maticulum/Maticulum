@@ -1,11 +1,14 @@
 
+body {
+   background-color:#edfaeb; 
+}
+
 .next {
   margin-left: 10px;
 }
 
 .main {
   margin: 1em;
-   background-color:rgb(0,204,204); 
   /* background: no-repeat url('https://gateway.pinata.cloud/ipfs/QmYovH9rKcDnyX1BRUg4eK1KkYJpJWeCE9Zpyb9p9S4owJ/maticulumBackground.png');  */
 }
 
