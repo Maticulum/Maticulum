@@ -390,6 +390,7 @@ contract MaticulumTraining is Ownable {
       require(block.timestamp >= trainingStudentRegistrationDates[_trainingId][_user] + (trainings[_trainingId].duration * 3600 ), "StillOngoingTraining");
 
       DiplomaValidation storage validation = diplomaUserValidations[_trainingId][_user];
+      require(!validation.juries.contains(msg.sender));
       validation.juries.add(msg.sender);
 
       uint256 count = validation.juries.length();

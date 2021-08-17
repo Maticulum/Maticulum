@@ -82,7 +82,7 @@ contract MaticulumNFT is ERC721URIStorage, Ownable {
     * @param _schoolAddress     address of the MaticulumSchool smart contract
     * @param _trainingAddress   address of the MaticulumTraining smart contract
     */
-    function registerSchoolTrainingContract(address _schoolAddress, address _trainingAddress) public{
+    function registerSchoolTrainingContract(address _schoolAddress, address _trainingAddress) public onlyOwner {
         school = ISchool(_schoolAddress);
         training = MaticulumTraining(_trainingAddress);
     }

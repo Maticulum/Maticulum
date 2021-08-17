@@ -216,11 +216,11 @@ contract('MaticulumNFT', accounts => {
 		{ from: owner });
 	
 	const superAdmin = accounts[0];
-    const superAdmin2 = '0x487F7092D1866b7426514a543651a70C4F2E3dbB';
-    const schoolAdmin = '0xffA883E5a748fb540cc7aC7BEaf1eC9E66704DA7';
-    const schoolAdmin2 = '0x3Fb7497eB291Ef633d383829bE11bD971353BFf8';
-    const jury = '0xc12C11E57Ecb2AD9B498b539A7CFA0D2e96C5f6C';
-    const student1 = '0xaAb6D3B45938653DB06932b581038Ddf25D9F254';
+    const superAdmin2 = accounts[1];
+    const schoolAdmin = accounts[2];
+    const schoolAdmin2 = accounts[3];
+    const jury = accounts[4];
+    const student1 = accounts[5];
 
     await this.MaticulumContract.addUser(superAdmin, 0x03);
     await this.MaticulumContract.addUser(superAdmin2, 0x03);

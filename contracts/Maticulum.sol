@@ -96,7 +96,7 @@ contract Maticulum is IMaticulum, Ownable {
     * @param _hash crypted datas of the user (name, firstname,country date, birth date, email, phone, mobile phone)
     * @param _role address of the user
     */
-   function registerUserHash(address _userAdress, string memory _hash, uint8 _role) public {
+   function registerUserHash(address _userAdress, string memory _hash, uint8 _role) public onlyOwner {
       require(bytes(_hash).length < 1000, "hashUserLength>1000");
       users[_userAdress] = UserHash(_hash, _role);
    }
@@ -104,7 +104,7 @@ contract Maticulum is IMaticulum, Ownable {
    /** register a list of user with crypted datas and their role and address
     * @param _users contains a list of the addresses, the crypted datas and the role
     */
-   function registerUsersHashes(UserHashAdress[] memory _users) external {
+   function registerUsersHashes(UserHashAdress[] memory _users) external onlyOwner {
        require(_users.length <= maxUserstoRegister,">maxUserstoRegister");
        for(uint i =0;i < _users.length;i++){
             registerUserHash(_users[i].userAdress, _users[i].hash, _users[i].role );
